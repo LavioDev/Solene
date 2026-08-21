@@ -112,6 +112,12 @@ export default {
     language: 'Ngôn ngữ',
     all: 'Tất cả',
   },
+  tabs: {
+    refresh: 'Làm mới',
+    closeOther: 'Đóng các tab khác',
+    closeAll: 'Đóng toàn bộ',
+    maximizeContent: 'Toàn màn hình nội dung',
+  },
   upload: {
     dragOrClick: 'Nhấp hoặc kéo thả ảnh vào đây',
     supportedFormats: 'Hỗ trợ JPG, PNG, WEBP, GIF',

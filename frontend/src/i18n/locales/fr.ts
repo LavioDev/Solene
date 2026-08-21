@@ -112,6 +112,12 @@ export default {
     language: 'Langue',
     all: 'Tous',
   },
+  tabs: {
+    refresh: 'Actualiser',
+    closeOther: 'Fermer les autres',
+    closeAll: 'Fermer tout',
+    maximizeContent: 'Plein écran contenu',
+  },
   upload: {
     dragOrClick: 'Cliquez ou glissez-déposez vos images ici',
     supportedFormats: 'Supporte JPG, PNG, WEBP, GIF',

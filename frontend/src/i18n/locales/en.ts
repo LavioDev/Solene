@@ -112,6 +112,12 @@ export default {
     language: 'Language',
     all: 'All',
   },
+  tabs: {
+    refresh: 'Refresh',
+    closeOther: 'Close other tabs',
+    closeAll: 'Close all tabs',
+    maximizeContent: 'Maximize content',
+  },
   upload: {
     dragOrClick: 'Click or drag & drop images here',
     supportedFormats: 'Supports JPG, PNG, WEBP, GIF',

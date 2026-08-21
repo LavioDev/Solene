@@ -112,6 +112,12 @@ export default {
     language: '语言',
     all: '全部',
   },
+  tabs: {
+    refresh: '刷新当前页',
+    closeOther: '关闭其他标签',
+    closeAll: '关闭全部标签',
+    maximizeContent: '内容全屏',
+  },
   upload: {
     dragOrClick: '点击或拖拽图片至此处',
     supportedFormats: '支持 JPG, PNG, WEBP, GIF',
