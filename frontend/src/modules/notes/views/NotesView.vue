@@ -175,7 +175,7 @@ onMounted(fetchNotes)
   <div class="flex gap-6 items-start select-none pb-10">
 
     <!-- ─── Left Panel (Bọc toàn bộ trong 1 div duy nhất) ─── -->
-    <div class="w-60 shrink-0 sticky top-6 bg-white border border-border rounded-2xl p-4 shadow-card space-y-4">
+    <div class="w-60 shrink-0 sticky top-6 bg-white border border-border rounded-2xl p-5 shadow-card space-y-4">
       <!-- Title -->
       <div class="flex items-center gap-2 pb-3 border-b border-border/60">
         <Heart class="w-4 h-4 text-violet-500 shrink-0" />
@@ -241,11 +241,11 @@ onMounted(fetchNotes)
       </AppCard>
 
       <!-- Notes Grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         <div
           v-for="note in filteredNotes"
           :key="note.id"
-          class="bg-white border border-border rounded-xl shadow-card hover:shadow-pop transition-all overflow-hidden flex flex-col group cursor-pointer"
+          class="bg-white border border-border rounded-2xl shadow-card hover:shadow-pop transition-all overflow-hidden flex flex-col group cursor-pointer"
           @click="openEditModal(note)"
         >
           <!-- Image Header -->
@@ -261,7 +261,7 @@ onMounted(fetchNotes)
             <!-- Multiple Images Badge -->
             <div
               v-if="note.images && note.images.length > 1"
-              class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs"
+              class="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs"
             >
               <ImageIcon class="w-3 h-3" />
               <span>+{{ note.images.length - 1 }}</span>
@@ -271,7 +271,7 @@ onMounted(fetchNotes)
           <div v-else class="h-1.5 w-full bg-gradient-to-r from-violet-100 to-violet-50" />
 
           <!-- Body -->
-          <div class="p-4 flex-1 space-y-2">
+          <div class="p-5 flex-1 space-y-2.5">
             <div class="flex items-start justify-between gap-2">
               <h3 class="text-sm font-semibold text-ink leading-snug group-hover:text-violet-700 transition-colors line-clamp-2 flex-1">
                 {{ note.title }}
@@ -287,7 +287,7 @@ onMounted(fetchNotes)
           </div>
 
           <!-- Footer -->
-          <div class="px-4 py-2.5 border-t border-border/60 bg-surface-subtle/40 flex items-center justify-between">
+          <div class="px-5 py-3 border-t border-border/60 bg-surface-subtle/40 flex items-center justify-between">
             <span class="text-[10px] text-ink-faint font-mono flex items-center gap-1">
               <CalendarIcon class="w-3 h-3 text-violet-300" />
               {{ formatDate(note.created_at) }}

@@ -385,11 +385,11 @@ async function confirmDeleteEvent() {
   <div class="h-full w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden select-none">
 
     <!-- Header Toolbar — slim, quiet -->
-    <div class="h-13 px-5 border-b border-border/60 flex items-center justify-between bg-white shrink-0 py-4">
+    <div class="h-14 px-6 border-b border-border/60 flex items-center justify-between bg-white shrink-0">
 
       <!-- Left: Title + loading indicator -->
       <div class="flex items-center gap-2.5">
-        <h2 class="text-sm sm:text-base font-medium text-ink capitalize tracking-tight">
+        <h2 class="text-sm sm:text-base font-semibold text-ink capitalize tracking-tight">
           {{ headerLabel }}
         </h2>
         <span
@@ -478,7 +478,7 @@ async function confirmDeleteEvent() {
           <div
             v-for="wd in weekDays"
             :key="wd"
-            class="py-2 text-center text-xs font-normal uppercase tracking-wider text-ink-muted"
+            class="py-2.5 text-center text-xs font-medium uppercase tracking-wider text-ink-muted"
           >
             {{ wd }}
           </div>
@@ -489,9 +489,9 @@ async function confirmDeleteEvent() {
           <div
             v-for="(day, idx) in calendarDays"
             :key="idx"
-            class="p-2 flex flex-col gap-1 transition-colors cursor-pointer group relative overflow-hidden"
+            class="p-2.5 flex flex-col gap-1.5 transition-colors cursor-pointer group relative overflow-hidden"
             :class="[
-              viewMode === 'week' ? 'min-h-[200px]' : 'min-h-[92px]',
+              viewMode === 'week' ? 'min-h-[220px]' : 'min-h-[105px]',
               !day.isCurrentMonth && viewMode === 'month'
                 ? 'bg-surface-subtle/40'
                 : 'bg-white hover:bg-violet-50/30',
