@@ -1,0 +1,49 @@
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import type { EventOccurrence } from '@/modules/calendar/types'
+import { Sparkles } from 'lucide-vue-next'
+
+interface Props {
+  occurrences: EventOccurrence[]
+  todayDateStr: string
+  formatDisplayDate: (dateStr: string) => string
+}
+
+defineProps<Props>()
+
+const { t } = useI18n()
+</script>
+
+<template>
+  <div class="p-5 rounded-2xl bg-white border border-border/60 shadow-2xs space-y-3">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-border/40 pb-3">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-ink font-mono flex items-center gap-1.5">
+        <Sparkles class="w-3.5 h-3.5 text-amber-500" />
+        <span>{{ t('home.todayEvents.title') }}</span>
+      </h2>
+      <span class="text-[11px] text-ink-faint font-mono">{{ formatDisplayDate(todayDateStr) }}</span>
+    </div>
+
+    <!-- Today's List -->
+    <div v-if="occurrences.length > 0" class="space-y-2 pt-1">
+      <div
+        v-for="occ in occurrences"
+        :key="occ.event_id"
+        class="p-2.5 rounded-xl hover:bg-surface-subtle transition-colors flex items-start gap-2.5"
+      >
+        <div class="w-2 h-2 rounded-full bg-violet-600 mt-1 shrink-0"></div>
+        <div class="min-w-0 flex-1">
+          <p class="text-xs font-bold text-ink truncate">{{ occ.title }}</p>
+          <p v-if="occ.milestone_info" class="text-[11px] text-ink-muted mt-0.5 line-clamp-1">
+            {{ occ.milestone_info }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <p v-else class="text-xs text-ink-faint py-4 text-center">
+      {{ t('home.todayEvents.empty') }}
+    </p>
+  </div>
+</template>

@@ -33,8 +33,14 @@ class User(Base):
         default="admin",
         nullable=False,
     )
+    avatar_url: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+        default=None,
+    )
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
         nullable=False,
     )
+

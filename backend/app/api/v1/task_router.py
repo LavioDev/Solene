@@ -7,7 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.core.database import get_async_db
 from app.modules.auth.models import User
-from app.modules.tasks.schemas import TaskCreate, TaskOut, TaskToggleStatus, TaskUpdate
+from app.modules.tasks.schemas import (
+    PartnerActiveStatusOut,
+    TaskCreate,
+    TaskOut,
+    TaskToggleStatus,
+    TaskUpdate,
+)
 from app.modules.tasks.service import TaskService
 
 router = APIRouter(prefix="/tasks", tags=["Tasks & To-Do List"])
@@ -24,7 +30,17 @@ async def create_task(
     return task
 
 
+@router.get("/partner-active", response_model=PartnerActiveStatusOut)
+async def get_partner_active_task(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_db),
+) -> PartnerActiveStatusOut:
+    """Get active task and busy status for current user's partner in active couple."""
+    return await TaskService.get_partner_active_status(session=session, user_id=current_user.id)
+
+
 @router.get("", response_model=List[TaskOut])
+
 async def list_tasks(
     is_completed: Optional[bool] = Query(None, description="Filter by completion status"),
     start_from: Optional[datetime] = Query(None, description="Filter tasks starting after or at this datetime"),

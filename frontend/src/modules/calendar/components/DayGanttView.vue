@@ -353,10 +353,10 @@ defineExpose({
     <!-- Main 2-Pane Split Layout (Left Fixed Task Pane + Right Timeline Track Pane) -->
     <div class="flex-1 flex overflow-hidden">
 
-      <!-- PANE 1: Left Fixed Task Column (Physically separate, never overlaps, never covers timeline) -->
-      <div class="w-80 shrink-0 flex flex-col border-r border-border/80 bg-white z-20 shadow-[2px_0_6px_-2px_rgba(0,0,0,0.06)]">
+      <!-- PANE 1: Left Fixed Task Column -->
+      <div class="w-64 sm:w-72 shrink-0 flex flex-col border-r border-border/80 bg-white z-20 shadow-[1px_0_4px_-1px_rgba(0,0,0,0.04)]">
         <!-- Left Header -->
-        <div class="h-10 px-4 flex items-center border-b border-border/80 bg-surface-subtle text-xs font-semibold text-ink-muted shrink-0">
+        <div class="h-10 px-4 flex items-center border-b border-border/80 bg-surface-subtle/50 text-[11px] font-bold text-ink-faint uppercase tracking-wider shrink-0">
           {{ t('calendar.gantt.taskColumn') }}
         </div>
 
@@ -369,23 +369,23 @@ defineExpose({
           <!-- Empty state -->
           <div
             v-if="tasks.length === 0"
-            class="h-64 flex flex-col items-center justify-center gap-2 text-center px-4"
+            class="h-56 flex flex-col items-center justify-center gap-2 text-center px-4"
           >
-            <div class="w-9 h-9 rounded-2xl bg-violet-50 flex items-center justify-center text-violet-600 border border-violet-100">
-              <Clock class="w-4.5 h-4.5" />
+            <div class="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center text-violet-500 border border-violet-100/70">
+              <Clock class="w-4 h-4" />
             </div>
             <div>
               <p class="text-xs font-semibold text-ink">{{ t('calendar.gantt.noTasks') }}</p>
-              <p class="text-[11px] text-ink-muted mt-0.5">{{ activeDateStr }}</p>
+              <p class="text-[10px] text-ink-faint mt-0.5 font-mono">{{ activeDateStr }}</p>
             </div>
           </div>
 
-          <!-- Task Rows -->
+          <!-- Task Rows (Clean minimalist h-12 height) -->
           <div
             v-for="task in tasks"
             :key="task.id"
-            class="h-14 px-4 flex items-center gap-2.5 hover:bg-violet-50/20 transition-colors group"
-            :class="task.is_completed ? 'bg-surface-subtle/20' : ''"
+            class="h-12 px-3.5 flex items-center gap-2 hover:bg-violet-50/30 transition-colors group"
+            :class="task.is_completed ? 'bg-surface-subtle/30' : ''"
           >
             <!-- Toggle Complete Checkbox -->
             <button
@@ -395,50 +395,48 @@ defineExpose({
               :title="task.is_completed ? t('calendar.tasks.completed') : t('calendar.tasks.pending')"
             >
               <CheckSquare v-if="task.is_completed" class="w-4 h-4 text-emerald-600" />
-              <Square v-else class="w-4 h-4" />
+              <Square v-else class="w-4 h-4 text-ink-muted hover:text-violet-600" />
             </button>
 
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 truncate">
                 <span
-                  class="text-sm font-semibold text-ink truncate"
-                  :class="task.is_completed ? 'line-through text-ink-muted' : ''"
+                  class="text-sm font-semibold text-ink truncate leading-tight"
+                  :class="task.is_completed ? 'line-through text-ink-faint' : ''"
                 >
                   {{ task.title }}
                 </span>
               </div>
 
-              <div class="flex items-center gap-2 text-[11px] text-ink-muted font-mono mt-0.5">
+              <!-- <div class="flex items-center gap-1.5 text-[10px] text-ink-faint font-mono mt-0.5 leading-none">
                 <span v-if="task.start_time || task.end_time" class="flex items-center gap-1">
-                  <Clock class="w-3 h-3 text-violet-500" />
+                  <Clock class="w-2.5 h-2.5 text-violet-500" />
                   {{ formatTimeOnly(task.start_time) }}
                   <template v-if="task.end_time"> - {{ formatTimeOnly(task.end_time) }}</template>
                 </span>
                 <span v-else>{{ t('calendar.gantt.allDay') }}</span>
-              </div>
+              </div> -->
             </div>
 
-            <!-- Action buttons on hover (Edit on the left, Delete on the right) -->
+            <!-- Action buttons on hover -->
             <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all shrink-0">
-              <!-- Edit button to the left of delete -->
               <button
                 type="button"
                 @click="openEditTaskModal(task)"
-                class="p-1 rounded text-ink-faint hover:text-violet-600 hover:bg-violet-50 transition-all cursor-pointer shrink-0"
+                class="p-1 rounded-md text-ink-faint hover:text-violet-600 hover:bg-violet-50 transition-all cursor-pointer shrink-0"
                 :title="t('calendar.tasks.editTask')"
               >
-                <Pencil class="w-3.5 h-3.5" />
+                <Pencil class="w-3 h-3" />
               </button>
 
-              <!-- Delete button -->
               <button
                 type="button"
                 @click="deleteTask(task)"
                 :disabled="deletingTaskId === task.id"
-                class="p-1 rounded text-ink-faint hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer shrink-0"
+                class="p-1 rounded-md text-ink-faint hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer shrink-0"
                 :title="t('common.delete')"
               >
-                <Trash2 class="w-3.5 h-3.5" />
+                <Trash2 class="w-3 h-3" />
               </button>
             </div>
           </div>
@@ -454,15 +452,15 @@ defineExpose({
       >
         <!-- Timeline Header Axis (Sticky top) -->
         <div
-          class="h-10 border-b border-border/80 bg-surface-subtle text-xs font-semibold text-ink-muted sticky top-0 z-10 shrink-0 flex items-center px-4 gantt-header-axis"
+          class="h-10 border-b border-border/80 bg-surface-subtle/50 text-[11px] font-mono text-ink-muted sticky top-0 z-10 shrink-0 flex items-center px-4 gantt-header-axis"
           :style="{ width: timelineTrackWidth, minWidth: timelineTrackWidth }"
         >
-          <div class="relative w-full h-5">
+          <div class="relative w-full h-4 flex items-center">
             <div
               v-for="h in timeMarks"
               :key="h"
-              class="absolute -translate-x-1/2 text-[11px] font-mono select-none"
-              :class="h % 2 === 0 ? 'text-ink font-semibold' : 'text-ink-muted/70 font-normal'"
+              class="absolute -translate-x-1/2 select-none"
+              :class="h % 2 === 0 ? 'text-ink/80 font-semibold' : 'text-ink-faint font-normal'"
               :style="{ left: `${(h / 24) * 100}%` }"
             >
               {{ String(h).padStart(2, '0') }}:00
@@ -484,12 +482,14 @@ defineExpose({
               :class="h % 2 === 0 ? 'border-border/40' : 'border-border/20 border-dashed'"
               :style="{ left: `${(h / 24) * 100}%` }"
             />
-            <!-- Current Time Indicator Vertical Red Line -->
+            <!-- Current Time Indicator Vertical Red Line with Dot -->
             <div
               v-if="isToday"
-              class="absolute top-0 bottom-0 w-px bg-rose-500/90 z-10 border-l border-rose-500 border-dashed"
+              class="absolute top-0 bottom-0 w-px bg-rose-500 z-10"
               :style="{ left: `${currentTimePercent}%` }"
-            />
+            >
+              <div class="w-2 h-2 rounded-full bg-rose-500 -ml-[3.5px] -mt-0.5 ring-2 ring-white shadow-xs" />
+            </div>
           </div>
 
           <!-- Loading state -->
@@ -500,28 +500,25 @@ defineExpose({
           <!-- Empty state in Timeline -->
           <div
             v-else-if="tasks.length === 0"
-            class="h-64 flex flex-col items-center justify-center gap-3 text-center px-4"
-          >
-            <AppButton size="sm" @click="emit('addTask', activeDateStr)" class="!bg-violet-600 hover:!bg-violet-700 text-white font-medium">
-              {{ t('calendar.gantt.addTask') }}
-            </AppButton>
-          </div>
+            class="h-56"
+          />
 
-          <!-- Task Rows in Timeline (Exact h-14 height matching Left Pane) -->
+          <!-- Task Rows in Timeline (Exact h-12 height matching Left Pane) -->
           <div
             v-for="task in tasks"
             :key="task.id"
-            class="h-14 px-4 flex items-center hover:bg-violet-50/20 transition-colors relative"
-            :class="task.is_completed ? 'bg-surface-subtle/20' : ''"
+            class="h-12 px-4 flex items-center hover:bg-violet-50/30 transition-colors relative"
+            :class="task.is_completed ? 'bg-surface-subtle/30' : ''"
           >
-            <div class="relative w-full h-8 flex items-center gantt-timeline-track">
+            <div class="relative w-full h-6 flex items-center gantt-timeline-track">
               <div
-                class="absolute h-3.5 rounded-full transition-all shadow-2xs hover:shadow-md hover:scale-y-125 cursor-pointer select-none"
+                class="absolute h-5 rounded-md transition-all shadow-2xs hover:shadow-md cursor-pointer select-none flex items-center px-2 overflow-hidden text-[10px] font-medium"
                 :class="getPriorityBarClass(task.priority, task.is_completed)"
                 :style="getGanttBarStyle(task)"
                 :title="`${task.title} (${formatTimeOnly(task.start_time)} - ${formatTimeOnly(task.end_time)})\n${task.content || ''}`"
                 @click="openEditTaskModal(task)"
-              />
+              >
+              </div>
             </div>
           </div>
         </div>

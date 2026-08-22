@@ -87,3 +87,43 @@ class TaskService:
             return False
         await repo.delete_task(task)
         return True
+
+    @staticmethod
+    async def get_partner_active_status(
+        session: AsyncSession,
+        user_id: uuid.UUID,
+    ):
+        from datetime import timezone
+        from app.modules.couples.repository import CoupleRepository
+        from app.modules.couples.schemas import UserPartnerSummary
+        from app.modules.tasks.schemas import PartnerActiveStatusOut, TaskOut
+
+        couple_repo = CoupleRepository(session)
+        couple = await couple_repo.get_by_user_id(user_id=user_id, status="active")
+        if not couple:
+            return PartnerActiveStatusOut(in_couple=False, is_busy=False)
+
+        partner_obj = couple.user2 if couple.user1_id == user_id else couple.user1
+        if not partner_obj:
+            return PartnerActiveStatusOut(in_couple=True, partner=None, is_busy=False)
+
+        partner_summary = UserPartnerSummary.model_validate(partner_obj)
+        now = datetime.now(timezone.utc)
+        task_repo = TaskRepository(session)
+        active_task = await task_repo.get_current_active_task_for_user(user_id=partner_obj.id, now=now)
+
+        if active_task:
+            return PartnerActiveStatusOut(
+                in_couple=True,
+                partner=partner_summary,
+                is_busy=True,
+                active_task=TaskOut.model_validate(active_task),
+            )
+
+        return PartnerActiveStatusOut(
+            in_couple=True,
+            partner=partner_summary,
+            is_busy=False,
+            active_task=None,
+        )
+

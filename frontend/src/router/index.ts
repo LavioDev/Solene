@@ -29,8 +29,24 @@ const routes: RouteRecordRaw[] = [
         name: 'Notes',
         component: () => import('@/modules/notes/views/NotesView.vue'),
       },
+      {
+        path: 'users',
+        name: 'Users',
+        component: () => import('@/modules/users/views/UsersView.vue'),
+      },
+      {
+        path: 'couples',
+        name: 'Couples',
+        component: () => import('@/modules/couples/views/CouplesView.vue'),
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/modules/profile/views/ProfileView.vue'),
+      },
     ],
   },
+
   {
     path: '/:pathMatch(.*)*',
     redirect: '/',

@@ -11,6 +11,7 @@ sys.path.append(str(BASE_DIR))
 from app.core.config import settings
 from app.core.database import Base
 from app.modules.auth.models import User
+from app.modules.couples.models import Couple
 from app.modules.devices.models import Device, TelemetryLog
 from app.modules.events.models import SpecialEvent
 from app.modules.notes.models import UserNote

@@ -618,36 +618,40 @@ async function confirmDeleteEvent() {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden select-none">
+  <div class="space-y-3 select-none">
 
-    <!-- Header Toolbar — with Sub-Nav (Calendar Grid vs Day-Gantt) -->
-    <div class="h-14 px-6 border-b border-border/60 flex items-center justify-between bg-white shrink-0">
+    <!-- Top Sub-Nav Switcher (size: sm) placed above table card -->
+    <div class="flex items-center justify-between gap-3">
+      <div class="inline-flex items-center gap-1.5 p-1 bg-white border border-border rounded-2xl shadow-card">
+        <button
+          type="button"
+          @click="mainViewMode = 'calendar'"
+          class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+          :class="mainViewMode === 'calendar' ? 'bg-violet-50 text-violet-700 font-bold shadow-2xs' : 'text-ink-muted hover:text-ink hover:bg-surface-raised'"
+        >
+          <CalendarIcon class="w-4 h-4" />
+          <span>{{ t('calendar.subnav.calendar') }}</span>
+        </button>
+        <button
+          type="button"
+          @click="mainViewMode = 'gantt'"
+          class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+          :class="mainViewMode === 'gantt' ? 'bg-violet-50 text-violet-700 font-bold shadow-2xs' : 'text-ink-muted hover:text-ink hover:bg-surface-raised'"
+        >
+          <Clock class="w-4 h-4" />
+          <span>{{ t('calendar.subnav.gantt') }}</span>
+        </button>
+      </div>
+    </div>
 
-      <!-- Left: Sub-Nav Switcher + Title / Loading indicator -->
-      <div class="flex items-center gap-4">
-        <!-- Sub-Nav Switcher (Calendar Grid vs Day-Gantt) -->
-        <div class="flex items-center gap-1 p-0.5 bg-surface-subtle border border-border/70 rounded-xl">
-          <button
-            type="button"
-            @click="mainViewMode = 'calendar'"
-            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
-            :class="mainViewMode === 'calendar' ? 'bg-white text-violet-700 shadow-2xs' : 'text-ink-muted hover:text-ink'"
-          >
-            <CalendarIcon class="w-3.5 h-3.5" />
-            <span>{{ t('calendar.subnav.calendar') }}</span>
-          </button>
-          <button
-            type="button"
-            @click="mainViewMode = 'gantt'"
-            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
-            :class="mainViewMode === 'gantt' ? 'bg-white text-violet-700 shadow-2xs' : 'text-ink-muted hover:text-ink'"
-          >
-            <Clock class="w-3.5 h-3.5" />
-            <span>{{ t('calendar.subnav.gantt') }}</span>
-          </button>
-        </div>
+    <!-- Main Calendar & Gantt Card Container (Expanded to fill available viewport height) -->
+    <div class="w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[calc(100vh-210px)] h-[calc(100vh-210px)]">
 
-        <div class="flex items-center gap-2.5 pl-2 border-l border-border/60">
+      <!-- Header Toolbar inside card -->
+      <div class="h-14 px-6 border-b border-border/60 flex items-center justify-between bg-white shrink-0">
+
+        <!-- Left: Title / Loading indicator -->
+        <div class="flex items-center gap-2.5">
           <h2 class="text-sm sm:text-base font-semibold text-ink capitalize tracking-tight">
             {{ mainViewMode === 'calendar' ? headerLabel : ganttHeaderLabel }}
           </h2>
@@ -658,7 +662,6 @@ async function confirmDeleteEvent() {
             {{ t('calendar.loading') }}
           </span>
         </div>
-      </div>
 
       <!-- Right: Calendar Controls (Only shown in Calendar mode) -->
       <div v-if="mainViewMode === 'calendar'" class="flex items-center gap-1.5">
@@ -878,6 +881,7 @@ async function confirmDeleteEvent() {
       />
     </div>
 
+    </div>
 
     <!-- Modal 1: Auto-Generate Rules (Create or Edit) -->
     <AutoRuleModal

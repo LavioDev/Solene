@@ -12,6 +12,8 @@ import {
   Home,
   Calendar as CalendarIcon,
   StickyNote,
+  Users as UsersIcon,
+  Heart,
 } from 'lucide-vue-next'
 import { useUiStore } from '@/stores/uiStore'
 import { useAuthStore } from '@/stores/authStore'
@@ -32,6 +34,12 @@ const pageTitle = computed(() => {
       return t('nav.calendar')
     case 'Notes':
       return t('nav.notes')
+    case 'Users':
+      return t('nav.users')
+    case 'Couples':
+      return t('nav.couples')
+    case 'Profile':
+      return t('nav.profile')
     default:
       return 'Solène'
   }
@@ -43,11 +51,20 @@ const isSearchOpen = ref(false)
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const searchContainerRef = ref<HTMLElement | null>(null)
 
-const navItems = computed(() => [
-  { name: t('nav.home'),     path: '/',         icon: Home,         desc: t('nav.homeDesc') },
-  { name: t('nav.calendar'), path: '/calendar', icon: CalendarIcon, desc: t('nav.calendarDesc') },
-  { name: t('nav.notes'),    path: '/notes',    icon: StickyNote,   desc: t('nav.notesDesc') },
-])
+const navItems = computed(() => {
+  const items = [
+    { name: t('nav.home'),     path: '/',         icon: Home,         desc: t('nav.homeDesc') },
+    { name: t('nav.calendar'), path: '/calendar', icon: CalendarIcon, desc: t('nav.calendarDesc') },
+    { name: t('nav.notes'),    path: '/notes',    icon: StickyNote,   desc: t('nav.notesDesc') },
+    { name: t('nav.couples'),  path: '/couples',  icon: Heart,        desc: t('nav.couplesDesc') },
+  ]
+  if (authStore.user?.role === 'admin') {
+    items.push({ name: t('nav.users'), path: '/users', icon: UsersIcon, desc: t('nav.usersDesc') })
+  }
+  items.push({ name: t('nav.profile'), path: '/profile', icon: UserIcon, desc: t('nav.profileDesc') })
+  return items
+})
+
 
 const filteredNavItems = computed(() => {
   if (!searchQuery.value.trim()) return navItems.value
@@ -226,9 +243,15 @@ onUnmounted(() => {
           type="button"
           @click.stop="showUserMenu = !showUserMenu"
           :title="authStore.user?.full_name || t('nav.account')"
-          class="w-8 h-8 rounded-full bg-violet-100 hover:bg-violet-200 border border-violet-200 flex items-center justify-center text-violet-700 font-bold text-xs transition-colors cursor-pointer"
+          class="w-8 h-8 rounded-full bg-violet-100 hover:bg-violet-200 border border-violet-200 flex items-center justify-center text-violet-700 font-bold text-xs transition-colors cursor-pointer overflow-hidden shadow-2xs"
         >
-          <UserIcon class="w-4 h-4" />
+          <img
+            v-if="authStore.user?.avatar_url"
+            :src="authStore.user.avatar_url"
+            :alt="authStore.user.full_name"
+            class="w-full h-full object-cover"
+          />
+          <UserIcon v-else class="w-4 h-4" />
         </button>
 
         <!-- User Popover Card -->
@@ -245,15 +268,36 @@ onUnmounted(() => {
             class="absolute right-0 top-full mt-2 w-56 p-3 bg-white/95 backdrop-blur-md border border-border rounded-2xl shadow-xl space-y-3 z-50"
           >
             <!-- User Info Header -->
-            <div class="flex items-center gap-2.5 pb-2.5 border-b border-border/60">
-              <div class="w-8 h-8 rounded-xl bg-violet-100 border border-violet-200 flex items-center justify-center text-violet-700 font-bold text-xs shrink-0">
-                <UserIcon class="w-4 h-4" />
+            <router-link
+              to="/profile"
+              @click="showUserMenu = false"
+              class="flex items-center gap-2.5 pb-2.5 border-b border-border/60 hover:opacity-80 transition-opacity group cursor-pointer"
+            >
+              <div class="w-8 h-8 rounded-xl bg-violet-100 border border-violet-200 flex items-center justify-center text-violet-700 font-bold text-xs shrink-0 group-hover:bg-violet-200 transition-colors overflow-hidden">
+                <img
+                  v-if="authStore.user.avatar_url"
+                  :src="authStore.user.avatar_url"
+                  :alt="authStore.user.full_name"
+                  class="w-full h-full object-cover"
+                />
+                <UserIcon v-else class="w-4 h-4" />
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-bold text-ink truncate leading-tight">{{ authStore.user.full_name }}</p>
+                <p class="text-xs font-bold text-ink truncate leading-tight group-hover:text-violet-700 transition-colors">{{ authStore.user.full_name }}</p>
                 <p class="text-[10px] text-ink-muted font-mono truncate mt-0.5">{{ authStore.user.email }}</p>
               </div>
-            </div>
+            </router-link>
+
+
+            <!-- Profile Page Link Button -->
+            <button
+              type="button"
+              @click="navigateTo('/profile')"
+              class="w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium text-ink hover:bg-violet-50 hover:text-violet-700 transition-colors cursor-pointer text-left"
+            >
+              <UserIcon class="w-3.5 h-3.5 text-ink-muted group-hover:text-violet-600" />
+              <span>{{ t('nav.profile') }}</span>
+            </button>
 
             <!-- Logout Action -->
             <button
@@ -266,6 +310,7 @@ onUnmounted(() => {
             </button>
           </div>
         </transition>
+
       </div>
 
     </div>

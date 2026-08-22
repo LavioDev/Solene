@@ -54,3 +54,31 @@ class TaskRepository(BaseRepository[Task, TaskCreate, TaskUpdate]):
     async def delete_task(self, task: Task) -> None:
         await self.session.delete(task)
         await self.session.commit()
+
+    async def get_current_active_task_for_user(self, user_id: uuid.UUID, now: datetime) -> Optional[Task]:
+        from sqlalchemy import case, or_
+        priority_order = case(
+            {
+                "urgent": 1,
+                "high": 2,
+                "medium": 3,
+                "low": 4,
+            },
+            value=Task.priority,
+            else_=5,
+        )
+        stmt = (
+            select(Task)
+            .where(
+                Task.user_id == user_id,
+                Task.is_completed == False,
+                Task.start_time.is_not(None),
+                Task.start_time <= now,
+                or_(Task.end_time.is_(None), Task.end_time >= now),
+            )
+            .order_by(priority_order, Task.start_time.desc())
+            .limit(1)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().first()
+

@@ -7,6 +7,9 @@ import {
   Home,
   Calendar as CalendarIcon,
   StickyNote,
+  Users as UsersIcon,
+  User as UserIcon,
+  Heart,
   X,
   RotateCw,
   MoreVertical,
@@ -30,6 +33,9 @@ const routeConfig: Record<string, { title: string; icon: string; name: string }>
   '/': { title: 'nav.home', icon: 'Home', name: 'Home' },
   '/calendar': { title: 'nav.calendar', icon: 'Calendar', name: 'Calendar' },
   '/notes': { title: 'nav.notes', icon: 'StickyNote', name: 'Notes' },
+  '/users': { title: 'nav.users', icon: 'Users', name: 'Users' },
+  '/couples': { title: 'nav.couples', icon: 'Heart', name: 'Couples' },
+  '/profile': { title: 'nav.profile', icon: 'User', name: 'Profile' },
 }
 
 function getIconComponent(iconName?: string) {
@@ -38,10 +44,17 @@ function getIconComponent(iconName?: string) {
       return CalendarIcon
     case 'StickyNote':
       return StickyNote
+    case 'Users':
+      return UsersIcon
+    case 'Heart':
+      return Heart
+    case 'User':
+      return UserIcon
     default:
       return Home
   }
 }
+
 
 // Sync route with tabStore
 watch(

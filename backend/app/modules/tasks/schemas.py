@@ -47,3 +47,16 @@ class TaskOut(TaskBase):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PartnerActiveStatusOut(BaseModel):
+    in_couple: bool
+    partner: Optional["UserPartnerSummary"] = None
+    is_busy: bool = False
+    active_task: Optional[TaskOut] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+from app.modules.couples.schemas import UserPartnerSummary  # noqa: E402
+

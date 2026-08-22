@@ -8,8 +8,11 @@ import {
   Home,
   Calendar as CalendarIcon,
   StickyNote,
+  Users as UsersIcon,
+  Heart,
   LogOut,
   User as UserIcon,
+  Sparkles,
 } from 'lucide-vue-next'
 import AppLangSwitcher from '@/components/ui/AppLangSwitcher.vue'
 import faviconImg from '@/img/favicon.png'
@@ -20,11 +23,20 @@ const authStore = useAuthStore()
 const uiStore = useUiStore()
 const { t } = useI18n()
 
-const navigation = computed(() => [
-  { name: t('nav.home'),     path: '/',         icon: Home },
-  { name: t('nav.calendar'), path: '/calendar', icon: CalendarIcon },
-  { name: t('nav.notes'),    path: '/notes',    icon: StickyNote },
-])
+const navigation = computed(() => {
+  const items = [
+    { name: t('nav.home'),     path: '/',         icon: Home },
+    { name: t('nav.calendar'), path: '/calendar', icon: CalendarIcon },
+    { name: t('nav.notes'),    path: '/notes',    icon: StickyNote },
+    { name: t('nav.couples'),  path: '/couples',  icon: Heart },
+  ]
+
+  if (authStore.user?.role === 'admin') {
+    items.push({ name: t('nav.users'), path: '/users', icon: UsersIcon })
+  }
+
+  return items
+})
 
 function isActive(path: string) {
   if (path === '/') return route.path === '/'
@@ -51,10 +63,11 @@ async function handleLogout() {
       <router-link to="/" class="group flex items-center gap-2">
         <span
           v-if="!uiStore.isSidebarCollapsed"
-          class="select-none tracking-tight text-ink font-bold text-lg group-hover:text-violet-700 transition-colors"
+          class="select-none tracking-tight text-ink font-bold text-lg group-hover:text-violet-700 transition-colors inline-flex items-center gap-1.5"
           style="font-family: 'Plus Jakarta Sans', sans-serif;"
         >
-          Solène
+          <span>Solène</span>
+          <Sparkles class="w-4 h-4 text-violet-600 animate-pulse" />
         </span>
         <img
           v-else
@@ -113,15 +126,21 @@ async function handleLogout() {
         v-if="!uiStore.isSidebarCollapsed && authStore.user"
         class="flex items-center justify-between p-1.5 pl-2 rounded-xl hover:bg-surface-raised/80 transition-colors group"
       >
-        <div class="flex items-center gap-2 min-w-0">
-          <div class="w-7 h-7 rounded-full bg-violet-100 text-violet-700 font-semibold text-xs flex items-center justify-center shrink-0">
-            <UserIcon class="w-3.5 h-3.5" />
+        <router-link to="/profile" class="flex items-center gap-2 min-w-0 flex-1 group/user" :title="t('nav.profile')">
+          <div class="w-7 h-7 rounded-full bg-violet-100 group-hover/user:bg-violet-200 text-violet-700 font-semibold text-xs flex items-center justify-center shrink-0 transition-colors overflow-hidden border border-violet-200">
+            <img
+              v-if="authStore.user.avatar_url"
+              :src="authStore.user.avatar_url"
+              :alt="authStore.user.full_name"
+              class="w-full h-full object-cover"
+            />
+            <UserIcon v-else class="w-3.5 h-3.5" />
           </div>
           <div class="min-w-0 flex-1">
-            <p class="text-xs font-medium text-ink truncate leading-tight">{{ authStore.user.full_name }}</p>
+            <p class="text-xs font-medium text-ink group-hover/user:text-violet-700 truncate leading-tight transition-colors">{{ authStore.user.full_name }}</p>
             <p class="text-[10px] text-ink-faint truncate">{{ authStore.user.email }}</p>
           </div>
-        </div>
+        </router-link>
 
         <!-- Ghost Logout Button -->
         <button
@@ -139,12 +158,20 @@ async function handleLogout() {
         v-else-if="uiStore.isSidebarCollapsed && authStore.user"
         class="flex flex-col items-center gap-1 pt-1"
       >
-        <div
+        <router-link
+          to="/profile"
           :title="`${authStore.user.full_name} (${authStore.user.email})`"
-          class="w-8 h-8 rounded-xl bg-violet-100 text-violet-700 font-semibold text-xs flex items-center justify-center shrink-0 cursor-default"
+          class="w-8 h-8 rounded-xl bg-violet-100 hover:bg-violet-200 text-violet-700 font-semibold text-xs flex items-center justify-center shrink-0 transition-colors overflow-hidden border border-violet-200"
         >
-          <UserIcon class="w-3.5 h-3.5" />
-        </div>
+          <img
+            v-if="authStore.user.avatar_url"
+            :src="authStore.user.avatar_url"
+            :alt="authStore.user.full_name"
+            class="w-full h-full object-cover"
+          />
+          <UserIcon v-else class="w-3.5 h-3.5" />
+        </router-link>
+
 
         <button
           type="button"
@@ -157,6 +184,7 @@ async function handleLogout() {
       </div>
 
     </div>
+
 
   </aside>
 </template>
