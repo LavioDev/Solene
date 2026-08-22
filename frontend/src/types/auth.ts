@@ -45,6 +45,8 @@ export interface UserUpdatePayload {
 }
 
 export interface UserFilterParams {
+  page?: number
+  per_page?: number
   skip?: number
   limit?: number
   role?: string

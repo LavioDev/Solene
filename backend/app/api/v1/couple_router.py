@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.core.database import get_async_db
+from app.core.pagination import PaginatedResponse, paginate_response
 from app.modules.auth.models import User
 from app.modules.couples.schemas import CoupleCreate, CoupleOut, CoupleUpdate
 from app.modules.couples.service import CoupleService
@@ -49,25 +50,39 @@ async def get_my_couple(
     return couple
 
 
-@router.get("", response_model=List[CoupleOut])
+@router.get("", response_model=PaginatedResponse[CoupleOut])
 async def list_couples(
     status_filter: Optional[str] = Query(None, alias="status", description="Filter by status (e.g. active, paused)"),
-    skip: int = Query(0, ge=0, description="Offset for pagination"),
-    limit: int = Query(100, ge=1, le=500, description="Limit for pagination"),
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(15, ge=1, le=100, description="Items per page (default: 15)"),
+    skip: Optional[int] = Query(None, ge=0, description="Offset for pagination (backward compatibility)"),
+    limit: Optional[int] = Query(None, ge=1, le=500, description="Limit for pagination (backward compatibility)"),
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_db),
-) -> List[CoupleOut]:
-    """List couples (all if admin, or belonging to the current user)."""
+) -> PaginatedResponse[CoupleOut]:
+    """List couples with pagination (per-page: 15)."""
     is_admin = current_user.role == "admin"
-    couples = await CoupleService.list_couples(
+    actual_page = page
+    actual_per_page = limit if limit is not None else per_page
+    if skip is not None and limit is not None:
+        actual_page = (skip // limit) + 1
+
+    couples, total = await CoupleService.list_couples(
         session=session,
         user_id=current_user.id,
         is_admin=is_admin,
         status=status_filter,
+        page=actual_page,
+        per_page=actual_per_page,
         skip=skip,
         limit=limit,
     )
-    return list(couples)
+    return paginate_response(
+        items=[CoupleOut.model_validate(c) for c in couples],
+        total=total,
+        page=actual_page,
+        per_page=actual_per_page,
+    )
 
 
 @router.get("/{couple_id}", response_model=CoupleOut)

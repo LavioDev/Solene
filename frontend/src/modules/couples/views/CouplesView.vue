@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/authStore'
 import { userService } from '@/services/userService'
@@ -24,6 +24,7 @@ import AppSelect from '@/components/ui/AppSelect.vue'
 import AppBadge from '@/components/ui/AppBadge.vue'
 import AppConfirmModal from '@/components/ui/AppConfirmModal.vue'
 import AppImageUpload from '@/components/ui/AppImageUpload.vue'
+import AppPagination from '@/components/ui/AppPagination.vue'
 
 const { t, locale } = useI18n()
 const authStore = useAuthStore()
@@ -34,6 +35,12 @@ const couples = ref<Couple[]>([])
 const loading = ref(true)
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
+
+// Pagination State (per-page: 15)
+const currentPage = ref(1)
+const perPage = ref(15)
+const totalCouples = ref(0)
+const totalPages = ref(1)
 
 // Filters
 const searchQuery = ref('')
@@ -103,39 +110,69 @@ const user2SelectOptions = computed(() => {
   ]
 })
 
+// Filtered couples list (rendered directly from server pagination response)
 const filteredCouples = computed(() => {
+  if (!searchQuery.value.trim()) return couples.value
+  const q = searchQuery.value.toLowerCase().trim()
   return couples.value.filter((c) => {
-    if (selectedStatus.value !== 'ALL' && c.status !== selectedStatus.value) {
-      return false
-    }
-    if (searchQuery.value.trim()) {
-      const q = searchQuery.value.toLowerCase().trim()
-      const matchNickname = c.nickname?.toLowerCase().includes(q)
-      const matchUser1 =
-        c.user1?.full_name?.toLowerCase().includes(q) || c.user1?.email?.toLowerCase().includes(q)
-      const matchUser2 =
-        c.user2?.full_name?.toLowerCase().includes(q) || c.user2?.email?.toLowerCase().includes(q)
-      if (!matchNickname && !matchUser1 && !matchUser2) return false
-    }
-    return true
+    const matchNickname = c.nickname?.toLowerCase().includes(q)
+    const matchUser1 =
+      c.user1?.full_name?.toLowerCase().includes(q) || c.user1?.email?.toLowerCase().includes(q)
+    const matchUser2 =
+      c.user2?.full_name?.toLowerCase().includes(q) || c.user2?.email?.toLowerCase().includes(q)
+    return matchNickname || matchUser1 || matchUser2
   })
 })
 
-async function fetchData() {
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
+function handleFilterChange() {
+  currentPage.value = 1
+  fetchCouples()
+}
+
+watch(selectedStatus, () => {
+  handleFilterChange()
+})
+
+watch(searchQuery, () => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+  searchDebounceTimer = setTimeout(() => {
+    handleFilterChange()
+  }, 300)
+})
+
+async function fetchCouples() {
   loading.value = true
   errorMessage.value = null
   try {
-    const [couplesData, usersData] = await Promise.all([
-      coupleService.getCouples(),
-      userService.getUsers().catch(() => []),
-    ])
-    couples.value = couplesData
-    users.value = usersData
+    const res = await coupleService.getCouples({
+      page: currentPage.value,
+      per_page: perPage.value,
+      status: selectedStatus.value === 'ALL' ? undefined : selectedStatus.value,
+      search: searchQuery.value.trim() || undefined,
+    })
+    couples.value = res.items
+    totalCouples.value = res.total
+    totalPages.value = res.total_pages
+    currentPage.value = res.page
   } catch (err: any) {
-    console.error('Failed to load couples data:', err)
+    console.error('Failed to load couples:', err)
     errorMessage.value = err.response?.data?.detail || 'Failed to load couples.'
   } finally {
     loading.value = false
+  }
+}
+
+async function fetchData() {
+  try {
+    const [_, usersRes] = await Promise.all([
+      fetchCouples(),
+      userService.getUsers({ per_page: 100 }).catch(() => ({ items: [] })),
+    ])
+    users.value = usersRes.items || []
+  } catch (err: any) {
+    console.error('Failed to load initial data:', err)
   }
 }
 
@@ -496,6 +533,17 @@ onMounted(() => {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Table Pagination (15 items per page) -->
+      <div v-if="!loading && totalCouples > 0" class="border-t border-border/60 pt-3 mt-3">
+        <AppPagination
+          v-model:currentPage="currentPage"
+          :totalItems="totalCouples"
+          :perPage="perPage"
+          :totalPages="totalPages"
+          @change="fetchCouples"
+        />
       </div>
     </div>
 

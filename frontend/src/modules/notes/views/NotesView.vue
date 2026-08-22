@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { apiClient } from '@/services/apiClient'
+import { noteService } from '@/services/noteService'
 import {
   Plus,
   Trash2,
@@ -10,6 +10,7 @@ import {
   Sparkles,
   Edit2,
   Image as ImageIcon,
+  Loader2,
 } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppModal from '@/components/ui/AppModal.vue'
@@ -43,16 +44,23 @@ interface UserNote {
 const { t, locale } = useI18n()
 const todayStr = new Date().toISOString().split('T')[0]
 
+// Data & Lazy load state (per-page: 15)
 const notes = ref<UserNote[]>([])
 const loading = ref(true)
+const loadingMore = ref(false)
+const page = ref(1)
+const perPage = ref(15)
+const hasMore = ref(true)
+const totalCount = ref(0)
+
+// Sentinel ref for IntersectionObserver
+const sentinelRef = ref<HTMLElement | null>(null)
+let observer: IntersectionObserver | null = null
 
 // Filter state
 const filterType = ref<'ALL' | 'DATE' | 'RANDOM'>('ALL')
 
-const filteredNotes = computed(() => {
-  if (filterType.value === 'ALL') return notes.value
-  return notes.value.filter(n => n.display_type === filterType.value)
-})
+const filteredNotes = computed(() => notes.value)
 
 // Add / Edit Modal state
 const showAddModal = ref(false)
@@ -70,17 +78,81 @@ const showDeleteConfirmModal = ref(false)
 const deletingNoteId = ref<string | null>(null)
 const deleting = ref(false)
 
-async function fetchNotes() {
-  loading.value = true
+async function fetchNotes(reset = false) {
+  if (reset) {
+    page.value = 1
+    hasMore.value = true
+    loading.value = true
+  } else {
+    loadingMore.value = true
+  }
+
   try {
-    const res = await apiClient.get<UserNote[]>('/notes')
-    notes.value = res.data
+    const res = await noteService.getNotes({
+      page: page.value,
+      per_page: perPage.value,
+      display_type: filterType.value === 'ALL' ? undefined : filterType.value,
+    })
+
+    if (reset) {
+      notes.value = res.items as UserNote[]
+    } else {
+      const existingIds = new Set(notes.value.map(n => n.id))
+      const newItems = (res.items as UserNote[]).filter(n => !existingIds.has(n.id))
+      notes.value = [...notes.value, ...newItems]
+    }
+
+    totalCount.value = res.total
+    hasMore.value = res.has_more
   } catch (err) {
     console.error('Failed to fetch notes:', err)
   } finally {
     loading.value = false
+    loadingMore.value = false
   }
 }
+
+function loadMore() {
+  if (loading.value || loadingMore.value || !hasMore.value) return
+  page.value += 1
+  fetchNotes(false)
+}
+
+function setupObserver() {
+  if (observer) {
+    observer.disconnect()
+  }
+
+  if (typeof IntersectionObserver === 'undefined') return
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      const entry = entries[0]
+      if (entry && entry.isIntersecting) {
+        loadMore()
+      }
+    },
+    {
+      root: null,
+      rootMargin: '250px',
+      threshold: 0.1,
+    }
+  )
+
+  if (sentinelRef.value) {
+    observer.observe(sentinelRef.value)
+  }
+}
+
+watch(filterType, () => {
+  fetchNotes(true)
+})
+
+watch(sentinelRef, (newEl) => {
+  if (newEl && observer) {
+    observer.observe(newEl)
+  }
+})
 
 function openAddModal() {
   editingNote.value = null
@@ -122,12 +194,17 @@ async function handleSaveNote() {
       target_date: formDisplayType.value === 'DATE' ? formTargetDate.value : null,
     }
     if (editingNote.value) {
-      await apiClient.put(`/notes/${editingNote.value.id}`, payload)
+      const updated = await noteService.updateNote(editingNote.value.id, payload)
+      // Update in-place
+      const idx = notes.value.findIndex(n => n.id === editingNote.value!.id)
+      if (idx !== -1) {
+        notes.value[idx] = { ...notes.value[idx], ...updated } as UserNote
+      }
     } else {
-      await apiClient.post('/notes', payload)
+      await noteService.createNote(payload)
+      await fetchNotes(true)
     }
     showAddModal.value = false
-    await fetchNotes()
   } catch (err) {
     console.error('Failed to save note:', err)
   } finally {
@@ -144,11 +221,13 @@ async function confirmDeleteNote() {
   if (!deletingNoteId.value) return
   deleting.value = true
   try {
-    await apiClient.delete(`/notes/${deletingNoteId.value}`)
+    await noteService.deleteNote(deletingNoteId.value)
     showDeleteConfirmModal.value = false
+    const deletedId = deletingNoteId.value
     deletingNoteId.value = null
-    if (editingNote.value?.id === deletingNoteId.value) showAddModal.value = false
-    await fetchNotes()
+    if (editingNote.value?.id === deletedId) showAddModal.value = false
+    notes.value = notes.value.filter(n => n.id !== deletedId)
+    totalCount.value = Math.max(0, totalCount.value - 1)
   } catch (err) {
     console.error('Failed to delete note:', err)
   } finally {
@@ -163,12 +242,23 @@ function formatDate(dateStr: string) {
 }
 
 const counts = computed(() => ({
-  all: notes.value.length,
+  all: totalCount.value || notes.value.length,
   date: notes.value.filter(n => n.display_type === 'DATE').length,
   random: notes.value.filter(n => n.display_type === 'RANDOM').length,
 }))
 
-onMounted(fetchNotes)
+onMounted(() => {
+  fetchNotes(true).then(() => {
+    setupObserver()
+  })
+})
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
+})
 </script>
 
 <template>
@@ -220,7 +310,7 @@ onMounted(fetchNotes)
     <!-- ─── Main Content Area ─── -->
     <div class="flex-1 min-w-0">
 
-      <!-- Loading -->
+      <!-- Loading Placeholder -->
       <div v-if="loading" class="py-20 text-center text-sm text-ink-faint">
         {{ t('notes.loading') }}
       </div>
@@ -311,6 +401,27 @@ onMounted(fetchNotes)
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Infinite Scroll Sentinel & Loading Indicators -->
+      <div ref="sentinelRef" class="w-full py-4 flex flex-col items-center justify-center">
+        <!-- Loading More Spinner -->
+        <div
+          v-if="loadingMore"
+          class="flex items-center gap-2 py-3 px-4 rounded-xl bg-violet-50/80 border border-violet-100 text-violet-700 text-xs font-medium shadow-2xs animate-pulse"
+        >
+          <Loader2 class="w-4 h-4 animate-spin text-violet-600" />
+          <span>{{ t('notes.loadingMore') }}</span>
+        </div>
+
+        <!-- End of Notes indicator -->
+        <div
+          v-else-if="!hasMore && notes.length > 0"
+          class="py-4 text-center text-xs text-ink-faint flex items-center justify-center gap-1.5"
+        >
+          <Heart class="w-3.5 h-3.5 text-violet-300 fill-violet-50" />
+          <span>{{ t('notes.allLoaded') }}</span>
         </div>
       </div>
     </div>

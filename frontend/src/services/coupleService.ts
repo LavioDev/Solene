@@ -1,10 +1,17 @@
 import { apiClient } from '@/services/apiClient'
 import type { Couple, CoupleCreatePayload, CoupleUpdatePayload } from '@/types/couple'
+import type { PaginatedResponse } from '@/types/pagination'
 
 export const coupleService = {
-  async getCouples(status?: string): Promise<Couple[]> {
-    const response = await apiClient.get<Couple[]>('/couples', {
-      params: status ? { status } : undefined,
+  async getCouples(params?: {
+    status?: string
+    page?: number
+    per_page?: number
+    search?: string
+  } | string): Promise<PaginatedResponse<Couple>> {
+    const queryParams = typeof params === 'string' ? { status: params } : params
+    const response = await apiClient.get<PaginatedResponse<Couple>>('/couples', {
+      params: queryParams,
     })
     return response.data
   },

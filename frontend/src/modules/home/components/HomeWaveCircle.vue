@@ -59,7 +59,7 @@ const { t } = useI18n()
       </div>
 
       <!-- Real-Time Digital Clock Pill (HH : MM : SS) -->
-      <div class="text-xs font-mono font-bold text-ink bg-surface-subtle px-3 py-1 rounded-full border border-border/60 shadow-2xs tracking-wider my-0.5">
+      <div class="text-xs font-mono font-bold text-ink px-3 py-1 tracking-wider my-0.5">
         {{ String(hours).padStart(2, '0') }}:{{ String(minutes).padStart(2, '0') }}:{{ String(seconds).padStart(2, '0') }}
       </div>
 

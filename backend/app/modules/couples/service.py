@@ -63,13 +63,21 @@ class CoupleService:
         user_id: uuid.UUID,
         is_admin: bool = False,
         status: Optional[str] = None,
-        skip: int = 0,
-        limit: int = 100,
-    ) -> Sequence[Couple]:
+        page: int = 1,
+        per_page: int = 15,
+        skip: Optional[int] = None,
+        limit: Optional[int] = None,
+    ) -> tuple[Sequence[Couple], int]:
         repo = CoupleRepository(session)
+        actual_skip = skip if skip is not None else max(0, (page - 1) * per_page)
+        actual_limit = limit if limit is not None else per_page
         if is_admin:
-            return await repo.list_all(status=status, skip=skip, limit=limit)
-        return await repo.list_for_user(user_id=user_id, status=status, skip=skip, limit=limit)
+            items = await repo.list_all(status=status, skip=actual_skip, limit=actual_limit)
+            total = await repo.count_all(status=status)
+        else:
+            items = await repo.list_for_user(user_id=user_id, status=status, skip=actual_skip, limit=actual_limit)
+            total = await repo.count_for_user(user_id=user_id, status=status)
+        return items, total
 
     @staticmethod
     async def update_couple(

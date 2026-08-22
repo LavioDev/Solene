@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_async_db
+from app.core.pagination import PaginatedResponse, paginate_response
 from app.api.deps import get_current_user
 from app.modules.auth.models import User
 from app.modules.notes.schemas import NoteCreate, NoteUpdate, NoteOut
@@ -22,13 +23,30 @@ async def create_note(
     return await NoteService.create_note(session, current_user.id, payload)
 
 
-@router.get("", response_model=List[NoteOut])
+@router.get("", response_model=PaginatedResponse[NoteOut])
 async def list_notes(
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(15, ge=1, le=100, description="Items per page (default: 15)"),
+    display_type: Optional[str] = Query(None, description="Filter by display type: DATE or RANDOM"),
+    search: Optional[str] = Query(None, description="Search by title or content"),
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_db),
-):
-    """List all notes and memory cards for current user."""
-    return await NoteService.list_user_notes(session, current_user.id)
+) -> PaginatedResponse[NoteOut]:
+    """List notes and memory cards with pagination (per-page: 15)."""
+    items, total = await NoteService.list_user_notes(
+        session=session,
+        user_id=current_user.id,
+        page=page,
+        per_page=per_page,
+        display_type=display_type,
+        search=search,
+    )
+    return paginate_response(
+        items=[NoteOut.model_validate(n) for n in items],
+        total=total,
+        page=page,
+        per_page=per_page,
+    )
 
 
 @router.put("/{note_id}", response_model=NoteOut)

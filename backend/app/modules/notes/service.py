@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, func
 from sqlalchemy.orm import selectinload
 from app.modules.notes.models import UserNote, NoteImage
 from app.modules.notes.schemas import NoteCreate, NoteUpdate
@@ -41,15 +41,41 @@ class NoteService:
         return note
 
     @staticmethod
-    async def list_user_notes(session: AsyncSession, user_id: UUID) -> List[UserNote]:
+    async def list_user_notes(
+        session: AsyncSession,
+        user_id: UUID,
+        page: int = 1,
+        per_page: int = 15,
+        display_type: Optional[str] = None,
+        search: Optional[str] = None,
+    ) -> tuple[List[UserNote], int]:
+        base_stmt = select(UserNote).where(UserNote.user_id == user_id)
+
+        if display_type and display_type.upper() in ["DATE", "RANDOM"]:
+            base_stmt = base_stmt.where(UserNote.display_type == display_type.upper())
+
+        if search and search.strip():
+            term = f"%{search.strip()}%"
+            base_stmt = base_stmt.where(
+                (UserNote.title.ilike(term)) | (UserNote.content.ilike(term))
+            )
+
+        # Count total
+        count_stmt = select(func.count()).select_from(base_stmt.subquery())
+        count_result = await session.execute(count_stmt)
+        total = count_result.scalar_one()
+
+        # Paginated items
+        offset = max(0, (page - 1) * per_page)
         stmt = (
-            select(UserNote)
-            .where(UserNote.user_id == user_id)
+            base_stmt
             .options(selectinload(UserNote.images))
             .order_by(desc(UserNote.created_at))
+            .offset(offset)
+            .limit(per_page)
         )
         result = await session.execute(stmt)
-        return list(result.scalars().all())
+        return list(result.scalars().all()), total
 
     @staticmethod
     async def update_note(session: AsyncSession, user_id: UUID, note_id: UUID, payload: NoteUpdate) -> Optional[UserNote]:

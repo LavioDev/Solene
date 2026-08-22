@@ -134,11 +134,13 @@ async def test_couple_full_crud_and_security() -> None:
         # 10. List couples
         list_a = await ac.get("/api/v1/couples", headers=headers_a)
         assert list_a.status_code == 200
-        assert len(list_a.json()) >= 1
+        assert "items" in list_a.json()
+        assert len(list_a.json()["items"]) >= 1
 
         list_c = await ac.get("/api/v1/couples", headers=headers_c)
         assert list_c.status_code == 200
-        assert len(list_c.json()) == 0
+        assert "items" in list_c.json()
+        assert len(list_c.json()["items"]) == 0
 
         # 11. Update Couple (PUT)
         update_payload = {

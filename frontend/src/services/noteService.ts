@@ -1,9 +1,15 @@
 import { apiClient } from '@/services/apiClient'
 import type { NoteItem } from '@/types/note'
+import type { PaginatedResponse } from '@/types/pagination'
 
 export const noteService = {
-  async getNotes(): Promise<NoteItem[]> {
-    const response = await apiClient.get<NoteItem[]>('/notes')
+  async getNotes(params?: {
+    page?: number
+    per_page?: number
+    display_type?: string
+    search?: string
+  }): Promise<PaginatedResponse<NoteItem>> {
+    const response = await apiClient.get<PaginatedResponse<NoteItem>>('/notes', { params })
     return response.data
   },
 

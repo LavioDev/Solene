@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_admin_user, get_current_user
 from app.core.database import get_async_db
 from app.core.exceptions import ForbiddenException
+from app.core.pagination import PaginatedResponse, paginate_response
 from app.modules.auth.models import User
 from app.modules.auth.schemas import UserCreate, UserOut, UserUpdate
 from app.modules.auth.service import UserService
@@ -24,26 +25,40 @@ async def create_user(
     return UserOut.model_validate(user)
 
 
-@router.get("", response_model=List[UserOut])
+@router.get("", response_model=PaginatedResponse[UserOut])
 async def list_users(
-    skip: int = Query(0, ge=0, description="Offset for pagination"),
-    limit: int = Query(100, ge=1, le=500, description="Limit for pagination"),
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(15, ge=1, le=100, description="Items per page (default: 15)"),
+    skip: Optional[int] = Query(None, ge=0, description="Offset for pagination (backward compatibility)"),
+    limit: Optional[int] = Query(None, ge=1, le=500, description="Limit for pagination (backward compatibility)"),
     role: Optional[str] = Query(None, description="Filter by user role"),
     is_active: Optional[bool] = Query(None, description="Filter by active status"),
     search: Optional[str] = Query(None, description="Search by email or full name"),
     admin: User = Depends(get_current_admin_user),
     session: AsyncSession = Depends(get_async_db),
-) -> List[UserOut]:
-    """List users with pagination, filters, and search (Admin only)."""
-    users = await UserService.list_users(
+) -> PaginatedResponse[UserOut]:
+    """List users with pagination, filters, and search (Admin only, per-page: 15)."""
+    actual_page = page
+    actual_per_page = limit if limit is not None else per_page
+    if skip is not None and limit is not None:
+        actual_page = (skip // limit) + 1
+
+    users, total = await UserService.list_users(
         session=session,
+        page=actual_page,
+        per_page=actual_per_page,
         skip=skip,
         limit=limit,
         role=role,
         is_active=is_active,
         search=search,
     )
-    return [UserOut.model_validate(u) for u in users]
+    return paginate_response(
+        items=[UserOut.model_validate(u) for u in users],
+        total=total,
+        page=actual_page,
+        per_page=actual_per_page,
+    )
 
 
 @router.get("/{user_id}", response_model=UserOut)

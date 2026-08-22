@@ -214,6 +214,8 @@ export default {
     deleteTitle: 'Delete Memory',
     deleteMessage: 'Are you sure you want to delete this memory? This action cannot be undone.',
     deleteConfirm: 'Delete',
+    loadingMore: 'Loading more memories...',
+    allLoaded: "You've reached the end",
   },
   users: {
     title: 'Users',
@@ -324,6 +326,13 @@ export default {
     language: 'Language',
     all: 'All',
     noResults: 'No results found',
+    pagination: {
+      showing: 'Showing {start} to {end} of {total} entries',
+      prev: 'Previous',
+      next: 'Next',
+      first: 'First page',
+      last: 'Last page',
+    },
   },
   tabs: {
     refresh: 'Refresh',

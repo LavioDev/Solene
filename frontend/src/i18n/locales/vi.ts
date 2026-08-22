@@ -214,6 +214,8 @@ export default {
     deleteTitle: 'Xóa Kỷ Niệm',
     deleteMessage: 'Bạn có chắc chắn muốn xóa kỷ niệm này? Thao tác này không thể hoàn tác.',
     deleteConfirm: 'Xóa Kỷ Niệm',
+    loadingMore: 'Đang tải thêm kỷ niệm...',
+    allLoaded: 'Đã hiển thị tất cả kỷ niệm',
   },
   users: {
     title: 'Người dùng',
@@ -324,6 +326,13 @@ export default {
     language: 'Ngôn ngữ',
     all: 'Tất cả',
     noResults: 'Không tìm thấy kết quả',
+    pagination: {
+      showing: 'Hiển thị {start} đến {end} trên tổng số {total} mục',
+      prev: 'Trước',
+      next: 'Sau',
+      first: 'Trang đầu',
+      last: 'Trang cuối',
+    },
   },
   tabs: {
     refresh: 'Làm mới',

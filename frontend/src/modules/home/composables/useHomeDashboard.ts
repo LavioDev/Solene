@@ -226,8 +226,8 @@ export function useHomeDashboard() {
 
       // 4. Fetch Notes
       try {
-        const notesData = await noteService.getNotes()
-        notes.value = notesData
+        const notesData = await noteService.getNotes({ per_page: 50 })
+        notes.value = notesData.items || []
       } catch {
         notes.value = []
       }

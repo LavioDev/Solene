@@ -62,7 +62,11 @@ async def test_users_crud_complete_flow() -> None:
             params={"search": target_email, "role": "user"},
         )
         assert list_res.status_code == 200
-        users_list = list_res.json()
+        data = list_res.json()
+        assert "items" in data
+        assert "total" in data
+        assert data["per_page"] == 15
+        users_list = data["items"]
         assert len(users_list) >= 1
         assert any(u["id"] == target_user_id for u in users_list)
 

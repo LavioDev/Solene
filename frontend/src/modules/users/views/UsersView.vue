@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/authStore'
 import { userService } from '@/services/userService'
@@ -22,6 +22,7 @@ import AppSelect from '@/components/ui/AppSelect.vue'
 import AppBadge from '@/components/ui/AppBadge.vue'
 import AppConfirmModal from '@/components/ui/AppConfirmModal.vue'
 import AppAvatarCropper from '@/components/ui/AppAvatarCropper.vue'
+import AppPagination from '@/components/ui/AppPagination.vue'
 
 const { t, locale } = useI18n()
 const authStore = useAuthStore()
@@ -31,6 +32,12 @@ const users = ref<User[]>([])
 const loading = ref(true)
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
+
+// Pagination State (per-page: 15)
+const currentPage = ref(1)
+const perPage = ref(15)
+const totalUsers = ref(0)
+const totalPages = ref(1)
 
 // Users Filters
 const searchQuery = ref('')
@@ -78,32 +85,42 @@ const modalStatusOptions = computed(() => [
   { label: t('users.statusInactive'), value: 'false' },
 ])
 
-// Filtered users list
-const filteredUsers = computed(() => {
-  return users.value.filter((u) => {
-    if (selectedRole.value !== 'ALL' && u.role !== selectedRole.value) {
-      return false
-    }
-    if (selectedStatus.value !== 'ALL') {
-      const targetStatus = selectedStatus.value === 'true'
-      if (u.is_active !== targetStatus) return false
-    }
-    if (searchQuery.value.trim()) {
-      const q = searchQuery.value.toLowerCase().trim()
-      const matchName = u.full_name?.toLowerCase().includes(q)
-      const matchEmail = u.email?.toLowerCase().includes(q)
-      if (!matchName && !matchEmail) return false
-    }
-    return true
-  })
+// Filtered users list (rendered directly from server pagination response)
+const filteredUsers = computed(() => users.value)
+
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
+function handleFilterChange() {
+  currentPage.value = 1
+  fetchUsers()
+}
+
+watch([selectedRole, selectedStatus], () => {
+  handleFilterChange()
+})
+
+watch(searchQuery, () => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+  searchDebounceTimer = setTimeout(() => {
+    handleFilterChange()
+  }, 300)
 })
 
 async function fetchUsers() {
   loading.value = true
   errorMessage.value = null
   try {
-    const data = await userService.getUsers()
-    users.value = data
+    const res = await userService.getUsers({
+      page: currentPage.value,
+      per_page: perPage.value,
+      role: selectedRole.value === 'ALL' ? undefined : selectedRole.value,
+      is_active: selectedStatus.value === 'ALL' ? undefined : (selectedStatus.value === 'true'),
+      search: searchQuery.value.trim() || undefined,
+    })
+    users.value = res.items
+    totalUsers.value = res.total
+    totalPages.value = res.total_pages
+    currentPage.value = res.page
   } catch (err: any) {
     console.error('Failed to load users:', err)
     errorMessage.value = err.response?.data?.detail || 'Failed to load users.'
@@ -421,6 +438,17 @@ onMounted(() => {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Table Pagination (15 items per page) -->
+      <div v-if="!loading && totalUsers > 0" class="border-t border-border/60 pt-3 mt-3">
+        <AppPagination
+          v-model:currentPage="currentPage"
+          :totalItems="totalUsers"
+          :perPage="perPage"
+          :totalPages="totalPages"
+          @change="fetchUsers"
+        />
       </div>
     </div>
 

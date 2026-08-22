@@ -214,6 +214,8 @@ export default {
     deleteTitle: 'Supprimer le souvenir',
     deleteMessage: 'Voulez-vous vraiment supprimer ce souvenir ? Cette action est irréversible.',
     deleteConfirm: 'Supprimer',
+    loadingMore: 'Chargement d’autres souvenirs…',
+    allLoaded: 'Vous avez atteint la fin',
   },
   users: {
     title: 'Utilisateurs',
@@ -324,6 +326,13 @@ export default {
     language: 'Langue',
     all: 'Tous',
     noResults: 'Aucun résultat trouvé',
+    pagination: {
+      showing: 'Affichage de {start} à {end} sur {total} entrées',
+      prev: 'Précédent',
+      next: 'Suivant',
+      first: 'Première page',
+      last: 'Dernière page',
+    },
   },
   tabs: {
     refresh: 'Actualiser',

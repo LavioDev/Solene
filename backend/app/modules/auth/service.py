@@ -91,20 +91,30 @@ class UserService:
     async def list_users(
         session: AsyncSession,
         *,
-        skip: int = 0,
-        limit: int = 100,
+        page: int = 1,
+        per_page: int = 15,
+        skip: Optional[int] = None,
+        limit: Optional[int] = None,
         role: Optional[str] = None,
         is_active: Optional[bool] = None,
         search: Optional[str] = None,
-    ) -> Sequence[User]:
+    ) -> Tuple[Sequence[User], int]:
         user_repo = UserRepository(session=session)
-        return await user_repo.list_users(
-            skip=skip,
-            limit=limit,
+        actual_skip = skip if skip is not None else max(0, (page - 1) * per_page)
+        actual_limit = limit if limit is not None else per_page
+        users = await user_repo.list_users(
+            skip=actual_skip,
+            limit=actual_limit,
             role=role,
             is_active=is_active,
             search=search,
         )
+        total = await user_repo.count_users(
+            role=role,
+            is_active=is_active,
+            search=search,
+        )
+        return users, total
 
     @staticmethod
     async def count_users(

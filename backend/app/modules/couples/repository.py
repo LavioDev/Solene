@@ -1,6 +1,6 @@
 from typing import Optional, Sequence
 import uuid
-from sqlalchemy import desc, or_, select
+from sqlalchemy import desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from app.core.repository import BaseRepository
@@ -73,6 +73,18 @@ class CoupleRepository(BaseRepository[Couple, CoupleCreate, CoupleUpdate]):
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
+    async def count_for_user(
+        self,
+        user_id: uuid.UUID,
+        *,
+        status: Optional[str] = None,
+    ) -> int:
+        stmt = select(func.count()).select_from(Couple).where(or_(Couple.user1_id == user_id, Couple.user2_id == user_id))
+        if status:
+            stmt = stmt.where(Couple.status == status)
+        result = await self.session.execute(stmt)
+        return result.scalar_one() or 0
+
     async def list_all(
         self,
         *,
@@ -89,6 +101,17 @@ class CoupleRepository(BaseRepository[Couple, CoupleCreate, CoupleUpdate]):
         stmt = stmt.order_by(desc(Couple.created_at)).offset(skip).limit(limit)
         result = await self.session.execute(stmt)
         return result.scalars().all()
+
+    async def count_all(
+        self,
+        *,
+        status: Optional[str] = None,
+    ) -> int:
+        stmt = select(func.count()).select_from(Couple)
+        if status:
+            stmt = stmt.where(Couple.status == status)
+        result = await self.session.execute(stmt)
+        return result.scalar_one() or 0
 
     async def create_couple(
         self,

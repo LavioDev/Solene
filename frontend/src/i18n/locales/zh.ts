@@ -214,6 +214,8 @@ export default {
     deleteTitle: '删除回忆',
     deleteMessage: '确定要删除这条回忆吗？此操作无法撤销。',
     deleteConfirm: '确认删除',
+    loadingMore: '正在加载更多回忆…',
+    allLoaded: '已加载全部回忆',
   },
   users: {
     title: '用户',
@@ -324,6 +326,13 @@ export default {
     language: '语言',
     all: '全部',
     noResults: '未找到匹配结果',
+    pagination: {
+      showing: '显示第 {start} 至 {end} 项，共 {total} 项',
+      prev: '上一页',
+      next: '下一页',
+      first: '首页',
+      last: '末页',
+    },
   },
   tabs: {
     refresh: '刷新当前页',

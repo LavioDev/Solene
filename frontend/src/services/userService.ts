@@ -1,9 +1,10 @@
 import { apiClient } from '@/services/apiClient'
 import type { User, UserCreatePayload, UserFilterParams, UserUpdatePayload } from '@/types/auth'
+import type { PaginatedResponse } from '@/types/pagination'
 
 export const userService = {
-  async getUsers(params?: UserFilterParams): Promise<User[]> {
-    const response = await apiClient.get<User[]>('/users', { params })
+  async getUsers(params?: UserFilterParams): Promise<PaginatedResponse<User>> {
+    const response = await apiClient.get<PaginatedResponse<User>>('/users', { params })
     return response.data
   },
 
