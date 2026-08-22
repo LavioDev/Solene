@@ -71,8 +71,58 @@ export default {
       months: 'Mốc {n} tháng',
       years: 'Kỷ niệm {n} năm',
       note: 'Ghi chú',
+      task: 'Công việc',
+    },
+    subnav: {
+      calendar: 'Lịch Lưới',
+      gantt: 'Day-Gantt',
+    },
+    gantt: {
+      title: 'Dòng Thời Gian Công Việc Trong Ngày',
+      addTask: 'Thêm Công Việc',
+      noTasks: 'Chưa có công việc trong ngày',
+
+      totalScheduled: 'Tổng thời gian',
+      completedTasks: 'Đã hoàn thành',
+      now: 'Hiện tại',
+      allDay: 'Cả ngày',
+      tasksOverview: 'Tổng quan 24 giờ trong ngày',
+      taskColumn: 'Công việc / Sự kiện',
+      timeLineColumn: 'Dòng thời gian (00:00 - 24:00)',
+      focusNow: 'Thời điểm hiện tại',
+    },
+
+    tabs: {
+      note: 'Ghi Chú & Kỷ Niệm',
+      tasks: 'Công Việc & To-Do',
+    },
+    tasks: {
+      dateTarget: 'Ngày thực hiện',
+      taskTitle: 'Tiêu đề công việc',
+      taskTitlePlaceholder: 'Nhập tiêu đề công việc...',
+      startTime: 'Giờ bắt đầu',
+      endTime: 'Giờ kết thúc',
+      priority: 'Mức độ ưu tiên',
+      priorityLow: 'Thấp',
+      priorityMedium: 'Trung bình',
+      priorityHigh: 'Cao',
+      priorityUrgent: 'Khẩn cấp',
+      content: 'Nội dung chi tiết / Ghi chú',
+      contentPlaceholder: 'Nội dung chi tiết công việc hoặc ghi chú bổ sung...',
+      addTask: 'Thêm công việc vào ngày',
+      listTitle: 'Danh sách công việc ngày {date} ({count})',
+      noTasks: 'Chưa có công việc nào trong ngày này. Nhập form phía trên để thêm!',
+      completed: 'Hoàn thành',
+      pending: 'Chưa xong',
+      deleteConfirmTitle: 'Xóa công việc',
+      deleteConfirmMessage: 'Bạn có chắc chắn muốn xóa công việc này không?',
+      editTask: 'Chỉnh sửa công việc',
+      updateTask: 'Cập nhật công việc',
     },
   },
+
+
+
   notes: {
     title: 'Kỷ Niệm & Ghi Chú',
     subtitle: 'Lưu giữ những khoảnh khắc và kỷ niệm đáng nhớ',

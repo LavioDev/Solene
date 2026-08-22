@@ -71,8 +71,58 @@ export default {
       months: 'Milestone {n} months',
       years: '{n} Year Anniversary',
       note: 'Note',
+      task: 'Task',
+    },
+    subnav: {
+      calendar: 'Calendar View',
+      gantt: 'Day-Gantt',
+    },
+    gantt: {
+      title: 'Day Schedule Timeline',
+      addTask: 'Add Task',
+      noTasks: 'No tasks for this day',
+
+      totalScheduled: 'Total Scheduled',
+      completedTasks: 'Completed',
+      now: 'Current Time',
+      allDay: 'All Day',
+      tasksOverview: '24-Hour Day Overview',
+      taskColumn: 'Task / Event',
+      timeLineColumn: 'Timeline (00:00 - 24:00)',
+      focusNow: 'Current time',
+    },
+
+    tabs: {
+      note: 'Note & Memory',
+      tasks: 'Tasks & To-Do',
+    },
+    tasks: {
+      dateTarget: 'Target Date',
+      taskTitle: 'Task Title',
+      taskTitlePlaceholder: 'Task title...',
+      startTime: 'Start Time',
+      endTime: 'End Time',
+      priority: 'Priority',
+      priorityLow: 'Low',
+      priorityMedium: 'Medium',
+      priorityHigh: 'High',
+      priorityUrgent: 'Urgent',
+      content: 'Detailed Content / Notes',
+      contentPlaceholder: 'Optional description or notes...',
+      addTask: 'Add Task to Date',
+      listTitle: 'Tasks for {date} ({count})',
+      noTasks: 'No tasks scheduled for this day yet. Add one above!',
+      completed: 'Completed',
+      pending: 'Pending',
+      deleteConfirmTitle: 'Delete Task',
+      deleteConfirmMessage: 'Are you sure you want to delete this task?',
+      editTask: 'Edit Task',
+      updateTask: 'Update Task',
     },
   },
+
+
+
   notes: {
     title: 'Notes & Memories',
     subtitle: 'Preserving special moments and memorable thoughts',

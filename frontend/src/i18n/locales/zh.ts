@@ -71,8 +71,58 @@ export default {
       months: '相伴 {n} 个月',
       years: '相伴 {n} 周年纪念',
       note: '笔记',
+      task: '任务',
+    },
+    subnav: {
+      calendar: '日历视图',
+      gantt: 'Day-Gantt',
+    },
+    gantt: {
+      title: '当日时间线甘特图',
+      addTask: '添加任务',
+      noTasks: '当日暂无任务',
+
+      totalScheduled: '已安排时长',
+      completedTasks: '已完成',
+      now: '当前时间',
+      allDay: '全天',
+      tasksOverview: '24小时日程总览',
+      taskColumn: '任务 / 事件',
+      timeLineColumn: '时间轴 (00:00 - 24:00)',
+      focusNow: '当前时间',
+    },
+
+    tabs: {
+      note: '笔记与回忆',
+      tasks: '任务与待办',
+    },
+    tasks: {
+      dateTarget: '目标日期',
+      taskTitle: '任务标题',
+      taskTitlePlaceholder: '任务标题...',
+      startTime: '开始时间',
+      endTime: '结束时间',
+      priority: '优先级',
+      priorityLow: '低',
+      priorityMedium: '中',
+      priorityHigh: '高',
+      priorityUrgent: '紧急',
+      content: '详细内容 / 备注',
+      contentPlaceholder: '可选详细描述或补充备注...',
+      addTask: '添加到当日任务',
+      listTitle: '{date} 当日任务列表 ({count})',
+      noTasks: '该日期暂无安排任务。在上方填写以添加！',
+      completed: '已完成',
+      pending: '未完成',
+      deleteConfirmTitle: '删除任务',
+      deleteConfirmMessage: '您确定要删除此任务吗？',
+      editTask: '编辑任务',
+      updateTask: '更新任务',
     },
   },
+
+
+
   notes: {
     title: '回忆与笔记',
     subtitle: '珍藏每一个美好与难忘的瞬间',

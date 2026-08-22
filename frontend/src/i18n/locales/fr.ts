@@ -71,8 +71,58 @@ export default {
       months: 'Étape {n} mois',
       years: 'Anniversaire {n} ans',
       note: 'Note',
+      task: 'Tâche',
+    },
+    subnav: {
+      calendar: 'Vue Calendrier',
+      gantt: 'Day-Gantt',
+    },
+    gantt: {
+      title: 'Planning journalier (Gantt)',
+      addTask: 'Ajouter une tâche',
+      noTasks: 'Aucune tâche pour ce jour',
+
+      totalScheduled: 'Total planifié',
+      completedTasks: 'Terminées',
+      now: 'Heure actuelle',
+      allDay: 'Toute la journée',
+      tasksOverview: 'Aperçu 24 heures',
+      taskColumn: 'Tâche / Événement',
+      timeLineColumn: 'Chronologie (00:00 - 24:00)',
+      focusNow: 'Heure actuelle',
+    },
+
+    tabs: {
+      note: 'Notes & Souvenirs',
+      tasks: 'Tâches & To-Do',
+    },
+    tasks: {
+      dateTarget: 'Date ciblée',
+      taskTitle: 'Titre de la tâche',
+      taskTitlePlaceholder: 'Titre de la tâche...',
+      startTime: 'Heure de début',
+      endTime: 'Heure de fin',
+      priority: 'Priorité',
+      priorityLow: 'Basse',
+      priorityMedium: 'Moyenne',
+      priorityHigh: 'Haute',
+      priorityUrgent: 'Urgente',
+      content: 'Description détaillée / Notes',
+      contentPlaceholder: 'Description facultative, notes...',
+      addTask: 'Ajouter la tâche au jour',
+      listTitle: 'Tâches du {date} ({count})',
+      noTasks: 'Aucune tâche prévue pour ce jour. Remplissez le formulaire ci-dessus pour en ajouter !',
+      completed: 'Terminée',
+      pending: 'En cours',
+      deleteConfirmTitle: 'Supprimer la tâche',
+      deleteConfirmMessage: 'Êtes-vous sûr de vouloir supprimer cette tâche ?',
+      editTask: 'Modifier la tâche',
+      updateTask: 'Mettre à jour la tâche',
     },
   },
+
+
+
   notes: {
     title: 'Notes & Souvenirs',
     subtitle: 'Conservez vos moments précieux',

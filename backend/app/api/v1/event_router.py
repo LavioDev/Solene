@@ -1,8 +1,8 @@
-from datetime import date
+from datetime import date, datetime, time, timezone
 from typing import List
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_async_db
@@ -11,8 +11,10 @@ from app.modules.auth.models import User
 from app.modules.events.schemas import SpecialEventCreate, SpecialEventUpdate, SpecialEventOut, EventOccurrenceOut
 from app.modules.events.service import EventService
 from app.modules.notes.models import UserNote
+from app.modules.tasks.models import Task
 
 router = APIRouter(prefix="/events", tags=["Special Events & Calendar"])
+
 
 
 @router.post("", response_model=SpecialEventOut, status_code=status.HTTP_201_CREATED)
@@ -99,6 +101,8 @@ async def get_event_occurrences(
     # Sort occurrences chronologically
     all_occurrences.sort(key=lambda x: x.date)
     return all_occurrences
+
+
 
 
 @router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
