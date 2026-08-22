@@ -18,24 +18,8 @@ import AppTextarea from '@/components/ui/AppTextarea.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
 import AppImageUpload from '@/components/ui/AppImageUpload.vue'
 import AppConfirmModal from '@/components/ui/AppConfirmModal.vue'
-
-interface EventOccurrence {
-  event_id: string
-  title: string
-  date: string // YYYY-MM-DD
-  category: string
-  milestone_info?: string
-  image_url?: string
-}
-
-interface CalendarDay {
-  date: Date
-  dateStr: string
-  dayNumber: number
-  isCurrentMonth: boolean
-  isToday: boolean
-  events: EventOccurrence[]
-}
+import AutoRuleModal from '../components/AutoRuleModal.vue'
+import type { EventOccurrence, CalendarDay } from '../types'
 
 const { t, locale } = useI18n()
 
@@ -56,12 +40,6 @@ const showAutoRuleModal = ref(false)
 const showSingleDayModal = ref(false)
 const showDeleteConfirmModal = ref(false)
 const deletingEvent = ref(false)
-
-// Auto Rule Form State
-const ruleTitle = ref('')
-const ruleRecurrenceType = ref<'EVERY_N_DAYS' | 'MONTHLY' | 'YEARLY'>('EVERY_N_DAYS')
-const ruleIntervalValue = ref(100)
-const ruleAnchorDate = ref(todayStr)
 
 // Single Day Note Form State (Unified with /notes)
 const singleNoteTitle = ref('')
@@ -258,10 +236,6 @@ onMounted(() => {
 // Open Auto-Generate Rule Modal for creation
 function openAutoRuleModal() {
   selectedEvent.value = null
-  ruleTitle.value = ''
-  ruleAnchorDate.value = '2022-05-22'
-  ruleRecurrenceType.value = 'EVERY_N_DAYS'
-  ruleIntervalValue.value = 100
   showAutoRuleModal.value = true
 }
 
@@ -290,40 +264,13 @@ function openEventEditModal(evt: EventOccurrence) {
     singleNoteTargetDate.value = evt.date
     showSingleDayModal.value = true
   } else {
-    ruleTitle.value = evt.title
-    ruleAnchorDate.value = evt.date
     showAutoRuleModal.value = true
   }
 }
 
-// Save (Create or Update) Auto Rule
-async function handleSaveAutoRule() {
-  if (!ruleTitle.value.trim() || !ruleAnchorDate.value) return
-
-  try {
-    if (selectedEvent.value && selectedEvent.value.category !== 'note') {
-      await apiClient.put(`/events/${selectedEvent.value.event_id}`, {
-        title: ruleTitle.value.trim(),
-        anchor_date: ruleAnchorDate.value,
-        recurrence_type: ruleRecurrenceType.value,
-        interval_value: ruleIntervalValue.value,
-        category: 'love',
-      })
-    } else {
-      await apiClient.post('/events', {
-        title: ruleTitle.value.trim(),
-        anchor_date: ruleAnchorDate.value,
-        recurrence_type: ruleRecurrenceType.value,
-        interval_value: ruleIntervalValue.value,
-        category: 'love',
-      })
-    }
-    showAutoRuleModal.value = false
-    selectedEvent.value = null
-    await fetchOccurrences()
-  } catch (err) {
-    console.error('Failed to save auto rule:', err)
-  }
+function handleDeleteFromModal(evt: EventOccurrence) {
+  selectedEvent.value = evt
+  showDeleteConfirmModal.value = true
 }
 
 // Save (Create or Update) Single-Day Note
@@ -550,74 +497,13 @@ async function confirmDeleteEvent() {
     </div>
 
     <!-- Modal 1: Auto-Generate Rules (Create or Edit) -->
-    <AppModal
+    <AutoRuleModal
       :show="showAutoRuleModal"
-      :title="selectedEvent ? t('common.edit') : t('calendar.modalAutoTitle')"
-      width="880"
+      :selected-event="selectedEvent"
       @close="showAutoRuleModal = false"
-    >
-      <form @submit.prevent="handleSaveAutoRule" class="space-y-4">
-        <AppInput
-          v-model="ruleTitle"
-          :label="t('calendar.ruleTitleLabel')"
-          :placeholder="t('calendar.ruleTitlePlaceholder')"
-          required
-        />
-
-        <AppInput
-          v-model="ruleAnchorDate"
-          type="date"
-          :label="t('calendar.anchorDateLabel')"
-          required
-        />
-
-        <!-- Side-by-Side 2-Column Row for Recurrence Type & Interval using AppSelect and AppInput -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <AppSelect
-            v-model="ruleRecurrenceType"
-            :label="t('calendar.recurrenceTypeLabel')"
-            :options="[
-              { label: t('calendar.recurrenceOptions.everyNDays'), value: 'EVERY_N_DAYS' },
-              { label: t('calendar.recurrenceOptions.monthly'), value: 'MONTHLY' },
-              { label: t('calendar.recurrenceOptions.yearly'), value: 'YEARLY' },
-            ]"
-          />
-
-          <div v-if="ruleRecurrenceType === 'EVERY_N_DAYS'">
-            <AppInput
-              v-model.number="ruleIntervalValue"
-              type="number"
-              :label="t('calendar.intervalLabel')"
-              :placeholder="t('calendar.intervalPlaceholder')"
-            />
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between pt-2 border-t border-border">
-          <div>
-            <AppButton
-              v-if="selectedEvent"
-              variant="outline"
-              type="button"
-              size="sm"
-              class="text-err-text hover:bg-err-bg border-err-border"
-              @click="showDeleteConfirmModal = true"
-            >
-              <Trash2 class="w-3.5 h-3.5 mr-1" />
-              {{ t('common.delete') }}
-            </AppButton>
-          </div>
-          <div class="flex gap-2">
-            <AppButton variant="outline" type="button" size="sm" @click="showAutoRuleModal = false">
-              {{ t('common.cancel') }}
-            </AppButton>
-            <AppButton type="submit" size="sm">
-              {{ selectedEvent ? t('common.save') : t('calendar.autoGenerate') }}
-            </AppButton>
-          </div>
-        </div>
-      </form>
-    </AppModal>
+      @saved="fetchOccurrences"
+      @delete="handleDeleteFromModal"
+    />
 
     <!-- Modal 2: Note Modal (Native UI AppInput, AppSelect, AppTextarea, AppButton) -->
     <AppModal

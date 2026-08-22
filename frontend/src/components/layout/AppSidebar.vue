@@ -12,6 +12,7 @@ import {
   User as UserIcon,
 } from 'lucide-vue-next'
 import AppLangSwitcher from '@/components/ui/AppLangSwitcher.vue'
+import faviconImg from '@/img/favicon.png'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,14 +56,13 @@ async function handleLogout() {
         >
           Solène
         </span>
-        <span
+        <img
           v-else
-          class="w-8 h-8 rounded-xl bg-violet-600 text-white font-extrabold text-sm flex items-center justify-center shadow-xs group-hover:bg-violet-700 transition-colors"
-          style="font-family: 'Plus Jakarta Sans', sans-serif;"
+          :src="faviconImg"
+          alt="Solène"
+          class="w-8 h-8 rounded-xl object-cover shadow-xs group-hover:opacity-90 transition-opacity"
           title="Solène"
-        >
-          S
-        </span>
+        />
       </router-link>
     </div>
 
