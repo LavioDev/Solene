@@ -73,8 +73,8 @@ const modalTitle = computed(() => {
     </div>
 
     <template #footer>
-      <div class="flex items-center justify-between w-full">
-        <AppButton
+      <div class="flex items-center justify-end w-full">
+        <!-- <AppButton
           variant="ghost"
           size="sm"
           @click="emit('shuffle')"
@@ -83,7 +83,7 @@ const modalTitle = computed(() => {
         >
           <RotateCw class="w-3.5 h-3.5 mr-1" :class="{ 'animate-spin': isShuffling }" />
           {{ t('home.randomNoteModal.shuffle') }}
-        </AppButton>
+        </AppButton> -->
 
         <AppButton
           variant="secondary"

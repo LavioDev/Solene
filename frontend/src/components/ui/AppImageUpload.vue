@@ -303,17 +303,6 @@ function closeCropModal() {
         <!-- Hover Action Toolbar (Crop & Remove & Re-upload) -->
         <div class="absolute inset-0 bg-black/40 backdrop-blur-2xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2.5">
           <button
-            v-if="crop"
-            type="button"
-            @click.stop="openCropExisting(images[0], 0)"
-            class="px-3 py-1.5 rounded-xl bg-white/90 hover:bg-white text-ink text-xs font-semibold shadow-md transition-all flex items-center gap-1.5 cursor-pointer hover:scale-105"
-            :title="t('upload.cropImage')"
-          >
-            <Crop class="w-3.5 h-3.5 text-violet-600" />
-            <span>{{ t('upload.cropImage') }}</span>
-          </button>
-
-          <button
             type="button"
             @click.stop="triggerFileInput"
             class="px-3 py-1.5 rounded-xl bg-white/90 hover:bg-white text-ink text-xs font-semibold shadow-md transition-all flex items-center gap-1.5 cursor-pointer hover:scale-105"
