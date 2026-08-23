@@ -56,7 +56,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6 px-6 py-6 pb-16 min-w-[800px] max-w-6xl mx-auto select-none">
+  <div class="space-y-4 px-4 sm:px-6 lg:px-8 pt-1 sm:pt-2 pb-16 w-full select-none">
     <!-- Page Header & Stats Row -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>

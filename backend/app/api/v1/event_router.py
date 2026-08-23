@@ -11,7 +11,7 @@ from app.modules.auth.models import User
 from app.modules.events.schemas import SpecialEventCreate, SpecialEventUpdate, SpecialEventOut, EventOccurrenceOut
 from app.modules.events.service import EventService
 from app.modules.couples.models import Couple
-from app.modules.notes.models import UserNote
+from app.modules.memories.models import Memory
 from app.modules.tasks.models import Task
 
 router = APIRouter(prefix="/events", tags=["Special Events & Calendar"])
@@ -59,8 +59,8 @@ async def get_event_occurrences(
     session: AsyncSession = Depends(get_async_db),
 ):
     """
-    Dynamically calculate and return event occurrences and date-bound notes falling within the specified date window.
-    Unifies recurring milestone rules and user_notes.
+    Dynamically calculate and return event occurrences and date-bound memories falling within the specified date window.
+    Unifies recurring milestone rules and memories.
     """
     if start_date > end_date:
         raise HTTPException(
@@ -76,7 +76,7 @@ async def get_event_occurrences(
         occs = EventService.generate_occurrences_for_window(event, start_date, end_date)
         all_occurrences.extend(occs)
 
-    # 2. Date-bound Notes from user_notes
+    # 2. Date-bound Memories from memories
     couple_stmt = (
         select(Couple)
         .where(
@@ -92,33 +92,33 @@ async def get_event_occurrences(
         partner_id = couple.user2_id if couple.user1_id == current_user.id else couple.user1_id
 
     if partner_id:
-        note_user_filter = or_(
-            UserNote.user_id == current_user.id,
-            and_(UserNote.user_id == partner_id, UserNote.is_shared == True),
+        memory_user_filter = or_(
+            Memory.user_id == current_user.id,
+            and_(Memory.user_id == partner_id, Memory.is_shared == True),
         )
     else:
-        note_user_filter = (UserNote.user_id == current_user.id)
+        memory_user_filter = (Memory.user_id == current_user.id)
 
-    notes_stmt = select(UserNote).where(
-        note_user_filter,
-        UserNote.display_type == "DATE",
-        UserNote.target_date >= start_date,
-        UserNote.target_date <= end_date,
+    memory_stmt = select(Memory).where(
+        memory_user_filter,
+        Memory.display_type == "DATE",
+        Memory.target_date >= start_date,
+        Memory.target_date <= end_date,
     )
-    notes_res = await session.execute(notes_stmt)
-    date_notes = notes_res.scalars().all()
+    memory_res = await session.execute(memory_stmt)
+    date_memories = memory_res.scalars().all()
 
-    for note in date_notes:
-        if note.target_date:
+    for mem in date_memories:
+        if mem.target_date:
             all_occurrences.append(
                 EventOccurrenceOut(
-                    event_id=note.id,
-                    title=note.title,
-                    date=note.target_date,
-                    category="note",
-                    milestone_info=note.content,
-                    image_url=note.image_url,
-                    is_shared=note.is_shared,
+                    event_id=mem.id,
+                    title=mem.title,
+                    date=mem.target_date,
+                    category="memory",
+                    milestone_info=mem.content,
+                    image_url=mem.image_url,
+                    is_shared=mem.is_shared,
                 )
             )
 

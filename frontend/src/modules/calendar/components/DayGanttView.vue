@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { apiClient } from '@/services/apiClient'
+import { useAuthStore } from '@/stores/authStore'
 import {
   CheckSquare,
   Clock,
@@ -10,6 +11,7 @@ import {
   Trash2,
   ZoomIn,
   ZoomOut,
+  Heart,
 } from 'lucide-vue-next'
 
 
@@ -24,11 +26,13 @@ import type { TaskItem } from '../types'
 interface Props {
   activeDate?: string
   initialDate?: string
+  viewMode?: 'my' | 'partner' | 'combined'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   activeDate: '',
   initialDate: '',
+  viewMode: 'combined',
 })
 
 const emit = defineEmits<{
@@ -37,10 +41,26 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const authStore = useAuthStore()
+const currentUserId = computed(() => authStore.user?.id)
 
 // Active Day State
 const activeDateStr = ref(props.activeDate || props.initialDate || new Date().toISOString().split('T')[0])
 const tasks = ref<TaskItem[]>([])
+
+const filteredTasks = computed(() => {
+  if (props.viewMode === 'my') {
+    return tasks.value.filter((t) => !currentUserId.value || t.user_id === currentUserId.value)
+  }
+  if (props.viewMode === 'partner') {
+    return tasks.value.filter((t) => Boolean(currentUserId.value && t.user_id !== currentUserId.value))
+  }
+  return tasks.value
+})
+
+function isPartnerTask(task: TaskItem): boolean {
+  return Boolean(currentUserId.value && task.user_id !== currentUserId.value)
+}
 
 const loading = ref(false)
 const deletingTaskId = ref<string | null>(null)
@@ -243,9 +263,21 @@ async function handleUpdateTask() {
 
 // Priority styling helper for timeline bars
 
-function getPriorityBarClass(priority: string, isCompleted: boolean): string {
+function getPriorityBarClass(priority: string, isCompleted: boolean, isPartner: boolean = false): string {
   if (isCompleted) {
     return 'bg-emerald-500/85 text-white border-emerald-600/30'
+  }
+  if (isPartner) {
+    switch (priority) {
+      case 'urgent':
+        return 'bg-rose-500 text-white shadow-xs'
+      case 'high':
+        return 'bg-pink-500 text-white shadow-xs'
+      case 'low':
+        return 'bg-pink-400 text-white shadow-xs'
+      default:
+        return 'bg-pink-500 text-white shadow-xs'
+    }
   }
   switch (priority) {
     case 'urgent':
@@ -374,21 +406,23 @@ defineExpose({
         >
           <!-- Empty state -->
           <div
-            v-if="tasks.length === 0"
+            v-if="filteredTasks.length === 0"
             class="h-56 flex flex-col items-center justify-center gap-2 text-center px-4"
           >
             <div class="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center text-violet-500 border border-violet-100/70">
               <Clock class="w-4 h-4" />
             </div>
             <div>
-              <p class="text-xs font-semibold text-ink">{{ t('calendar.gantt.noTasks') }}</p>
+              <p class="text-xs font-semibold text-ink">
+                {{ viewMode === 'partner' ? t('calendar.gantt.noPartnerTasks') : viewMode === 'my' ? t('calendar.gantt.noMyTasks') : t('calendar.gantt.noTasks') }}
+              </p>
               <p class="text-[10px] text-ink-faint mt-0.5 font-mono">{{ activeDateStr }}</p>
             </div>
           </div>
 
           <!-- Task Rows (Clean minimalist h-12 height) -->
           <div
-            v-for="task in tasks"
+            v-for="task in filteredTasks"
             :key="task.id"
             class="h-12 px-3.5 flex items-center gap-2 hover:bg-violet-50/30 transition-colors group"
             :class="task.is_completed ? 'bg-surface-subtle/30' : ''"
@@ -406,6 +440,16 @@ defineExpose({
 
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 truncate">
+                <!-- Partner Badge if in Combined View -->
+                <span
+                  v-if="viewMode === 'combined' && isPartnerTask(task)"
+                  class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-pink-50 text-pink-700 border border-pink-200 text-[9px] font-bold shrink-0 leading-none"
+                  :title="t('calendar.gantt.partnerBadge')"
+                >
+                  <Heart class="w-2.5 h-2.5 text-pink-500 fill-pink-500" />
+                  <span>{{ t('calendar.gantt.partnerBadge') }}</span>
+                </span>
+
                 <span
                   class="text-sm font-semibold text-ink truncate leading-tight"
                   :class="task.is_completed ? 'line-through text-ink-faint' : ''"
@@ -413,15 +457,6 @@ defineExpose({
                   {{ task.title }}
                 </span>
               </div>
-
-              <!-- <div class="flex items-center gap-1.5 text-[10px] text-ink-faint font-mono mt-0.5 leading-none">
-                <span v-if="task.start_time || task.end_time" class="flex items-center gap-1">
-                  <Clock class="w-2.5 h-2.5 text-violet-500" />
-                  {{ formatTimeOnly(task.start_time) }}
-                  <template v-if="task.end_time"> - {{ formatTimeOnly(task.end_time) }}</template>
-                </span>
-                <span v-else>{{ t('calendar.gantt.allDay') }}</span>
-              </div> -->
             </div>
 
             <!-- Action buttons on hover -->
@@ -505,13 +540,13 @@ defineExpose({
 
           <!-- Empty state in Timeline -->
           <div
-            v-else-if="tasks.length === 0"
+            v-else-if="filteredTasks.length === 0"
             class="h-56"
           />
 
           <!-- Task Rows in Timeline (Exact h-12 height matching Left Pane) -->
           <div
-            v-for="task in tasks"
+            v-for="task in filteredTasks"
             :key="task.id"
             class="h-12 px-4 flex items-center hover:bg-violet-50/30 transition-colors relative"
             :class="task.is_completed ? 'bg-surface-subtle/30' : ''"
@@ -519,9 +554,9 @@ defineExpose({
             <div class="relative w-full h-6 flex items-center gantt-timeline-track">
               <div
                 class="absolute h-5 rounded-md transition-all shadow-2xs hover:shadow-md cursor-pointer select-none flex items-center px-2 overflow-hidden text-[10px] font-medium"
-                :class="getPriorityBarClass(task.priority, task.is_completed)"
+                :class="getPriorityBarClass(task.priority, task.is_completed, isPartnerTask(task))"
                 :style="getGanttBarStyle(task)"
-                :title="`${task.title} (${formatTimeOnly(task.start_time)} - ${formatTimeOnly(task.end_time)})\n${task.content || ''}`"
+                :title="`${task.title} (${formatTimeOnly(task.start_time)} - ${formatTimeOnly(task.end_time)})\n${isPartnerTask(task) ? `[${t('calendar.gantt.partnerBadge')}] ` : ''}${task.content || ''}`"
                 @click="openEditTaskModal(task)"
               >
               </div>

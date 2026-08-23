@@ -9,6 +9,9 @@ import {
   PawPrint,
   Plus,
   Sparkles,
+  User,
+  Heart,
+  Layers,
 } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppModal from '@/components/ui/AppModal.vue'
@@ -24,6 +27,7 @@ const router = useRouter()
 const { t, locale } = useI18n()
 
 const ganttViewRef = ref<InstanceType<typeof DayGanttView> | null>(null)
+const viewMode = ref<'my' | 'partner' | 'combined'>('my')
 
 const today = new Date()
 const todayStr = today.toISOString().split('T')[0]
@@ -156,23 +160,72 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-3 select-none">
+  <div class="space-y-4 px-4 sm:px-6 lg:px-8 pt-1 sm:pt-2 pb-16 w-full select-none">
+    <!-- Page Header (Chuẩn 1:1 theo phong cách MoodsView) -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl sm:text-2xl font-bold text-ink font-sans tracking-tight">
+            {{ t('nav.schedule') }}
+          </h1>
+        </div>
+        <p class="text-xs sm:text-sm text-ink-muted mt-0.5">
+          {{ t('nav.scheduleDesc') }}
+        </p>
+      </div>
 
-    <!-- Main Card Container (Exact original style & height) -->
-    <div class="w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[calc(100vh-210px)] h-[calc(100vh-210px)]">
+      <!-- Controls: View Mode Segmented Pill (Chuẩn 1:1 theo MoodsView) -->
+      <div class="flex items-center gap-3">
+        <!-- View Mode Segmented Pill -->
+        <div class="flex bg-surface-raised p-1 rounded-xl border border-border/80 text-xs font-medium shrink-0">
+          <button
+            type="button"
+            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
+            :class="viewMode === 'my' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+            @click="viewMode = 'my'"
+          >
+            <User class="w-4 h-4" />
+            <span class="text-xs">{{ t('calendar.gantt.mySchedule') }}</span>
+          </button>
 
-      <!-- Header Toolbar inside card (Exact original 1:1 style) -->
+          <button
+            type="button"
+            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
+            :class="viewMode === 'partner' ? 'bg-white text-pink-600 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+            @click="viewMode = 'partner'"
+          >
+            <Heart class="w-4 h-4" />
+            <span class="text-xs">{{ t('calendar.gantt.partnerSchedule') }}</span>
+          </button>
+
+          <button
+            type="button"
+            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
+            :class="viewMode === 'combined' ? 'bg-white text-emerald-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+            @click="viewMode = 'combined'"
+          >
+            <Layers class="w-4 h-4" />
+            <span class="text-xs">{{ t('calendar.gantt.combinedSchedule') }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Card Container (Đảm bảo chiều cao tối thiểu min-h-[600px] và mở rộng chiều ngang) -->
+    <div class="w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[600px] h-[calc(100vh-210px)]">
+
+      <!-- Header Toolbar inside card -->
       <div class="h-14 px-6 border-b border-border/60 flex items-center justify-between bg-white shrink-0">
 
-        <!-- Left: Title / Loading indicator -->
-        <div class="flex items-center gap-2.5">
-          <h2 class="text-sm sm:text-base font-semibold text-ink capitalize tracking-tight">
+        <!-- Left: Title / Date label -->
+        <div class="flex items-center gap-2.5 min-w-0">
+          <h2 class="text-sm sm:text-base font-semibold text-ink capitalize tracking-tight truncate">
             {{ ganttHeaderLabel }}
           </h2>
         </div>
 
-        <!-- Right: Day-Gantt Controls (Original exact 1:1 Calendar Header style) -->
-        <div class="flex items-center gap-1.5">
+        <!-- Right: Day-Gantt Controls -->
+        <div class="flex items-center gap-1.5 shrink-0">
           <!-- Focus to Current Time Icon Button -->
           <AppButton
             variant="ghost"
@@ -232,13 +285,14 @@ onMounted(() => {
         <DayGanttView
           ref="ganttViewRef"
           :active-date="ganttActiveDateStr"
+          :view-mode="viewMode"
           @add-task="handleGanttAddTask"
         />
       </div>
 
     </div>
 
-    <!-- Modal: Independent Day Tasks Modal (Exact 1:1 original modal) -->
+    <!-- Modal: Independent Day Tasks Modal -->
     <AppModal
       :show="showTaskModal"
       :title="`${t('calendar.tabs.tasks')} — ${ganttActiveDateStr}`"

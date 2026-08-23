@@ -5,10 +5,10 @@ import { useMoodStore } from '@/stores/moodStore'
 import { apiClient } from '@/services/apiClient'
 import { coupleService } from '@/services/coupleService'
 import { taskService } from '@/services/taskService'
-import { noteService } from '@/services/noteService'
+import { memoryService } from '@/services/memoryService'
 import type { Couple, UserPartnerSummary } from '@/types/couple'
 import type { PartnerActiveStatus } from '@/types/task'
-import type { NoteItem } from '@/types/note'
+import type { MemoryItem } from '@/types/memory'
 import type { EventOccurrence } from '@/modules/calendar/types'
 
 export function useHomeDashboard() {
@@ -22,12 +22,12 @@ export function useHomeDashboard() {
   const couple = ref<Couple | null>(null)
   const partnerStatus = ref<PartnerActiveStatus | null>(null)
   const occurrences = ref<EventOccurrence[]>([])
-  const notes = ref<NoteItem[]>([])
+  const memories = ref<MemoryItem[]>([])
 
-  // Random Note Modal State
-  const showRandomNoteModal = ref(false)
-  const currentRandomNote = ref<NoteItem | null>(null)
-  const isShufflingNote = ref(false)
+  // Random Memory Modal State
+  const showRandomMemoryModal = ref(false)
+  const currentRandomMemory = ref<MemoryItem | null>(null)
+  const isShufflingMemory = ref(false)
 
   // Live Love Counter
   const days = ref(0)
@@ -149,45 +149,45 @@ export function useHomeDashboard() {
     return 'U'
   }
 
-  function pickRandomNote() {
-    if (notes.value.length === 0) {
-      currentRandomNote.value = null
+  function pickRandomMemory() {
+    if (memories.value.length === 0) {
+      currentRandomMemory.value = null
       return
     }
-    isShufflingNote.value = true
+    isShufflingMemory.value = true
     setTimeout(() => {
-      const randomPool = notes.value.filter((n) => n.display_type === 'RANDOM')
-      const pool = randomPool.length > 0 ? randomPool : notes.value
+      const randomPool = memories.value.filter((n) => n.display_type === 'RANDOM')
+      const pool = randomPool.length > 0 ? randomPool : memories.value
       const randomIndex = Math.floor(Math.random() * pool.length)
-      currentRandomNote.value = pool[randomIndex]
-      isShufflingNote.value = false
+      currentRandomMemory.value = pool[randomIndex]
+      isShufflingMemory.value = false
     }, 180)
   }
 
-  const currentRandomNoteAuthor = computed(() => {
-    if (!currentRandomNote.value) return ''
-    const noteUserId = currentRandomNote.value.user_id
+  const currentRandomMemoryAuthor = computed(() => {
+    if (!currentRandomMemory.value) return ''
+    const memoryUserId = currentRandomMemory.value.user_id
     if (couple.value) {
-      if (noteUserId === couple.value.user1_id && couple.value.user1?.full_name) {
+      if (memoryUserId === couple.value.user1_id && couple.value.user1?.full_name) {
         return couple.value.user1.full_name
       }
-      if (noteUserId === couple.value.user2_id && couple.value.user2?.full_name) {
+      if (memoryUserId === couple.value.user2_id && couple.value.user2?.full_name) {
         return couple.value.user2.full_name
       }
     }
-    if (authStore.user?.id === noteUserId && authStore.user.full_name) {
+    if (authStore.user?.id === memoryUserId && authStore.user.full_name) {
       return authStore.user.full_name
     }
     return partner.value?.full_name || authStore.user?.full_name || ''
   })
 
-  function openRandomNoteModal() {
-    pickRandomNote()
-    showRandomNoteModal.value = true
+  function openRandomMemoryModal() {
+    pickRandomMemory()
+    showRandomMemoryModal.value = true
   }
 
-  function closeRandomNoteModal() {
-    showRandomNoteModal.value = false
+  function closeRandomMemoryModal() {
+    showRandomMemoryModal.value = false
   }
 
   async function fetchDashboardData() {
@@ -232,12 +232,12 @@ export function useHomeDashboard() {
         occurrences.value = []
       }
 
-      // 4. Fetch Notes
+      // 4. Fetch Memories
       try {
-        const notesData = await noteService.getNotes({ per_page: 50 })
-        notes.value = notesData.items || []
+        const memoriesData = await memoryService.getMemories({ per_page: 50 })
+        memories.value = memoriesData.items || []
       } catch {
-        notes.value = []
+        memories.value = []
       }
     } finally {
       loading.value = false
@@ -278,7 +278,7 @@ export function useHomeDashboard() {
     partner,
     partnerStatus,
     occurrences,
-    notes,
+    memories,
     days,
     hours,
     minutes,
@@ -287,17 +287,17 @@ export function useHomeDashboard() {
     todayDateStr,
     todayOccurrences,
     upcomingOccurrences,
-    showRandomNoteModal,
-    currentRandomNote,
-    currentRandomNoteAuthor,
-    isShufflingNote,
+    showRandomMemoryModal,
+    currentRandomMemory,
+    currentRandomMemoryAuthor,
+    isShufflingMemory,
     formatDisplayDate,
     calculateDaysRemaining,
     formatTaskTime,
     getUserInitials,
-    pickRandomNote,
-    openRandomNoteModal,
-    closeRandomNoteModal,
+    pickRandomMemory,
+    openRandomMemoryModal,
+    closeRandomMemoryModal,
     fetchDashboardData,
     refreshPartnerStatusOnly,
   }

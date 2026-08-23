@@ -30,9 +30,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/modules/schedule/views/ScheduleView.vue'),
       },
       {
-        path: 'notes',
-        name: 'Notes',
-        component: () => import('@/modules/notes/views/NotesView.vue'),
+        path: 'memories',
+        name: 'Memories',
+        component: () => import('@/modules/memories/views/MemoriesView.vue'),
       },
       {
         path: 'moods',

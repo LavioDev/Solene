@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { NoteItem } from '@/types/note'
+import type { MemoryItem } from '@/types/memory'
 import { StickyNote } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppModal from '@/components/ui/AppModal.vue'
 
 interface Props {
   show: boolean
-  note: NoteItem | null
+  memory: MemoryItem | null
   authorName?: string
   isShuffling?: boolean
-  hasNotes?: boolean
+  hasMemories?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   authorName: '',
   isShuffling: false,
-  hasNotes: true,
+  hasMemories: true,
 })
 
 const emit = defineEmits<{
@@ -34,21 +34,21 @@ const modalTitle = computed(() => {
   return t('home.randomNoteModal.defaultTitle')
 })
 
-// Thu thập toàn bộ ảnh được lưu (cả note.images mảng nhiều ảnh và note.image_url đơn)
+// Thu thập toàn bộ ảnh được lưu (cả memory.images mảng nhiều ảnh và memory.image_url đơn)
 const allImages = computed<string[]>(() => {
-  if (!props.note) return []
+  if (!props.memory) return []
   const list: string[] = []
 
-  if (props.note.images && Array.isArray(props.note.images) && props.note.images.length > 0) {
-    for (const img of props.note.images) {
+  if (props.memory.images && Array.isArray(props.memory.images) && props.memory.images.length > 0) {
+    for (const img of props.memory.images) {
       if (img?.file_path && !list.includes(img.file_path)) {
         list.push(img.file_path)
       }
     }
   }
 
-  if (props.note.image_url && !list.includes(props.note.image_url)) {
-    list.push(props.note.image_url)
+  if (props.memory.image_url && !list.includes(props.memory.image_url)) {
+    list.push(props.memory.image_url)
   }
 
   return list
@@ -62,16 +62,13 @@ const allImages = computed<string[]>(() => {
     width="md"
     @close="emit('close')"
   >
-    <div v-if="note" class="space-y-3 py-1">
+    <div v-if="memory" class="space-y-3 py-1">
       <div class="flex items-center justify-between gap-2">
-        <h3 class="font-bold text-sm text-ink truncate">{{ note.title }}</h3>
-        <!-- <AppBadge variant="violet" size="sm">
-          {{ note.target_date ? note.target_date : t('notes.badgeRandom') }}
-        </AppBadge> -->
+        <h3 class="font-bold text-sm text-ink truncate">{{ memory.title }}</h3>
       </div>
 
       <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
-        {{ note.content }}
+        {{ memory.content }}
       </p>
 
       <!-- TOÀN BỘ ẢNH ĐƯỢC LƯU (Tỷ lệ Full, bám theo chiều rộng, không bị cắt) -->
@@ -83,7 +80,7 @@ const allImages = computed<string[]>(() => {
         >
           <img
             :src="img"
-            :alt="`${note.title} ${idx + 1}`"
+            :alt="`${memory.title} ${idx + 1}`"
             class="w-full h-auto block"
             loading="lazy"
           />
@@ -109,4 +106,3 @@ const allImages = computed<string[]>(() => {
     </template>
   </AppModal>
 </template>
-

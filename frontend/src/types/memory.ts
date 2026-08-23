@@ -1,18 +1,18 @@
-export interface NoteImage {
+export interface MemoryImage {
   id: string
-  note_id: string
+  memory_id: string
   file_path: string
   filename?: string | null
   created_at: string
 }
 
-export interface NoteItem {
+export interface MemoryItem {
   id: string
   user_id: string
   title: string
   content: string
   image_url?: string | null
-  images: NoteImage[]
+  images: MemoryImage[]
   category: string
   display_type: 'DATE' | 'RANDOM'
   target_date?: string | null

@@ -482,23 +482,23 @@ async function handleSaveSingleDayNote() {
       target_date: targetDate,
       is_shared: singleNoteIsShared.value,
     }
-    if (selectedEvent.value && 'category' in selectedEvent.value && selectedEvent.value.category === 'note') {
+    if (selectedEvent.value && 'category' in selectedEvent.value && (selectedEvent.value.category === 'note' || selectedEvent.value.category === 'memory')) {
       const eventId = 'id' in selectedEvent.value ? selectedEvent.value.id : selectedEvent.value.event_id
-      await apiClient.put(`/notes/${eventId}`, payload)
+      await apiClient.put(`/memories/${eventId}`, payload)
     } else {
-      await apiClient.post('/notes', payload)
+      await apiClient.post('/memories', payload)
     }
     showNoteModal.value = false
     selectedEvent.value = null
     await fetchOccurrences()
   } catch (err) {
-    console.error('Failed to save note for calendar day:', err)
+    console.error('Failed to save memory for calendar day:', err)
   } finally {
     submittingNote.value = false
   }
 }
 
-// Delete Event / Note / Task
+// Delete Event / Memory / Task
 async function confirmDeleteEvent() {
   if (!selectedEvent.value) return
 
@@ -507,8 +507,8 @@ async function confirmDeleteEvent() {
     const eventId = 'id' in selectedEvent.value ? selectedEvent.value.id : selectedEvent.value.event_id
     const cat = 'category' in selectedEvent.value ? selectedEvent.value.category : 'love'
 
-    if (cat === 'note') {
-      await apiClient.delete(`/notes/${eventId}`)
+    if (cat === 'note' || cat === 'memory') {
+      await apiClient.delete(`/memories/${eventId}`)
     } else if (cat === 'task') {
       await apiClient.delete(`/tasks/${eventId}`)
     } else {
@@ -533,36 +533,50 @@ async function confirmDeleteEvent() {
 </script>
 
 <template>
-  <div class="space-y-3 select-none">
+  <div class="space-y-4 px-4 sm:px-6 lg:px-8 pt-1 sm:pt-2 pb-16 w-full select-none">
 
-    <!-- Top Sub-Nav Switcher (size: sm) placed above table card -->
-    <div class="flex items-center justify-between gap-3">
-      <div class="inline-flex items-center gap-1.5 p-1 bg-white border border-border rounded-2xl shadow-card">
-        <button
-          type="button"
-          @click="mainViewMode = 'calendar'"
-          class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
-          :class="mainViewMode === 'calendar' ? 'bg-violet-50 text-violet-700 font-bold shadow-2xs' : 'text-ink-muted hover:text-ink hover:bg-surface-raised'"
-        >
-          <CalendarIcon class="w-4 h-4" />
-          <span>{{ t('calendar.subnav.calendar') }}</span>
-        </button>
-        <button
-          type="button"
-          @click="mainViewMode = 'list'"
-          class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
-          :class="mainViewMode === 'list' ? 'bg-violet-50 text-violet-700 font-bold shadow-2xs' : 'text-ink-muted hover:text-ink hover:bg-surface-raised'"
-        >
-          <List class="w-4 h-4" />
-          <span>{{ t('calendar.subnav.list') }}</span>
-        </button>
+    <!-- Page Header (Chuẩn 1:1 theo MoodsView & ScheduleView) -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl sm:text-2xl font-bold text-ink font-sans tracking-tight">
+            {{ t('nav.calendar') }}
+          </h1>
+        </div>
+        <p class="text-xs sm:text-sm text-ink-muted mt-0.5">
+          {{ t('nav.calendarDesc') }}
+        </p>
+      </div>
+
+      <!-- Controls: Sub-Nav Switcher (Lịch Lưới / Danh Sách) -->
+      <div class="flex items-center gap-3">
+        <div class="flex bg-surface-raised p-1 rounded-xl border border-border/80 text-xs font-medium shrink-0">
+          <button
+            type="button"
+            @click="mainViewMode = 'calendar'"
+            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
+            :class="mainViewMode === 'calendar' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+          >
+            <CalendarIcon class="w-4 h-4" />
+            <span class="text-xs">{{ t('calendar.subnav.calendar') }}</span>
+          </button>
+          <button
+            type="button"
+            @click="mainViewMode = 'list'"
+            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
+            :class="mainViewMode === 'list' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+          >
+            <List class="w-4 h-4" />
+            <span class="text-xs">{{ t('calendar.subnav.list') }}</span>
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- SUB-VIEW 1: Calendar Grid Mode Card Container -->
     <div
       v-if="mainViewMode === 'calendar'"
-      class="w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[calc(100vh-210px)] h-[calc(100vh-210px)]"
+      class="w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[600px] h-[calc(100vh-210px)]"
     >
       <!-- Header Toolbar inside calendar card -->
       <div class="h-14 px-6 border-b border-border/60 flex items-center justify-between bg-white shrink-0">
@@ -759,8 +773,8 @@ async function confirmDeleteEvent() {
       <form @submit.prevent="handleSaveSingleDayNote" class="space-y-4">
         <AppInput
           v-model="singleNoteTitle"
-          :label="t('notes.noteTitle')"
-          :placeholder="t('notes.noteTitlePlaceholder')"
+          :label="t('memories.memoryTitle')"
+          :placeholder="t('memories.memoryTitlePlaceholder')"
           required
         />
 
@@ -768,10 +782,10 @@ async function confirmDeleteEvent() {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <AppSelect
             v-model="singleNoteDisplayType"
-            :label="t('notes.statusLabel')"
+            :label="t('memories.statusLabel')"
             :options="[
-              { label: t('notes.statusOptions.date'), value: 'DATE' },
-              { label: t('notes.statusOptions.random'), value: 'RANDOM' },
+              { label: t('memories.statusOptions.date'), value: 'DATE' },
+              { label: t('memories.statusOptions.random'), value: 'RANDOM' },
             ]"
           />
 
@@ -779,7 +793,7 @@ async function confirmDeleteEvent() {
             <AppInput
               v-model="singleNoteTargetDate"
               type="date"
-              :label="t('notes.targetDateLabel')"
+              :label="t('memories.targetDateLabel')"
               required
             />
           </div>
@@ -790,13 +804,13 @@ async function confirmDeleteEvent() {
           v-model="singleNoteImages"
           :multiple="true"
           :max-files="5"
-          :label="t('notes.imageUploadLabel')"
+          :label="t('memories.imageUploadLabel')"
         />
 
         <AppTextarea
           v-model="singleNoteContent"
-          :label="t('notes.contentLabel')"
-          :placeholder="t('notes.contentPlaceholder')"
+          :label="t('memories.contentLabel')"
+          :placeholder="t('memories.contentPlaceholder')"
           :rows="4"
           required
         />
@@ -805,15 +819,15 @@ async function confirmDeleteEvent() {
         <div class="p-3 bg-surface-subtle/40 border border-border/80 rounded-xl">
           <AppSwitch
             v-model="singleNoteIsShared"
-            :label="t('notes.shareWithPartner')"
-            :description="t('notes.shareWithPartnerDesc')"
+            :label="t('memories.shareWithPartner')"
+            :description="t('memories.shareWithPartnerDesc')"
           />
         </div>
 
         <div class="flex items-center justify-between pt-2 border-t border-border">
           <div>
             <AppButton
-              v-if="selectedEvent && selectedEvent.category === 'note'"
+              v-if="selectedEvent && (selectedEvent.category === 'note' || selectedEvent.category === 'memory')"
               variant="outline"
               type="button"
               size="sm"
@@ -1011,9 +1025,9 @@ async function confirmDeleteEvent() {
 
     <AppConfirmModal
       :show="showDeleteConfirmModal"
-      :title="t('notes.deleteTitle')"
-      :message="t('notes.deleteMessage')"
-      :confirmText="t('notes.deleteConfirm')"
+      :title="t('memories.deleteTitle')"
+      :message="t('memories.deleteMessage')"
+      :confirmText="t('memories.deleteConfirm')"
       :cancelText="t('common.cancel')"
       variant="danger"
       :loading="deletingEvent"

@@ -2,7 +2,6 @@
 import { useI18n } from 'vue-i18n'
 import { Heart } from 'lucide-vue-next'
 import type { MoodItem } from '@/types/mood'
-import { getMoodByScore } from '@/constants/moods'
 
 interface Props {
   days: number

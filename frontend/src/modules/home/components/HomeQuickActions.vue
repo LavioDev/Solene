@@ -25,7 +25,7 @@ const { t } = useI18n()
     <AppButton
       variant="secondary"
       size="sm"
-      @click="emit('navigate', '/notes')"
+      @click="emit('navigate', '/memories')"
       class="bg-white hover:bg-surface-subtle shadow-2xs border border-border/60 text-xs text-ink"
     >
       <StickyNote class="w-3.5 h-3.5 mr-1.5 text-amber-500" />

@@ -4,9 +4,9 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
 
-class NoteImageOut(BaseModel):
+class MemoryImageOut(BaseModel):
     id: UUID
-    note_id: UUID
+    memory_id: UUID
     file_path: str
     filename: Optional[str] = None
     created_at: datetime
@@ -14,7 +14,7 @@ class NoteImageOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class NoteCreate(BaseModel):
+class MemoryCreate(BaseModel):
     title: str
     content: str
     image_url: Optional[str] = None
@@ -25,7 +25,7 @@ class NoteCreate(BaseModel):
     is_shared: bool = True
 
 
-class NoteUpdate(BaseModel):
+class MemoryUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
     image_url: Optional[str] = None
@@ -36,13 +36,13 @@ class NoteUpdate(BaseModel):
     is_shared: Optional[bool] = None
 
 
-class NoteOut(BaseModel):
+class MemoryOut(BaseModel):
     id: UUID
     user_id: UUID
     title: str
     content: str
     image_url: Optional[str] = None
-    images: List[NoteImageOut] = []
+    images: List[MemoryImageOut] = []
     category: str
     display_type: str
     target_date: Optional[date] = None

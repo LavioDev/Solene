@@ -32,7 +32,7 @@ const isRefreshing = ref(false)
 const routeConfig: Record<string, { title: string; icon: string; name: string }> = {
   '/': { title: 'nav.home', icon: 'Home', name: 'Home' },
   '/calendar': { title: 'nav.calendar', icon: 'Calendar', name: 'Calendar' },
-  '/notes': { title: 'nav.notes', icon: 'StickyNote', name: 'Notes' },
+  '/memories': { title: 'nav.memories', icon: 'StickyNote', name: 'Memories' },
   '/users': { title: 'nav.users', icon: 'Users', name: 'Users' },
   '/couples': { title: 'nav.couples', icon: 'Heart', name: 'Couples' },
   '/profile': { title: 'nav.profile', icon: 'User', name: 'Profile' },

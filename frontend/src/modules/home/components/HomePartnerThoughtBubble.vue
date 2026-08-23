@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { TaskItem } from '@/types/task'
-import { Sparkles, Clock } from 'lucide-vue-next'
+import { Clock } from 'lucide-vue-next'
 import AppBadge from '@/components/ui/AppBadge.vue'
 import AppModal from '@/components/ui/AppModal.vue'
 import AppButton from '@/components/ui/AppButton.vue'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { noteService } from '@/services/noteService'
+import { memoryService } from '@/services/memoryService'
 import {
   Trash2,
   Calendar as CalendarIcon,
@@ -21,32 +21,13 @@ import AppCard from '@/components/ui/AppCard.vue'
 import AppImageUpload from '@/components/ui/AppImageUpload.vue'
 import AppConfirmModal from '@/components/ui/AppConfirmModal.vue'
 import AppSwitch from '@/components/ui/AppSwitch.vue'
-
-interface NoteImageItem {
-  id: string
-  file_path: string
-  filename?: string
-  created_at: string
-}
-
-interface UserNote {
-  id: string
-  title: string
-  content: string
-  image_url?: string
-  images?: NoteImageItem[]
-  category: string
-  display_type: 'DATE' | 'RANDOM'
-  target_date?: string
-  is_shared?: boolean
-  created_at: string
-}
+import type { MemoryItem } from '@/types/memory'
 
 const { t, locale } = useI18n()
 const todayStr = new Date().toISOString().split('T')[0]
 
 // Data & Lazy load state (per-page: 15)
-const notes = ref<UserNote[]>([])
+const memories = ref<MemoryItem[]>([])
 const loading = ref(true)
 const loadingMore = ref(false)
 const page = ref(1)
@@ -61,12 +42,12 @@ let observer: IntersectionObserver | null = null
 // Filter state
 const filterType = ref<'ALL' | 'DATE' | 'RANDOM'>('ALL')
 
-const filteredNotes = computed(() => notes.value)
+const filteredMemories = computed(() => memories.value)
 
 // Add / Edit Modal state
 const showAddModal = ref(false)
 const submitting = ref(false)
-const editingNote = ref<UserNote | null>(null)
+const editingMemory = ref<MemoryItem | null>(null)
 
 const formTitle = ref('')
 const formContent = ref('')
@@ -77,10 +58,10 @@ const formIsShared = ref(true)
 
 // Delete Confirm Modal
 const showDeleteConfirmModal = ref(false)
-const deletingNoteId = ref<string | null>(null)
+const deletingMemoryId = ref<string | null>(null)
 const deleting = ref(false)
 
-async function fetchNotes(reset = false) {
+async function fetchMemories(reset = false) {
   if (reset) {
     page.value = 1
     hasMore.value = true
@@ -90,24 +71,24 @@ async function fetchNotes(reset = false) {
   }
 
   try {
-    const res = await noteService.getNotes({
+    const res = await memoryService.getMemories({
       page: page.value,
       per_page: perPage.value,
       display_type: filterType.value === 'ALL' ? undefined : filterType.value,
     })
 
     if (reset) {
-      notes.value = res.items as UserNote[]
+      memories.value = res.items
     } else {
-      const existingIds = new Set(notes.value.map(n => n.id))
-      const newItems = (res.items as UserNote[]).filter(n => !existingIds.has(n.id))
-      notes.value = [...notes.value, ...newItems]
+      const existingIds = new Set(memories.value.map(n => n.id))
+      const newItems = res.items.filter(n => !existingIds.has(n.id))
+      memories.value = [...memories.value, ...newItems]
     }
 
     totalCount.value = res.total
     hasMore.value = res.has_more
   } catch (err) {
-    console.error('Failed to fetch notes:', err)
+    console.error('Failed to fetch memories:', err)
   } finally {
     loading.value = false
     loadingMore.value = false
@@ -117,7 +98,7 @@ async function fetchNotes(reset = false) {
 function loadMore() {
   if (loading.value || loadingMore.value || !hasMore.value) return
   page.value += 1
-  fetchNotes(false)
+  fetchMemories(false)
 }
 
 function setupObserver() {
@@ -147,7 +128,7 @@ function setupObserver() {
 }
 
 watch(filterType, () => {
-  fetchNotes(true)
+  fetchMemories(true)
 })
 
 watch(sentinelRef, (newEl) => {
@@ -157,7 +138,7 @@ watch(sentinelRef, (newEl) => {
 })
 
 function openAddModal() {
-  editingNote.value = null
+  editingMemory.value = null
   formTitle.value = ''
   formContent.value = ''
   formImages.value = []
@@ -167,24 +148,24 @@ function openAddModal() {
   showAddModal.value = true
 }
 
-function openEditModal(note: UserNote) {
-  editingNote.value = note
-  formTitle.value = note.title
-  formContent.value = note.content
-  if (note.images && note.images.length > 0) {
-    formImages.value = note.images.map(img => img.file_path)
-  } else if (note.image_url) {
-    formImages.value = [note.image_url]
+function openEditModal(memory: MemoryItem) {
+  editingMemory.value = memory
+  formTitle.value = memory.title
+  formContent.value = memory.content
+  if (memory.images && memory.images.length > 0) {
+    formImages.value = memory.images.map(img => img.file_path)
+  } else if (memory.image_url) {
+    formImages.value = [memory.image_url]
   } else {
     formImages.value = []
   }
-  formDisplayType.value = note.display_type
-  formTargetDate.value = note.target_date || todayStr
-  formIsShared.value = note.is_shared !== undefined ? note.is_shared : true
+  formDisplayType.value = memory.display_type
+  formTargetDate.value = memory.target_date || todayStr
+  formIsShared.value = memory.is_shared !== undefined ? memory.is_shared : true
   showAddModal.value = true
 }
 
-async function handleSaveNote() {
+async function handleSaveMemory() {
   if (!formTitle.value.trim() || !formContent.value.trim()) return
   submitting.value = true
   try {
@@ -198,43 +179,43 @@ async function handleSaveNote() {
       target_date: formDisplayType.value === 'DATE' ? formTargetDate.value : null,
       is_shared: formIsShared.value,
     }
-    if (editingNote.value) {
-      const updated = await noteService.updateNote(editingNote.value.id, payload)
+    if (editingMemory.value) {
+      const updated = await memoryService.updateMemory(editingMemory.value.id, payload)
       // Update in-place
-      const idx = notes.value.findIndex(n => n.id === editingNote.value!.id)
+      const idx = memories.value.findIndex(n => n.id === editingMemory.value!.id)
       if (idx !== -1) {
-        notes.value[idx] = { ...notes.value[idx], ...updated } as UserNote
+        memories.value[idx] = { ...memories.value[idx], ...updated }
       }
     } else {
-      await noteService.createNote(payload)
-      await fetchNotes(true)
+      await memoryService.createMemory(payload)
+      await fetchMemories(true)
     }
     showAddModal.value = false
   } catch (err) {
-    console.error('Failed to save note:', err)
+    console.error('Failed to save memory:', err)
   } finally {
     submitting.value = false
   }
 }
 
-function promptDeleteNote(id: string) {
-  deletingNoteId.value = id
+function promptDeleteMemory(id: string) {
+  deletingMemoryId.value = id
   showDeleteConfirmModal.value = true
 }
 
-async function confirmDeleteNote() {
-  if (!deletingNoteId.value) return
+async function confirmDeleteMemory() {
+  if (!deletingMemoryId.value) return
   deleting.value = true
   try {
-    await noteService.deleteNote(deletingNoteId.value)
+    await memoryService.deleteMemory(deletingMemoryId.value)
     showDeleteConfirmModal.value = false
-    const deletedId = deletingNoteId.value
-    deletingNoteId.value = null
-    if (editingNote.value?.id === deletedId) showAddModal.value = false
-    notes.value = notes.value.filter(n => n.id !== deletedId)
+    const deletedId = deletingMemoryId.value
+    deletingMemoryId.value = null
+    if (editingMemory.value?.id === deletedId) showAddModal.value = false
+    memories.value = memories.value.filter(n => n.id !== deletedId)
     totalCount.value = Math.max(0, totalCount.value - 1)
   } catch (err) {
-    console.error('Failed to delete note:', err)
+    console.error('Failed to delete memory:', err)
   } finally {
     deleting.value = false
   }
@@ -247,13 +228,13 @@ function formatDate(dateStr: string) {
 }
 
 const counts = computed(() => ({
-  all: totalCount.value || notes.value.length,
-  date: notes.value.filter(n => n.display_type === 'DATE').length,
-  random: notes.value.filter(n => n.display_type === 'RANDOM').length,
+  all: totalCount.value || memories.value.length,
+  date: memories.value.filter(n => n.display_type === 'DATE').length,
+  random: memories.value.filter(n => n.display_type === 'RANDOM').length,
 }))
 
 onMounted(() => {
-  fetchNotes(true).then(() => {
+  fetchMemories(true).then(() => {
     setupObserver()
   })
 })
@@ -269,12 +250,12 @@ onUnmounted(() => {
 <template>
   <div class="flex gap-6 items-start select-none pb-10">
 
-    <!-- ─── Left Panel (Bọc toàn bộ trong 1 div duy nhất) ─── -->
+    <!-- ─── Left Panel ─── -->
     <div class="w-60 shrink-0 sticky top-6 bg-white border border-border rounded-2xl p-5 shadow-card space-y-4">
       <!-- Title -->
       <div class="flex items-center gap-2 pb-3 border-b border-border/60">
         <Heart class="w-4 h-4 text-violet-500 shrink-0" />
-        <h1 class="text-sm font-bold text-ink">{{ t('notes.title') }}</h1>
+        <h1 class="text-sm font-bold text-ink">{{ t('memories.title') }}</h1>
       </div>
 
       <!-- Filter List -->
@@ -282,8 +263,8 @@ onUnmounted(() => {
         <button
           v-for="f in ([
             { key: 'ALL', label: t('common.all'), count: counts.all },
-            { key: 'DATE', label: t('notes.statusOptions.date'), count: counts.date },
-            { key: 'RANDOM', label: t('notes.statusOptions.random'), count: counts.random },
+            { key: 'DATE', label: t('memories.statusOptions.date'), count: counts.date },
+            { key: 'RANDOM', label: t('memories.statusOptions.random'), count: counts.random },
           ] as const)"
           :key="f.key"
           type="button"
@@ -307,7 +288,7 @@ onUnmounted(() => {
       <div class="pt-3 border-t border-border/60">
         <AppButton class="w-full" size="sm" @click="openAddModal">
           <Sparkles class="w-3.5 h-3.5 mr-1 text-white" />
-          {{ t('notes.addNote') }}
+          {{ t('memories.addMemory') }}
         </AppButton>
       </div>
     </div>
@@ -317,45 +298,45 @@ onUnmounted(() => {
 
       <!-- Loading Placeholder -->
       <div v-if="loading" class="py-20 text-center text-sm text-ink-faint">
-        {{ t('notes.loading') }}
+        {{ t('memories.loading') }}
       </div>
 
       <!-- Empty State -->
-      <AppCard v-else-if="filteredNotes.length === 0">
+      <AppCard v-else-if="filteredMemories.length === 0">
         <div class="py-12 text-center space-y-3">
           <div class="w-10 h-10 rounded-full bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-400 mx-auto">
             <Heart class="w-5 h-5" />
           </div>
-          <p class="text-sm font-medium text-ink">{{ t('notes.emptyTitle') }}</p>
-          <p class="text-xs text-ink-muted">{{ t('notes.emptySubtitle') }}</p>
+          <p class="text-sm font-medium text-ink">{{ t('memories.emptyTitle') }}</p>
+          <p class="text-xs text-ink-muted">{{ t('memories.emptySubtitle') }}</p>
         </div>
       </AppCard>
 
-      <!-- Notes Grid -->
+      <!-- Memories Grid -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         <div
-          v-for="note in filteredNotes"
-          :key="note.id"
+          v-for="memory in filteredMemories"
+          :key="memory.id"
           class="bg-white border border-border rounded-2xl shadow-card hover:shadow-pop transition-all overflow-hidden flex flex-col group cursor-pointer"
-          @click="openEditModal(note)"
+          @click="openEditModal(memory)"
         >
           <!-- Image Header -->
           <div
-            v-if="(note.images && note.images.length > 0) || note.image_url"
+            v-if="(memory.images && memory.images.length > 0) || memory.image_url"
             class="relative h-44 w-full overflow-hidden bg-surface-subtle border-b border-border/60"
           >
             <img
-              :src="note.images?.[0]?.file_path || note.image_url"
-              :alt="note.title"
+              :src="memory.images?.[0]?.file_path || memory.image_url || ''"
+              :alt="memory.title"
               class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
             />
             <!-- Multiple Images Badge -->
             <div
-              v-if="note.images && note.images.length > 1"
+              v-if="memory.images && memory.images.length > 1"
               class="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs"
             >
               <ImageIcon class="w-3 h-3" />
-              <span>+{{ note.images.length - 1 }}</span>
+              <span>+{{ memory.images.length - 1 }}</span>
             </div>
           </div>
           <!-- Placeholder strip if no image -->
@@ -365,13 +346,13 @@ onUnmounted(() => {
           <div class="p-5 flex-1 space-y-2.5">
             <div class="flex items-start justify-between gap-2">
               <h3 class="text-sm font-semibold text-ink leading-snug group-hover:text-violet-700 transition-colors line-clamp-2 flex-1">
-                {{ note.title }}
+                {{ memory.title }}
               </h3>
               <div class="flex items-center gap-1 shrink-0">
-                <AppBadge v-if="note.is_shared" variant="violet" size="sm" :title="t('common.shared')">
+                <AppBadge v-if="memory.is_shared" variant="violet" size="sm" :title="t('common.shared')">
                   <Heart class="w-3 h-3 fill-current text-violet-500" />
                 </AppBadge>
-                <AppBadge v-if="note.display_type === 'DATE'" variant="violet" size="sm">
+                <AppBadge v-if="memory.display_type === 'DATE'" variant="violet" size="sm">
                   <CalendarIcon class="w-3 h-3" />
                 </AppBadge>
                 <AppBadge v-else variant="info" size="sm">
@@ -379,19 +360,19 @@ onUnmounted(() => {
                 </AppBadge>
               </div>
             </div>
-            <p class="text-xs text-ink-muted leading-relaxed line-clamp-3">{{ note.content }}</p>
+            <p class="text-xs text-ink-muted leading-relaxed line-clamp-3">{{ memory.content }}</p>
           </div>
 
           <!-- Footer -->
           <div class="px-5 py-3 border-t border-border/60 bg-surface-subtle/40 flex items-center justify-between">
             <span class="text-[10px] text-ink-faint font-mono flex items-center gap-1">
               <CalendarIcon class="w-3 h-3 text-violet-300" />
-              {{ formatDate(note.created_at) }}
+              {{ formatDate(memory.created_at) }}
             </span>
             <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 type="button"
-                @click.stop="openEditModal(note)"
+                @click.stop="openEditModal(memory)"
                 class="p-1 text-ink-faint hover:text-violet-600 hover:bg-violet-50 rounded transition-colors cursor-pointer"
                 :title="t('common.edit')"
               >
@@ -399,7 +380,7 @@ onUnmounted(() => {
               </button>
               <button
                 type="button"
-                @click.stop="promptDeleteNote(note.id)"
+                @click.stop="promptDeleteMemory(memory.id)"
                 class="p-1 text-ink-faint hover:text-err-text hover:bg-err-bg rounded transition-colors cursor-pointer"
                 :title="t('common.delete')"
               >
@@ -418,16 +399,16 @@ onUnmounted(() => {
           class="flex items-center gap-2 py-3 px-4 rounded-xl bg-violet-50/80 border border-violet-100 text-violet-700 text-xs font-medium shadow-2xs animate-pulse"
         >
           <Loader2 class="w-4 h-4 animate-spin text-violet-600" />
-          <span>{{ t('notes.loadingMore') }}</span>
+          <span>{{ t('memories.loadingMore') }}</span>
         </div>
 
-        <!-- End of Notes indicator -->
+        <!-- End of Memories indicator -->
         <div
-          v-else-if="!hasMore && notes.length > 0"
+          v-else-if="!hasMore && memories.length > 0"
           class="py-4 text-center text-xs text-ink-faint flex items-center justify-center gap-1.5"
         >
           <Heart class="w-3.5 h-3.5 text-violet-300 fill-violet-50" />
-          <span>{{ t('notes.allLoaded') }}</span>
+          <span>{{ t('memories.allLoaded') }}</span>
         </div>
       </div>
     </div>
@@ -435,32 +416,32 @@ onUnmounted(() => {
     <!-- ─── Add / Edit Modal ─── -->
     <AppModal
       :show="showAddModal"
-      :title="editingNote ? t('common.edit') : t('notes.addNote')"
+      :title="editingMemory ? t('common.edit') : t('memories.addMemory')"
       width="880"
       @close="showAddModal = false"
     >
-      <form @submit.prevent="handleSaveNote" class="space-y-4">
+      <form @submit.prevent="handleSaveMemory" class="space-y-4">
         <AppInput
           v-model="formTitle"
-          :label="t('notes.noteTitle')"
-          :placeholder="t('notes.noteTitlePlaceholder')"
+          :label="t('memories.memoryTitle')"
+          :placeholder="t('memories.memoryTitlePlaceholder')"
           required
         />
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <AppSelect
             v-model="formDisplayType"
-            :label="t('notes.statusLabel')"
+            :label="t('memories.statusLabel')"
             :options="[
-              { label: t('notes.statusOptions.random'), value: 'RANDOM' },
-              { label: t('notes.statusOptions.date'), value: 'DATE' },
+              { label: t('memories.statusOptions.random'), value: 'RANDOM' },
+              { label: t('memories.statusOptions.date'), value: 'DATE' },
             ]"
           />
           <AppInput
             v-if="formDisplayType === 'DATE'"
             v-model="formTargetDate"
             type="date"
-            :label="t('notes.targetDateLabel')"
+            :label="t('memories.targetDateLabel')"
             required
           />
         </div>
@@ -470,35 +451,35 @@ onUnmounted(() => {
           v-model="formImages"
           :multiple="true"
           :max-files="6"
-          :label="t('notes.imageUploadLabel')"
+          :label="t('memories.imageUploadLabel')"
         />
 
         <AppTextarea
           v-model="formContent"
-          :label="t('notes.contentLabel')"
-          :placeholder="t('notes.contentPlaceholder')"
+          :label="t('memories.contentLabel')"
+          :placeholder="t('memories.contentPlaceholder')"
           :rows="4"
           required
         />
 
-        <!-- AppSwitch for Couple Shared Note -->
+        <!-- AppSwitch for Couple Shared Memory -->
         <div class="p-3 bg-surface-subtle/40 border border-border/80 rounded-xl">
           <AppSwitch
             v-model="formIsShared"
-            :label="t('notes.shareWithPartner')"
-            :description="t('notes.shareWithPartnerDesc')"
+            :label="t('memories.shareWithPartner')"
+            :description="t('memories.shareWithPartnerDesc')"
           />
         </div>
 
         <div class="flex items-center justify-between pt-2 border-t border-border">
           <div>
             <AppButton
-              v-if="editingNote"
+              v-if="editingMemory"
               variant="outline"
               type="button"
               size="sm"
               class="text-err-text hover:bg-err-bg border-err-border"
-              @click="promptDeleteNote(editingNote.id)"
+              @click="promptDeleteMemory(editingMemory.id)"
             >
               <Trash2 class="w-3.5 h-3.5" />
               {{ t('common.delete') }}
@@ -519,13 +500,13 @@ onUnmounted(() => {
     <!-- ─── Confirm Delete Modal ─── -->
     <AppConfirmModal
       :show="showDeleteConfirmModal"
-      :title="t('notes.deleteTitle')"
-      :message="t('notes.deleteMessage')"
-      :confirmText="t('notes.deleteConfirm')"
+      :title="t('memories.deleteTitle')"
+      :message="t('memories.deleteMessage')"
+      :confirmText="t('memories.deleteConfirm')"
       :cancelText="t('common.cancel')"
       variant="danger"
       :loading="deleting"
-      @confirm="confirmDeleteNote"
+      @confirm="confirmDeleteMemory"
       @close="showDeleteConfirmModal = false"
     />
 

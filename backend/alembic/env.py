@@ -14,7 +14,7 @@ from app.modules.auth.models import User
 from app.modules.couples.models import Couple
 from app.modules.devices.models import Device, TelemetryLog
 from app.modules.events.models import SpecialEvent
-from app.modules.notes.models import UserNote
+from app.modules.memories.models import Memory, MemoryImage
 from app.modules.moods.models import UserMood
 from app.modules.tasks.models import Task
 

@@ -23,7 +23,7 @@ const {
   couple,
   partner,
   partnerStatus,
-  notes,
+  memories,
   days,
   hours,
   minutes,
@@ -32,17 +32,17 @@ const {
   todayDateStr,
   todayOccurrences,
   upcomingOccurrences,
-  showRandomNoteModal,
-  currentRandomNote,
-  currentRandomNoteAuthor,
-  isShufflingNote,
+  showRandomMemoryModal,
+  currentRandomMemory,
+  currentRandomMemoryAuthor,
+  isShufflingMemory,
   formatDisplayDate,
   calculateDaysRemaining,
   formatTaskTime,
   getUserInitials,
-  pickRandomNote,
-  openRandomNoteModal,
-  closeRandomNoteModal,
+  pickRandomMemory,
+  openRandomMemoryModal,
+  closeRandomMemoryModal,
   refreshPartnerStatusOnly,
 } = useHomeDashboard()
 
@@ -94,20 +94,20 @@ function navigateTo(path: string) {
           :formatted-start-date="couple?.start_date ? formatDisplayDate(couple.start_date) : ''"
           :partner-mood="moodStore.partnerTodayMood"
           :partner-name="partner?.full_name"
-          @open-random-memory="openRandomNoteModal"
+          @open-random-memory="openRandomMemoryModal"
           @open-particle-heart="showParticleHeart = true"
         />
 
         <!-- White Cards: Today & Upcoming Events -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Column 1: Today's Events & Date Notes -->
+          <!-- Column 1: Today's Events & Date Memories -->
           <HomeTodayEvents
             :occurrences="todayOccurrences"
             :today-date-str="todayDateStr"
             :format-display-date="formatDisplayDate"
           />
 
-          <!-- Column 2: Upcoming Events & Notes -->
+          <!-- Column 2: Upcoming Events & Memories -->
           <HomeUpcomingEvents
             :occurrences="upcomingOccurrences"
             :format-display-date="formatDisplayDate"
@@ -125,13 +125,13 @@ function navigateTo(path: string) {
 
     <!-- Sweet Memory Modal -->
     <HomeMemoryModal
-      :show="showRandomNoteModal"
-      :note="currentRandomNote"
-      :author-name="currentRandomNoteAuthor"
-      :is-shuffling="isShufflingNote"
-      :has-notes="notes.length > 0"
-      @close="closeRandomNoteModal"
-      @shuffle="pickRandomNote"
+      :show="showRandomMemoryModal"
+      :memory="currentRandomMemory"
+      :author-name="currentRandomMemoryAuthor"
+      :is-shuffling="isShufflingMemory"
+      :has-memories="memories.length > 0"
+      @close="closeRandomMemoryModal"
+      @shuffle="pickRandomMemory"
     />
   </div>
 </template>

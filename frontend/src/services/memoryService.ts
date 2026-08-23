@@ -1,19 +1,19 @@
 import { apiClient } from '@/services/apiClient'
-import type { NoteItem } from '@/types/note'
+import type { MemoryItem } from '@/types/memory'
 import type { PaginatedResponse } from '@/types/pagination'
 
-export const noteService = {
-  async getNotes(params?: {
+export const memoryService = {
+  async getMemories(params?: {
     page?: number
     per_page?: number
     display_type?: string
     search?: string
-  }): Promise<PaginatedResponse<NoteItem>> {
-    const response = await apiClient.get<PaginatedResponse<NoteItem>>('/notes', { params })
+  }): Promise<PaginatedResponse<MemoryItem>> {
+    const response = await apiClient.get<PaginatedResponse<MemoryItem>>('/memories', { params })
     return response.data
   },
 
-  async createNote(payload: {
+  async createMemory(payload: {
     title: string
     content: string
     image_url?: string | null
@@ -22,13 +22,13 @@ export const noteService = {
     display_type?: 'DATE' | 'RANDOM'
     target_date?: string | null
     is_shared?: boolean
-  }): Promise<NoteItem> {
-    const response = await apiClient.post<NoteItem>('/notes', payload)
+  }): Promise<MemoryItem> {
+    const response = await apiClient.post<MemoryItem>('/memories', payload)
     return response.data
   },
 
-  async updateNote(
-    noteId: string,
+  async updateMemory(
+    memoryId: string,
     payload: {
       title?: string
       content?: string
@@ -39,12 +39,12 @@ export const noteService = {
       target_date?: string | null
       is_shared?: boolean
     },
-  ): Promise<NoteItem> {
-    const response = await apiClient.put<NoteItem>(`/notes/${noteId}`, payload)
+  ): Promise<MemoryItem> {
+    const response = await apiClient.put<MemoryItem>(`/memories/${memoryId}`, payload)
     return response.data
   },
 
-  async deleteNote(noteId: string): Promise<void> {
-    await apiClient.delete(`/notes/${noteId}`)
+  async deleteMemory(memoryId: string): Promise<void> {
+    await apiClient.delete(`/memories/${memoryId}`)
   },
 }
