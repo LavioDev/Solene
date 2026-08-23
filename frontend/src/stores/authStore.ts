@@ -39,6 +39,8 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       accessToken.value = null
       user.value = null
+      const { useMoodStore } = await import('./moodStore')
+      useMoodStore().reset()
     }
   }
 

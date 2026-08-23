@@ -9,6 +9,7 @@ import {
   Calendar as CalendarIcon,
   Clock,
   StickyNote,
+  Smile,
   Users as UsersIcon,
   Heart,
   LogOut,
@@ -30,6 +31,7 @@ const navigation = computed(() => {
     { name: t('nav.calendar'), path: '/calendar', icon: CalendarIcon },
     { name: t('nav.schedule'), path: '/schedule', icon: Clock },
     { name: t('nav.notes'),    path: '/notes',    icon: StickyNote },
+    { name: t('nav.moods'),    path: '/moods',    icon: Smile },
     { name: t('nav.couples'),  path: '/couples',  icon: Heart },
   ]
 

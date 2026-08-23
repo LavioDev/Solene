@@ -2,7 +2,9 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useHomeDashboard } from '../composables/useHomeDashboard'
+import { useMoodStore } from '@/stores/moodStore'
 import HomeTopBar from '../components/HomeTopBar.vue'
+import HomeDailyMoodWidget from '../components/HomeDailyMoodWidget.vue'
 import HomeWaveCircle from '../components/HomeWaveCircle.vue'
 import HomeTodayEvents from '../components/HomeTodayEvents.vue'
 import HomeUpcomingEvents from '../components/HomeUpcomingEvents.vue'
@@ -11,7 +13,9 @@ import HomeMemoryModal from '../components/HomeMemoryModal.vue'
 import HomeParticleHeartView from '../components/HomeParticleHeartView.vue'
 
 const router = useRouter()
+const moodStore = useMoodStore()
 const showParticleHeart = ref(false)
+const showDailyMoodWidget = ref(false)
 
 const {
   loading,
@@ -57,7 +61,7 @@ function navigateTo(path: string) {
 
       <!-- 2. Main Dashboard (Màn hình chính mặc định) -->
       <div v-else class="space-y-6 px-6 py-6 pb-12 min-w-[800px] max-w-5xl mx-auto">
-        <!-- Top Bar: Couple Profile (Left) & Partner Active Status (Right) -->
+        <!-- Top Bar: Couple Profile (Left) & Mood Button / Partner Active Status (Right) -->
         <HomeTopBar
           :couple="couple"
           :loading="loading"
@@ -66,10 +70,19 @@ function navigateTo(path: string) {
           :couple-nickname="coupleNickname"
           :formatted-start-date="couple?.start_date ? formatDisplayDate(couple.start_date) : ''"
           :is-refreshing-partner="isRefreshingPartner"
+          :is-mood-open="showDailyMoodWidget"
+          :my-mood="moodStore.myTodayMood"
           :get-user-initials="getUserInitials"
           :format-task-time="formatTaskTime"
           @link-couple="navigateTo('/couples')"
           @refresh-partner="refreshPartnerStatusOnly"
+          @toggle-mood="showDailyMoodWidget = !showDailyMoodWidget"
+        />
+
+        <!-- Daily Mood Tracker Modal (Mở khi bấm vào nút Cảm xúc ở TopBar) -->
+        <HomeDailyMoodWidget
+          :show="showDailyMoodWidget"
+          @close="showDailyMoodWidget = false"
         />
 
         <!-- Centered Love Wave Circle (Bấm trái tim -> mở màn hình hạt sáng, Bấm khối tròn -> mở ghi chú kỷ niệm) -->
@@ -79,6 +92,8 @@ function navigateTo(path: string) {
           :minutes="minutes"
           :seconds="seconds"
           :formatted-start-date="couple?.start_date ? formatDisplayDate(couple.start_date) : ''"
+          :partner-mood="moodStore.partnerTodayMood"
+          :partner-name="partner?.full_name"
           @open-random-memory="openRandomNoteModal"
           @open-particle-heart="showParticleHeart = true"
         />

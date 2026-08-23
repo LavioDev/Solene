@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { Heart } from 'lucide-vue-next'
+import type { MoodItem } from '@/types/mood'
+import { getMoodByScore } from '@/constants/moods'
 
 interface Props {
   days: number
@@ -8,9 +10,14 @@ interface Props {
   minutes: number
   seconds: number
   formattedStartDate: string
+  partnerMood?: MoodItem | null
+  partnerName?: string
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  partnerMood: null,
+  partnerName: '',
+})
 
 const emit = defineEmits<{
   (e: 'open-random-memory'): void
@@ -68,6 +75,37 @@ const { t } = useI18n()
         {{ t('home.since', { date: formattedStartDate }) }}
       </p>
     </div>
+
+    <!-- TỜ NOTE BÊN PHẢI SÁT MÉP (Biểu diễn ghi chú & cảm xúc trong ngày của đối phương chân thực nhất) -->
+    <Transition name="partner-note">
+      <div
+        v-if="partnerMood"
+        class="hidden md:flex flex-col absolute right-0 top-1/2 -translate-y-1/2 w-64 lg:w-72 p-4 pt-4.5 rounded-xl bg-[#fffef5] border border-amber-200/80 shadow-md shadow-amber-900/5 hover:shadow-xl rotate-1 hover:rotate-0 transition-all duration-300 text-left z-20 group"
+      >
+        <!-- Băng dính Washi Tape dán đầu tờ note -->
+        <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-16 h-3.5 bg-amber-200/70 border border-amber-300/50 rounded-2xs shadow-2xs rotate-[-1.5deg] pointer-events-none backdrop-blur-xs"></div>
+
+        <!-- Header Note: Tiêu đề ghi chú & Huy hiệu cảm xúc -->
+        <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-amber-200/50">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <Heart class="w-3.5 h-3.5 text-rose-400 fill-rose-400 shrink-0" />
+            <span class="text-xs font-bold text-amber-950 truncate font-sans">
+              {{ partnerName ? t('mood.partnerMessage', { name: partnerName }) : t('mood.partnerMessage', { name: 'người ấy' }) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Nội dung Ghi chú hôm nay của đối phương -->
+        <div class="relative">
+          <p v-if="partnerMood.note" class="text-xs text-amber-950/90 leading-relaxed font-sans whitespace-pre-wrap line-clamp-4 italic">
+            “{{ partnerMood.note }}”
+          </p>
+          <p v-else class="text-xs text-amber-800/60 italic font-sans">
+            (Hôm nay cảm thấy {{ partnerMood.mood_tag || 'bình yên' }})
+          </p>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -149,5 +187,16 @@ const { t } = useI18n()
 
 .animate-heartbeat {
   animation: heartbeat 1.8s ease-in-out infinite;
+}
+
+.partner-note-enter-active,
+.partner-note-leave-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.partner-note-enter-from,
+.partner-note-leave-to {
+  opacity: 0;
+  transform: translateY(-50%) translateX(12px) scale(0.95);
 }
 </style>

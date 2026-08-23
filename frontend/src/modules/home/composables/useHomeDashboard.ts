@@ -1,6 +1,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/authStore'
+import { useMoodStore } from '@/stores/moodStore'
 import { apiClient } from '@/services/apiClient'
 import { coupleService } from '@/services/coupleService'
 import { taskService } from '@/services/taskService'
@@ -13,6 +14,7 @@ import type { EventOccurrence } from '@/modules/calendar/types'
 export function useHomeDashboard() {
   const { locale } = useI18n()
   const authStore = useAuthStore()
+  const moodStore = useMoodStore()
 
   // State
   const loading = ref(true)
@@ -199,11 +201,17 @@ export function useHomeDashboard() {
         couple.value = null
       }
 
-      // 2. Fetch Partner Active Status
+      // 2. Fetch Partner Active Status & Today Mood
       try {
         partnerStatus.value = await taskService.getPartnerActiveStatus()
       } catch {
         partnerStatus.value = null
+      }
+
+      try {
+        await moodStore.fetchTodayMood()
+      } catch {
+        // ignore background mood fetch error
       }
 
       // 3. Fetch Occurrences for next 30 days
@@ -240,6 +248,7 @@ export function useHomeDashboard() {
     isRefreshingPartner.value = true
     try {
       partnerStatus.value = await taskService.getPartnerActiveStatus()
+      await moodStore.fetchTodayMood()
     } catch {
       // catch background polling error
     } finally {
