@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n'
 import type { NoteItem } from '@/types/note'
 import { StickyNote } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
-import AppBadge from '@/components/ui/AppBadge.vue'
 import AppModal from '@/components/ui/AppModal.vue'
 
 interface Props {

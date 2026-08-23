@@ -11,6 +11,7 @@ class SpecialEventCreate(BaseModel):
     interval_value: int = 100
     category: str = "love"
     description: Optional[str] = None
+    is_shared: bool = True
 
 
 class SpecialEventUpdate(BaseModel):
@@ -20,6 +21,7 @@ class SpecialEventUpdate(BaseModel):
     interval_value: Optional[int] = None
     category: Optional[str] = None
     description: Optional[str] = None
+    is_shared: Optional[bool] = None
 
 
 class SpecialEventOut(BaseModel):
@@ -31,6 +33,7 @@ class SpecialEventOut(BaseModel):
     interval_value: int
     category: str
     description: Optional[str] = None
+    is_shared: bool = True
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -43,3 +46,4 @@ class EventOccurrenceOut(BaseModel):
     category: str
     milestone_info: Optional[str] = None
     image_url: Optional[str] = None
+    is_shared: bool = True

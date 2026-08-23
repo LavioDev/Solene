@@ -7,6 +7,7 @@ import { useUiStore } from '@/stores/uiStore'
 import {
   Home,
   Calendar as CalendarIcon,
+  Clock,
   StickyNote,
   Users as UsersIcon,
   Heart,
@@ -27,6 +28,7 @@ const navigation = computed(() => {
   const items = [
     { name: t('nav.home'),     path: '/',         icon: Home },
     { name: t('nav.calendar'), path: '/calendar', icon: CalendarIcon },
+    { name: t('nav.schedule'), path: '/schedule', icon: Clock },
     { name: t('nav.notes'),    path: '/notes',    icon: StickyNote },
     { name: t('nav.couples'),  path: '/couples',  icon: Heart },
   ]

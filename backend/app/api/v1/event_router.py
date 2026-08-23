@@ -10,6 +10,7 @@ from app.api.deps import get_current_user
 from app.modules.auth.models import User
 from app.modules.events.schemas import SpecialEventCreate, SpecialEventUpdate, SpecialEventOut, EventOccurrenceOut
 from app.modules.events.service import EventService
+from app.modules.couples.models import Couple
 from app.modules.notes.models import UserNote
 from app.modules.tasks.models import Task
 
@@ -76,8 +77,30 @@ async def get_event_occurrences(
         all_occurrences.extend(occs)
 
     # 2. Date-bound Notes from user_notes
+    couple_stmt = (
+        select(Couple)
+        .where(
+            or_(Couple.user1_id == current_user.id, Couple.user2_id == current_user.id),
+            Couple.status == "active",
+        )
+        .order_by(Couple.created_at.desc())
+    )
+    couple_res = await session.execute(couple_stmt)
+    couple = couple_res.scalars().first()
+    partner_id = None
+    if couple:
+        partner_id = couple.user2_id if couple.user1_id == current_user.id else couple.user1_id
+
+    if partner_id:
+        note_user_filter = or_(
+            UserNote.user_id == current_user.id,
+            and_(UserNote.user_id == partner_id, UserNote.is_shared == True),
+        )
+    else:
+        note_user_filter = (UserNote.user_id == current_user.id)
+
     notes_stmt = select(UserNote).where(
-        UserNote.user_id == current_user.id,
+        note_user_filter,
         UserNote.display_type == "DATE",
         UserNote.target_date >= start_date,
         UserNote.target_date <= end_date,
@@ -95,6 +118,7 @@ async def get_event_occurrences(
                     category="note",
                     milestone_info=note.content,
                     image_url=note.image_url,
+                    is_shared=note.is_shared,
                 )
             )
 

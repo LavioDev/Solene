@@ -8,6 +8,7 @@ class TaskBase(BaseModel):
     title: str
     content: Optional[str] = None
     is_completed: bool = False
+    is_shared: bool = True
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     priority: str = "medium"
@@ -25,6 +26,7 @@ class TaskUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
     is_completed: Optional[bool] = None
+    is_shared: Optional[bool] = None
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     priority: Optional[str] = None

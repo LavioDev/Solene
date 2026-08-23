@@ -7,41 +7,57 @@ import AppModal from '@/components/ui/AppModal.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
 import AppButton from '@/components/ui/AppButton.vue'
-import type { EventOccurrence } from '../types'
+import AppSwitch from '@/components/ui/AppSwitch.vue'
+import type { EventOccurrence, SpecialEvent } from '../types'
 
 const props = defineProps<{
   show: boolean
-  selectedEvent: EventOccurrence | null
+  selectedEvent: EventOccurrence | SpecialEvent | null
 }>()
 
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'saved'): void
-  (e: 'delete', event: EventOccurrence): void
+  (e: 'delete', event: EventOccurrence | SpecialEvent): void
 }>()
 
 const { t } = useI18n()
 
 const ruleTitle = ref('')
-const ruleRecurrenceType = ref<'EVERY_N_DAYS' | 'MONTHLY' | 'YEARLY'>('EVERY_N_DAYS')
+const ruleRecurrenceType = ref<'EVERY_N_DAYS' | 'MONTHLY' | 'YEARLY' | 'SINGLE'>('EVERY_N_DAYS')
 const ruleIntervalValue = ref(100)
 const ruleAnchorDate = ref('2022-05-22')
+const ruleIsShared = ref(true)
 const submitting = ref(false)
+
+function isSpecialEvent(evt: EventOccurrence | SpecialEvent): evt is SpecialEvent {
+  return 'anchor_date' in evt
+}
 
 watch(
   () => [props.show, props.selectedEvent],
   ([show]) => {
     if (show) {
       if (props.selectedEvent) {
-        ruleTitle.value = props.selectedEvent.title
-        ruleAnchorDate.value = props.selectedEvent.date
-        ruleRecurrenceType.value = 'EVERY_N_DAYS'
-        ruleIntervalValue.value = 100
+        if (isSpecialEvent(props.selectedEvent)) {
+          ruleTitle.value = props.selectedEvent.title
+          ruleAnchorDate.value = props.selectedEvent.anchor_date
+          ruleRecurrenceType.value = props.selectedEvent.recurrence_type || 'EVERY_N_DAYS'
+          ruleIntervalValue.value = props.selectedEvent.interval_value || 100
+          ruleIsShared.value = props.selectedEvent.is_shared !== undefined ? props.selectedEvent.is_shared : true
+        } else {
+          ruleTitle.value = props.selectedEvent.title
+          ruleAnchorDate.value = props.selectedEvent.date
+          ruleRecurrenceType.value = 'EVERY_N_DAYS'
+          ruleIntervalValue.value = 100
+          ruleIsShared.value = props.selectedEvent.is_shared !== undefined ? props.selectedEvent.is_shared : true
+        }
       } else {
         ruleTitle.value = ''
-        ruleAnchorDate.value = '2022-05-22'
+        ruleAnchorDate.value = new Date().toISOString().split('T')[0]
         ruleRecurrenceType.value = 'EVERY_N_DAYS'
         ruleIntervalValue.value = 100
+        ruleIsShared.value = true
       }
     }
   },
@@ -53,13 +69,18 @@ async function handleSaveAutoRule() {
 
   submitting.value = true
   try {
-    if (props.selectedEvent && props.selectedEvent.category !== 'note') {
-      await apiClient.put(`/events/${props.selectedEvent.event_id}`, {
+    const eventId = props.selectedEvent
+      ? ('id' in props.selectedEvent ? props.selectedEvent.id : props.selectedEvent.event_id)
+      : null
+
+    if (eventId && (!('category' in props.selectedEvent!) || props.selectedEvent.category !== 'note')) {
+      await apiClient.put(`/events/${eventId}`, {
         title: ruleTitle.value.trim(),
         anchor_date: ruleAnchorDate.value,
         recurrence_type: ruleRecurrenceType.value,
         interval_value: ruleIntervalValue.value,
         category: 'love',
+        is_shared: ruleIsShared.value,
       })
     } else {
       await apiClient.post('/events', {
@@ -68,6 +89,7 @@ async function handleSaveAutoRule() {
         recurrence_type: ruleRecurrenceType.value,
         interval_value: ruleIntervalValue.value,
         category: 'love',
+        is_shared: ruleIsShared.value,
       })
     }
     emit('saved')
@@ -128,6 +150,15 @@ function handleDelete() {
             :placeholder="t('calendar.intervalPlaceholder')"
           />
         </div>
+      </div>
+
+      <!-- AppSwitch for Couple Shared -->
+      <div class="p-3 bg-surface-subtle/40 border border-border/80 rounded-xl">
+        <AppSwitch
+          v-model="ruleIsShared"
+          :label="t('calendar.shareWithPartner')"
+          :description="t('calendar.shareWithPartnerDesc')"
+        />
       </div>
 
       <div class="flex items-center justify-between pt-2 border-t border-border">

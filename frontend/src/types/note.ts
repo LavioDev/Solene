@@ -16,6 +16,7 @@ export interface NoteItem {
   category: string
   display_type: 'DATE' | 'RANDOM'
   target_date?: string | null
+  is_shared?: boolean
   created_at: string
   updated_at: string
 }

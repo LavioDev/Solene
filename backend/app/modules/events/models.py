@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, datetime
-from sqlalchemy import String, Integer, Date, DateTime, ForeignKey
+from sqlalchemy import String, Integer, Date, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
@@ -17,6 +17,7 @@ class SpecialEvent(Base):
     interval_value: Mapped[int] = mapped_column(Integer, default=100)
     category: Mapped[str] = mapped_column(String(50), default="love")
     description: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    is_shared: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

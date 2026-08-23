@@ -1,8 +1,9 @@
 from typing import List, Optional
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc, func
+from sqlalchemy import select, desc, func, or_, and_
 from sqlalchemy.orm import selectinload
+from app.modules.couples.models import Couple
 from app.modules.notes.models import UserNote, NoteImage
 from app.modules.notes.schemas import NoteCreate, NoteUpdate
 
@@ -23,6 +24,7 @@ class NoteService:
             category=payload.category,
             display_type=payload.display_type,
             target_date=payload.target_date,
+            is_shared=payload.is_shared,
         )
 
         # Attach NoteImage records if image_urls provided
@@ -49,7 +51,29 @@ class NoteService:
         display_type: Optional[str] = None,
         search: Optional[str] = None,
     ) -> tuple[List[UserNote], int]:
-        base_stmt = select(UserNote).where(UserNote.user_id == user_id)
+        couple_stmt = (
+            select(Couple)
+            .where(
+                or_(Couple.user1_id == user_id, Couple.user2_id == user_id),
+                Couple.status == "active",
+            )
+            .order_by(desc(Couple.created_at))
+        )
+        couple_res = await session.execute(couple_stmt)
+        couple = couple_res.scalars().first()
+        partner_id = None
+        if couple:
+            partner_id = couple.user2_id if couple.user1_id == user_id else couple.user1_id
+
+        if partner_id:
+            user_filter = or_(
+                UserNote.user_id == user_id,
+                and_(UserNote.user_id == partner_id, UserNote.is_shared == True),
+            )
+        else:
+            user_filter = (UserNote.user_id == user_id)
+
+        base_stmt = select(UserNote).where(user_filter)
 
         if display_type and display_type.upper() in ["DATE", "RANDOM"]:
             base_stmt = base_stmt.where(UserNote.display_type == display_type.upper())
@@ -99,6 +123,8 @@ class NoteService:
             note.display_type = payload.display_type
         if payload.target_date is not None:
             note.target_date = payload.target_date
+        if payload.is_shared is not None:
+            note.is_shared = payload.is_shared
 
         if payload.image_urls is not None:
             # Replace images

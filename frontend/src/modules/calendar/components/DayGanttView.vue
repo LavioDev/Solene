@@ -18,6 +18,7 @@ import AppModal from '@/components/ui/AppModal.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
 import AppTextarea from '@/components/ui/AppTextarea.vue'
+import AppSwitch from '@/components/ui/AppSwitch.vue'
 import type { TaskItem } from '../types'
 
 interface Props {
@@ -137,10 +138,12 @@ function getGanttBarStyle(task: TaskItem) {
   }
 }
 
-function formatTimeOnly(timeStr?: string | null): string {
-  if (!timeStr) return ''
+// Format time string to HH:MM
+function formatTimeOnly(timeInput?: string | Date | null): string {
+  if (!timeInput) return ''
   try {
-    const d = new Date(timeStr)
+    const d = new Date(timeInput)
+    if (isNaN(d.getTime())) return ''
     const hours = String(d.getHours()).padStart(2, '0')
     const minutes = String(d.getMinutes()).padStart(2, '0')
     return `${hours}:${minutes}`
@@ -149,7 +152,7 @@ function formatTimeOnly(timeStr?: string | null): string {
   }
 }
 
-// Toggle Task Complete
+// Toggle Task Status
 async function toggleTask(task: TaskItem) {
   try {
     const res = await apiClient.patch<TaskItem>(`/tasks/${task.id}/toggle`)
@@ -183,6 +186,7 @@ const editTaskEndTime = ref('10:00')
 const editTaskPriority = ref('medium')
 const editTaskContent = ref('')
 const editTaskIsCompleted = ref(false)
+const editTaskIsShared = ref(true)
 const updatingTask = ref(false)
 
 function openEditTaskModal(task: TaskItem) {
@@ -193,6 +197,7 @@ function openEditTaskModal(task: TaskItem) {
   editTaskPriority.value = task.priority || 'medium'
   editTaskContent.value = task.content || ''
   editTaskIsCompleted.value = task.is_completed
+  editTaskIsShared.value = task.is_shared !== undefined ? task.is_shared : true
   showEditTaskModal.value = true
 }
 
@@ -215,6 +220,7 @@ async function handleUpdateTask() {
       title: editTaskTitle.value.trim(),
       content: editTaskContent.value.trim() || null,
       is_completed: editTaskIsCompleted.value,
+      is_shared: editTaskIsShared.value,
       start_time,
       end_time,
       priority: editTaskPriority.value,
@@ -617,6 +623,15 @@ defineExpose({
           :placeholder="t('calendar.tasks.contentPlaceholder')"
           :rows="3"
         />
+
+        <!-- AppSwitch for Couple Shared Task -->
+        <div class="p-3 bg-surface-subtle/40 border border-border/80 rounded-xl">
+          <AppSwitch
+            v-model="editTaskIsShared"
+            :label="t('calendar.tasks.shareWithPartner')"
+            :description="t('calendar.tasks.shareWithPartnerDesc')"
+          />
+        </div>
 
         <div class="flex items-center justify-between pt-2 border-t border-border">
           <div class="flex items-center gap-2">

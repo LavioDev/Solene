@@ -11,6 +11,7 @@ import {
   User as UserIcon,
   Home,
   Calendar as CalendarIcon,
+  Clock,
   StickyNote,
   Users as UsersIcon,
   Heart,
@@ -32,6 +33,8 @@ const pageTitle = computed(() => {
       return t('nav.home')
     case 'Calendar':
       return t('nav.calendar')
+    case 'Schedule':
+      return t('nav.schedule')
     case 'Notes':
       return t('nav.notes')
     case 'Users':
@@ -55,6 +58,7 @@ const navItems = computed(() => {
   const items = [
     { name: t('nav.home'),     path: '/',         icon: Home,         desc: t('nav.homeDesc') },
     { name: t('nav.calendar'), path: '/calendar', icon: CalendarIcon, desc: t('nav.calendarDesc') },
+    { name: t('nav.schedule'), path: '/schedule', icon: Clock,        desc: t('nav.scheduleDesc') },
     { name: t('nav.notes'),    path: '/notes',    icon: StickyNote,   desc: t('nav.notesDesc') },
     { name: t('nav.couples'),  path: '/couples',  icon: Heart,        desc: t('nav.couplesDesc') },
   ]

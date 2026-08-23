@@ -18,6 +18,7 @@ class Task(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     content: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
+    is_shared: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
 
     start_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
     end_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)

@@ -5,7 +5,6 @@ import { useAuthStore } from '@/stores/authStore'
 import { userService } from '@/services/userService'
 import type { User, UserCreatePayload, UserUpdatePayload } from '@/types/auth'
 import {
-  Plus,
   Search,
   Edit2,
   Trash2,
@@ -14,6 +13,7 @@ import {
   User as UserIcon,
   CheckCircle2,
   AlertCircle,
+  Sparkles,
 } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppModal from '@/components/ui/AppModal.vue'
@@ -285,12 +285,12 @@ onMounted(() => {
     <div class="bg-white border border-border rounded-2xl p-3.5 shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <!-- Search Input -->
       <div class="relative flex-1 max-w-md">
-        <Search class="w-4 h-4 text-ink-faint absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <Search class="w-3.5 h-3.5 text-ink-faint absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           v-model="searchQuery"
           type="text"
           :placeholder="t('users.searchPlaceholder')"
-          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs sm:text-sm bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-500 transition-all shadow-2xs"
+          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-500 transition-all shadow-2xs"
         />
       </div>
 
@@ -300,16 +300,18 @@ onMounted(() => {
           <AppSelect
             v-model="selectedRole"
             :options="roleFilterOptions"
+            size="sm"
           />
         </div>
         <div class="w-36 sm:w-40">
           <AppSelect
             v-model="selectedStatus"
             :options="statusFilterOptions"
+            size="sm"
           />
         </div>
-        <AppButton size="md" @click="openCreateModal" class="h-[42px] py-2.5 px-4 shrink-0 shadow-2xs rounded-xl text-xs sm:text-sm font-semibold inline-flex items-center justify-center">
-          <Plus class="w-4 h-4 mr-1" />
+        <AppButton size="md" @click="openCreateModal" class="h-[42px] py-2.5 px-4 shrink-0 shadow-2xs rounded-xl text-xs font-semibold inline-flex items-center justify-center">
+          <Sparkles class="w-3.5 h-3.5 mr-1 text-white" />
           {{ t('users.addUser') }}
         </AppButton>
       </div>
@@ -331,7 +333,7 @@ onMounted(() => {
         <p class="text-sm font-semibold text-ink">{{ t('users.emptyTitle') }}</p>
         <p class="text-xs text-ink-muted">{{ t('users.emptySubtitle') }}</p>
         <AppButton size="sm" @click="openCreateModal" class="mx-auto mt-2">
-          <Plus class="w-3.5 h-3.5 mr-1" />
+          <Sparkles class="w-3.5 h-3.5 mr-1 text-white" />
           {{ t('users.addUser') }}
         </AppButton>
       </div>

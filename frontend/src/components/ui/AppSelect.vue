@@ -18,12 +18,14 @@ interface Props {
   error?: string
   required?: boolean
   disabled?: boolean
+  size?: 'sm' | 'md'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   required: false,
   disabled: false,
   searchable: false,
+  size: 'md',
 })
 
 const emit = defineEmits<{
@@ -109,8 +111,9 @@ onUnmounted(() => {
         type="button"
         :disabled="disabled"
         @click="toggleDropdown"
-        class="w-full flex items-center justify-between px-3.5 py-2.5 text-sm font-medium bg-white border rounded-xl text-ink transition-all duration-150 cursor-pointer disabled:bg-surface-subtle disabled:cursor-not-allowed disabled:opacity-60 text-left shadow-2xs"
+        class="w-full flex items-center justify-between px-3.5 py-2.5 font-medium bg-white border rounded-xl text-ink transition-all duration-150 cursor-pointer disabled:bg-surface-subtle disabled:cursor-not-allowed disabled:opacity-60 text-left shadow-2xs"
         :class="[
+          size === 'sm' ? 'text-xs' : 'text-xs sm:text-sm',
           error
             ? 'border-err-text focus:border-err-text focus:ring-2 focus:ring-rose-400/20'
             : isOpen
@@ -120,14 +123,20 @@ onUnmounted(() => {
       >
         <span
           class="truncate"
-          :class="(!selectedOption || selectedOption.value === '') ? 'text-ink-faint' : 'text-ink font-medium'"
+          :class="[
+            size === 'sm' ? 'text-xs' : 'text-xs sm:text-sm',
+            (!selectedOption || selectedOption.value === '') ? 'text-ink-faint' : 'text-ink font-medium'
+          ]"
         >
           {{ displayLabel }}
         </span>
 
         <ChevronDown
-          class="w-4 h-4 text-ink-muted shrink-0 ml-2 transition-transform duration-200"
-          :class="isOpen ? 'rotate-180 text-violet-600' : ''"
+          class="text-ink-muted shrink-0 ml-2 transition-transform duration-200"
+          :class="[
+            size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4',
+            isOpen ? 'rotate-180 text-violet-600' : ''
+          ]"
         />
       </button>
 
@@ -171,7 +180,7 @@ onUnmounted(() => {
               :key="opt.value"
               type="button"
               @click="selectOption(opt.value)"
-              class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors cursor-pointer text-left"
+              class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer text-left"
               :class="opt.value === modelValue
                 ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
                 : 'text-ink hover:bg-surface-raised hover:text-violet-700'"
@@ -179,7 +188,7 @@ onUnmounted(() => {
               <span class="truncate">{{ opt.label }}</span>
               <Check
                 v-if="opt.value === modelValue"
-                class="w-4 h-4 text-violet-600 shrink-0 ml-2"
+                class="w-3.5 h-3.5 text-violet-600 shrink-0 ml-2"
               />
             </button>
           </div>

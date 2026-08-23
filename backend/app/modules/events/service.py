@@ -3,7 +3,8 @@ from datetime import date, timedelta
 from typing import List, Optional
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_, and_, desc
+from app.modules.couples.models import Couple
 from app.modules.events.models import SpecialEvent
 from app.modules.events.schemas import SpecialEventCreate, SpecialEventUpdate, EventOccurrenceOut
 
@@ -19,6 +20,7 @@ class EventService:
             interval_value=payload.interval_value,
             category=payload.category,
             description=payload.description,
+            is_shared=payload.is_shared,
         )
         session.add(event)
         await session.commit()
@@ -27,7 +29,29 @@ class EventService:
 
     @staticmethod
     async def get_user_events(session: AsyncSession, user_id: UUID) -> List[SpecialEvent]:
-        stmt = select(SpecialEvent).where(SpecialEvent.user_id == user_id)
+        couple_stmt = (
+            select(Couple)
+            .where(
+                or_(Couple.user1_id == user_id, Couple.user2_id == user_id),
+                Couple.status == "active",
+            )
+            .order_by(desc(Couple.created_at))
+        )
+        couple_res = await session.execute(couple_stmt)
+        couple = couple_res.scalars().first()
+        partner_id = None
+        if couple:
+            partner_id = couple.user2_id if couple.user1_id == user_id else couple.user1_id
+
+        if partner_id:
+            user_filter = or_(
+                SpecialEvent.user_id == user_id,
+                and_(SpecialEvent.user_id == partner_id, SpecialEvent.is_shared == True),
+            )
+        else:
+            user_filter = (SpecialEvent.user_id == user_id)
+
+        stmt = select(SpecialEvent).where(user_filter).order_by(desc(SpecialEvent.created_at))
         result = await session.execute(stmt)
         return list(result.scalars().all())
 
@@ -50,6 +74,8 @@ class EventService:
             event.category = payload.category
         if payload.description is not None:
             event.description = payload.description
+        if payload.is_shared is not None:
+            event.is_shared = payload.is_shared
         await session.commit()
         await session.refresh(event)
         return event
@@ -92,6 +118,7 @@ class EventService:
                             date=occ_date,
                             category=event.category,
                             milestone_info=milestone_text,
+                            is_shared=event.is_shared,
                         )
                     )
 
@@ -119,6 +146,7 @@ class EventService:
                             date=occ_date,
                             category=event.category,
                             milestone_info=milestone_text,
+                            is_shared=event.is_shared,
                         )
                     )
 
@@ -145,6 +173,7 @@ class EventService:
                             date=occ_date,
                             category=event.category,
                             milestone_info=milestone_text,
+                            is_shared=event.is_shared,
                         )
                     )
 
@@ -157,6 +186,7 @@ class EventService:
                         date=event.anchor_date,
                         category=event.category,
                         milestone_info="Ghi chú",
+                        is_shared=event.is_shared,
                     )
                 )
 

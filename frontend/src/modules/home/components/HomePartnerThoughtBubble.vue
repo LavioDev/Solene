@@ -90,11 +90,7 @@ function openModal() {
         </div>
 
         <!-- Nội dung suy nghĩ / Task đang làm -->
-        <div class="flex items-center gap-1.5 max-w-[200px] sm:max-w-[260px]">
-          <span class="font-semibold text-ink-muted text-[11px] shrink-0">
-            {{ isBusy ? (partnerName ? `${partnerName}:` : 'Đang làm:') : 'Đang rảnh:' }}
-          </span>
-
+        <div class="flex items-center gap-1.5 max-w-[200px] sm:max-w-[260px]">  
           <span class="font-medium text-ink truncate text-xs" :title="isBusy && task?.title ? task.title : t('home.partnerStatus.noTasks')">
             {{ isBusy && task?.title ? task.title : t('home.partnerStatus.noTasks') }}
           </span>

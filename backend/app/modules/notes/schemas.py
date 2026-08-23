@@ -22,6 +22,7 @@ class NoteCreate(BaseModel):
     category: str = "memory"
     display_type: str = "RANDOM"  # 'DATE' or 'RANDOM'
     target_date: Optional[date] = None
+    is_shared: bool = True
 
 
 class NoteUpdate(BaseModel):
@@ -32,6 +33,7 @@ class NoteUpdate(BaseModel):
     category: Optional[str] = None
     display_type: Optional[str] = None
     target_date: Optional[date] = None
+    is_shared: Optional[bool] = None
 
 
 class NoteOut(BaseModel):
@@ -44,6 +46,7 @@ class NoteOut(BaseModel):
     category: str
     display_type: str
     target_date: Optional[date] = None
+    is_shared: bool = True
     created_at: datetime
     updated_at: datetime
 

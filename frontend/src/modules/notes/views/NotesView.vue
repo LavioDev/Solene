@@ -3,7 +3,6 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { noteService } from '@/services/noteService'
 import {
-  Plus,
   Trash2,
   Calendar as CalendarIcon,
   Heart,
@@ -21,6 +20,7 @@ import AppBadge from '@/components/ui/AppBadge.vue'
 import AppCard from '@/components/ui/AppCard.vue'
 import AppImageUpload from '@/components/ui/AppImageUpload.vue'
 import AppConfirmModal from '@/components/ui/AppConfirmModal.vue'
+import AppSwitch from '@/components/ui/AppSwitch.vue'
 
 interface NoteImageItem {
   id: string
@@ -38,6 +38,7 @@ interface UserNote {
   category: string
   display_type: 'DATE' | 'RANDOM'
   target_date?: string
+  is_shared?: boolean
   created_at: string
 }
 
@@ -72,6 +73,7 @@ const formContent = ref('')
 const formImages = ref<string[]>([])
 const formDisplayType = ref<'DATE' | 'RANDOM'>('RANDOM')
 const formTargetDate = ref(todayStr)
+const formIsShared = ref(true)
 
 // Delete Confirm Modal
 const showDeleteConfirmModal = ref(false)
@@ -161,6 +163,7 @@ function openAddModal() {
   formImages.value = []
   formDisplayType.value = 'RANDOM'
   formTargetDate.value = todayStr
+  formIsShared.value = true
   showAddModal.value = true
 }
 
@@ -177,6 +180,7 @@ function openEditModal(note: UserNote) {
   }
   formDisplayType.value = note.display_type
   formTargetDate.value = note.target_date || todayStr
+  formIsShared.value = note.is_shared !== undefined ? note.is_shared : true
   showAddModal.value = true
 }
 
@@ -192,6 +196,7 @@ async function handleSaveNote() {
       category: 'memory',
       display_type: formDisplayType.value,
       target_date: formDisplayType.value === 'DATE' ? formTargetDate.value : null,
+      is_shared: formIsShared.value,
     }
     if (editingNote.value) {
       const updated = await noteService.updateNote(editingNote.value.id, payload)
@@ -301,7 +306,7 @@ onUnmounted(() => {
       <!-- Add Button -->
       <div class="pt-3 border-t border-border/60">
         <AppButton class="w-full" size="sm" @click="openAddModal">
-          <Plus class="w-3.5 h-3.5 mr-1" />
+          <Sparkles class="w-3.5 h-3.5 mr-1 text-white" />
           {{ t('notes.addNote') }}
         </AppButton>
       </div>
@@ -323,10 +328,6 @@ onUnmounted(() => {
           </div>
           <p class="text-sm font-medium text-ink">{{ t('notes.emptyTitle') }}</p>
           <p class="text-xs text-ink-muted">{{ t('notes.emptySubtitle') }}</p>
-          <AppButton size="sm" @click="openAddModal" class="mx-auto mt-2">
-            <Plus class="w-3.5 h-3.5" />
-            {{ t('notes.addNote') }}
-          </AppButton>
         </div>
       </AppCard>
 
@@ -366,12 +367,17 @@ onUnmounted(() => {
               <h3 class="text-sm font-semibold text-ink leading-snug group-hover:text-violet-700 transition-colors line-clamp-2 flex-1">
                 {{ note.title }}
               </h3>
-              <AppBadge v-if="note.display_type === 'DATE'" variant="violet" size="sm">
-                <CalendarIcon class="w-3 h-3" />
-              </AppBadge>
-              <AppBadge v-else variant="info" size="sm">
-                <Sparkles class="w-3 h-3" />
-              </AppBadge>
+              <div class="flex items-center gap-1 shrink-0">
+                <AppBadge v-if="note.is_shared" variant="violet" size="sm" :title="t('common.shared')">
+                  <Heart class="w-3 h-3 fill-current text-violet-500" />
+                </AppBadge>
+                <AppBadge v-if="note.display_type === 'DATE'" variant="violet" size="sm">
+                  <CalendarIcon class="w-3 h-3" />
+                </AppBadge>
+                <AppBadge v-else variant="info" size="sm">
+                  <Sparkles class="w-3 h-3" />
+                </AppBadge>
+              </div>
             </div>
             <p class="text-xs text-ink-muted leading-relaxed line-clamp-3">{{ note.content }}</p>
           </div>
@@ -474,6 +480,15 @@ onUnmounted(() => {
           :rows="4"
           required
         />
+
+        <!-- AppSwitch for Couple Shared Note -->
+        <div class="p-3 bg-surface-subtle/40 border border-border/80 rounded-xl">
+          <AppSwitch
+            v-model="formIsShared"
+            :label="t('notes.shareWithPartner')"
+            :description="t('notes.shareWithPartnerDesc')"
+          />
+        </div>
 
         <div class="flex items-center justify-between pt-2 border-t border-border">
           <div>

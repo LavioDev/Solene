@@ -4,41 +4,33 @@ import { useI18n } from 'vue-i18n'
 import { apiClient } from '@/services/apiClient'
 import {
   Calendar as CalendarIcon,
-  CheckSquare,
   ChevronLeft,
   ChevronRight,
-  Clock,
   Heart,
-  PawPrint,
-  Pencil,
+  List,
   Plus,
   Sparkles,
-  Square,
   StickyNote,
   Trash2,
 } from 'lucide-vue-next'
 
-
-
-
-
 import AppButton from '@/components/ui/AppButton.vue'
-import AppBadge from '@/components/ui/AppBadge.vue'
 import AppModal from '@/components/ui/AppModal.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppTextarea from '@/components/ui/AppTextarea.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
 import AppImageUpload from '@/components/ui/AppImageUpload.vue'
 import AppConfirmModal from '@/components/ui/AppConfirmModal.vue'
+import AppSwitch from '@/components/ui/AppSwitch.vue'
 import AutoRuleModal from '../components/AutoRuleModal.vue'
-import DayGanttView from '../components/DayGanttView.vue'
-import type { EventOccurrence, CalendarDay, TaskItem } from '../types'
+import EventTableView from '../components/EventTableView.vue'
+import type { EventOccurrence, CalendarDay, TaskItem, SpecialEvent } from '../types'
 
 const { t, locale } = useI18n()
 
-// Main Sub-Nav mode: 'calendar' | 'gantt'
-const mainViewMode = ref<'calendar' | 'gantt'>('calendar')
-const ganttViewRef = ref<InstanceType<typeof DayGanttView> | null>(null)
+// Main Sub-Nav mode: 'calendar' | 'list'
+const mainViewMode = ref<'calendar' | 'list'>('calendar')
+const eventTableViewRef = ref<InstanceType<typeof EventTableView> | null>(null)
 
 const today = new Date()
 const todayStr = today.toISOString().split('T')[0]
@@ -51,7 +43,8 @@ const viewMode = ref<'month' | 'week'>('month')
 const currentWeekAnchor = ref<Date>(new Date())
 
 const selectedDay = ref<CalendarDay | null>(null)
-const selectedEvent = ref<EventOccurrence | null>(null)
+const selectedEvent = ref<EventOccurrence | SpecialEvent | null>(null)
+
 
 // Modals
 const showAutoRuleModal = ref(false)
@@ -67,13 +60,13 @@ const singleNoteContent = ref('')
 const singleNoteImages = ref<string[]>([])
 const singleNoteDisplayType = ref<'DATE' | 'RANDOM'>('DATE')
 const singleNoteTargetDate = ref(todayStr)
+const singleNoteIsShared = ref(true)
 const submittingNote = ref(false)
 
 // Day Tasks State
 const dayTasks = ref<TaskItem[]>([])
 const loadingDayTasks = ref(false)
 const addingTask = ref(false)
-const deletingTaskId = ref<string | null>(null)
 
 
 // New Task Form State (Preset date according to clicked cell, only select start & end time)
@@ -82,6 +75,7 @@ const newTaskStartTime = ref('09:00')
 const newTaskEndTime = ref('10:00')
 const newTaskPriority = ref('medium')
 const newTaskContent = ref('')
+const newTaskIsShared = ref(true)
 
 const occurrences = ref<EventOccurrence[]>([])
 const loading = ref(false)
@@ -265,47 +259,10 @@ watch([currentYear, currentMonth, viewMode, currentWeekAnchor], () => {
 })
 
 watch(mainViewMode, (newMode) => {
-  if (newMode === 'gantt' && ganttViewRef.value) {
-    ganttViewRef.value.fetchDayTasks()
+  if (newMode === 'list' && eventTableViewRef.value) {
+    eventTableViewRef.value.fetchEvents()
   }
 })
-
-// Day-Gantt Header Controls & Active Date
-const ganttActiveDateStr = ref(todayStr)
-
-const ganttHeaderLabel = computed(() => {
-  const loc = locale.value === 'vi' ? 'vi-VN' : locale.value === 'fr' ? 'fr-FR' : locale.value === 'zh' ? 'zh-CN' : 'en-US'
-  const parts = ganttActiveDateStr.value.split('-').map(Number)
-  if (parts.length !== 3) return ganttActiveDateStr.value
-  const d = new Date(parts[0], parts[1] - 1, parts[2])
-  if (locale.value === 'vi') {
-    return `Ngày ${d.getDate()} Tháng ${d.getMonth() + 1} Năm ${d.getFullYear()}`
-  }
-  return d.toLocaleDateString(loc, { day: 'numeric', month: 'long', year: 'numeric' })
-})
-
-function ganttPrevDay() {
-  const parts = ganttActiveDateStr.value.split('-').map(Number)
-  const d = new Date(parts[0], parts[1] - 1, parts[2] - 1)
-  ganttActiveDateStr.value = getLocalDateStr(d)
-}
-
-function ganttNextDay() {
-  const parts = ganttActiveDateStr.value.split('-').map(Number)
-  const d = new Date(parts[0], parts[1] - 1, parts[2] + 1)
-  ganttActiveDateStr.value = getLocalDateStr(d)
-}
-
-function ganttGoToday() {
-  ganttActiveDateStr.value = getLocalDateStr(new Date())
-}
-
-function handleFocusNow() {
-  ganttGoToday()
-  setTimeout(() => {
-    ganttViewRef.value?.scrollToNow()
-  }, 100)
-}
 
 onMounted(() => {
   fetchOccurrences()
@@ -345,18 +302,6 @@ async function fetchTasksForDay(dateStr: string) {
   }
 }
 
-function formatTaskTime(timeStr?: string | null): string {
-  if (!timeStr) return ''
-  try {
-    const d = new Date(timeStr)
-    const hours = String(d.getHours()).padStart(2, '0')
-    const minutes = String(d.getMinutes()).padStart(2, '0')
-    return `${hours}:${minutes}`
-  } catch {
-    return ''
-  }
-}
-
 // Create new task for day (pre-set date according to clicked cell, only set start and end time)
 async function handleCreateTaskForDay() {
   if (!newTaskTitle.value.trim()) return
@@ -378,6 +323,7 @@ async function handleCreateTaskForDay() {
       title: newTaskTitle.value.trim(),
       content: newTaskContent.value.trim() || null,
       is_completed: false,
+      is_shared: newTaskIsShared.value,
       start_time,
       end_time,
       priority: newTaskPriority.value,
@@ -389,48 +335,14 @@ async function handleCreateTaskForDay() {
     // Reset inputs
     newTaskTitle.value = ''
     newTaskContent.value = ''
+    newTaskIsShared.value = true
 
-    // Refresh calendar occurrences and Gantt chart in background
+    // Refresh calendar occurrences in background
     await fetchOccurrences()
-    if (ganttViewRef.value) {
-      await ganttViewRef.value.fetchDayTasks()
-    }
   } catch (err) {
     console.error('Failed to create task for day:', err)
   } finally {
     addingTask.value = false
-  }
-}
-
-// Toggle Task Status
-async function handleToggleTaskStatus(task: TaskItem) {
-  try {
-    const res = await apiClient.patch<TaskItem>(`/tasks/${task.id}/toggle`)
-    task.is_completed = res.data.is_completed
-    await fetchOccurrences()
-    if (ganttViewRef.value) {
-      await ganttViewRef.value.fetchDayTasks()
-    }
-  } catch (err) {
-    console.error('Failed to toggle task status:', err)
-  }
-}
-
-// Delete Task
-async function handleDeleteTask(task: TaskItem) {
-  deletingTaskId.value = task.id
-  try {
-    await apiClient.delete(`/tasks/${task.id}`)
-    dayTasks.value = dayTasks.value.filter((t) => t.id !== task.id)
-    await fetchOccurrences()
-    if (ganttViewRef.value) {
-      await ganttViewRef.value.fetchDayTasks()
-    }
-  } catch (err) {
-
-    console.error('Failed to delete task:', err)
-  } finally {
-    deletingTaskId.value = null
   }
 }
 
@@ -444,18 +356,8 @@ const editTaskEndTime = ref('10:00')
 const editTaskPriority = ref('medium')
 const editTaskContent = ref('')
 const editTaskIsCompleted = ref(false)
+const editTaskIsShared = ref(true)
 const updatingTask = ref(false)
-
-function openEditTaskModal(task: TaskItem) {
-  editingTask.value = task
-  editTaskTitle.value = task.title
-  editTaskStartTime.value = formatTaskTime(task.start_time) || '09:00'
-  editTaskEndTime.value = formatTaskTime(task.end_time) || '10:00'
-  editTaskPriority.value = task.priority || 'medium'
-  editTaskContent.value = task.content || ''
-  editTaskIsCompleted.value = task.is_completed
-  showEditTaskModal.value = true
-}
 
 async function handleUpdateTask() {
   if (!editingTask.value || !editTaskTitle.value.trim()) return
@@ -477,6 +379,7 @@ async function handleUpdateTask() {
       title: editTaskTitle.value.trim(),
       content: editTaskContent.value.trim() || null,
       is_completed: editTaskIsCompleted.value,
+      is_shared: editTaskIsShared.value,
       start_time,
       end_time,
       priority: editTaskPriority.value,
@@ -490,9 +393,6 @@ async function handleUpdateTask() {
     showEditTaskModal.value = false
     editingTask.value = null
     await fetchOccurrences()
-    if (ganttViewRef.value) {
-      await ganttViewRef.value.fetchDayTasks()
-    }
   } catch (err) {
     console.error('Failed to update task:', err)
   } finally {
@@ -516,18 +416,8 @@ function openSingleDayModal(day: CalendarDay) {
   singleNoteImages.value = []
   singleNoteDisplayType.value = 'DATE'
   singleNoteTargetDate.value = day.dateStr
+  singleNoteIsShared.value = true
   showNoteModal.value = true
-}
-
-// Open Task Modal directly from Day-Gantt view
-function handleGanttAddTask(dateStr: string) {
-  selectedEvent.value = null
-  selectedDay.value = calendarDays.value.find((d) => d.dateStr === dateStr) || null
-  singleNoteTargetDate.value = dateStr
-  newTaskTitle.value = ''
-  newTaskContent.value = ''
-  fetchTasksForDay(dateStr)
-  showTaskModal.value = true
 }
 
 
@@ -542,6 +432,7 @@ function openEventEditModal(evt: EventOccurrence) {
     singleNoteImages.value = evt.image_url ? [evt.image_url] : []
     singleNoteDisplayType.value = 'DATE'
     singleNoteTargetDate.value = evt.date
+    singleNoteIsShared.value = evt.is_shared !== undefined ? evt.is_shared : true
     showNoteModal.value = true
   } else if (evt.category === 'task') {
     singleNoteTargetDate.value = evt.date
@@ -552,9 +443,26 @@ function openEventEditModal(evt: EventOccurrence) {
   }
 }
 
-function handleDeleteFromModal(evt: EventOccurrence) {
+function handleEditSpecialEvent(evt: SpecialEvent) {
+  selectedEvent.value = evt
+  showAutoRuleModal.value = true
+}
+
+function handleDeleteSpecialEvent(evt: SpecialEvent) {
   selectedEvent.value = evt
   showDeleteConfirmModal.value = true
+}
+
+function handleDeleteFromModal(evt: EventOccurrence | SpecialEvent) {
+  selectedEvent.value = evt
+  showDeleteConfirmModal.value = true
+}
+
+function handleSavedEvent() {
+  fetchOccurrences()
+  if (eventTableViewRef.value) {
+    eventTableViewRef.value.fetchEvents()
+  }
 }
 
 // Save (Create or Update) Single-Day Note
@@ -572,9 +480,11 @@ async function handleSaveSingleDayNote() {
       category: 'memory',
       display_type: singleNoteDisplayType.value,
       target_date: targetDate,
+      is_shared: singleNoteIsShared.value,
     }
-    if (selectedEvent.value && selectedEvent.value.category === 'note') {
-      await apiClient.put(`/notes/${selectedEvent.value.event_id}`, payload)
+    if (selectedEvent.value && 'category' in selectedEvent.value && selectedEvent.value.category === 'note') {
+      const eventId = 'id' in selectedEvent.value ? selectedEvent.value.id : selectedEvent.value.event_id
+      await apiClient.put(`/notes/${eventId}`, payload)
     } else {
       await apiClient.post('/notes', payload)
     }
@@ -588,18 +498,21 @@ async function handleSaveSingleDayNote() {
   }
 }
 
-// Delete Event / Note
+// Delete Event / Note / Task
 async function confirmDeleteEvent() {
   if (!selectedEvent.value) return
 
   deletingEvent.value = true
   try {
-    if (selectedEvent.value.category === 'note') {
-      await apiClient.delete(`/notes/${selectedEvent.value.event_id}`)
-    } else if (selectedEvent.value.category === 'task') {
-      await apiClient.delete(`/tasks/${selectedEvent.value.event_id}`)
+    const eventId = 'id' in selectedEvent.value ? selectedEvent.value.id : selectedEvent.value.event_id
+    const cat = 'category' in selectedEvent.value ? selectedEvent.value.category : 'love'
+
+    if (cat === 'note') {
+      await apiClient.delete(`/notes/${eventId}`)
+    } else if (cat === 'task') {
+      await apiClient.delete(`/tasks/${eventId}`)
     } else {
-      await apiClient.delete(`/events/${selectedEvent.value.event_id}`)
+      await apiClient.delete(`/events/${eventId}`)
     }
     showDeleteConfirmModal.value = false
     showNoteModal.value = false
@@ -607,7 +520,9 @@ async function confirmDeleteEvent() {
     showAutoRuleModal.value = false
     selectedEvent.value = null
     await fetchOccurrences()
-
+    if (eventTableViewRef.value) {
+      await eventTableViewRef.value.fetchEvents()
+    }
   } catch (err) {
     console.error('Failed to delete event/note/task:', err)
   } finally {
@@ -634,26 +549,28 @@ async function confirmDeleteEvent() {
         </button>
         <button
           type="button"
-          @click="mainViewMode = 'gantt'"
+          @click="mainViewMode = 'list'"
           class="px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
-          :class="mainViewMode === 'gantt' ? 'bg-violet-50 text-violet-700 font-bold shadow-2xs' : 'text-ink-muted hover:text-ink hover:bg-surface-raised'"
+          :class="mainViewMode === 'list' ? 'bg-violet-50 text-violet-700 font-bold shadow-2xs' : 'text-ink-muted hover:text-ink hover:bg-surface-raised'"
         >
-          <Clock class="w-4 h-4" />
-          <span>{{ t('calendar.subnav.gantt') }}</span>
+          <List class="w-4 h-4" />
+          <span>{{ t('calendar.subnav.list') }}</span>
         </button>
       </div>
     </div>
 
-    <!-- Main Calendar & Gantt Card Container (Expanded to fill available viewport height) -->
-    <div class="w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[calc(100vh-210px)] h-[calc(100vh-210px)]">
-
-      <!-- Header Toolbar inside card -->
+    <!-- SUB-VIEW 1: Calendar Grid Mode Card Container -->
+    <div
+      v-if="mainViewMode === 'calendar'"
+      class="w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[calc(100vh-210px)] h-[calc(100vh-210px)]"
+    >
+      <!-- Header Toolbar inside calendar card -->
       <div class="h-14 px-6 border-b border-border/60 flex items-center justify-between bg-white shrink-0">
 
         <!-- Left: Title / Loading indicator -->
         <div class="flex items-center gap-2.5">
           <h2 class="text-sm sm:text-base font-semibold text-ink capitalize tracking-tight">
-            {{ mainViewMode === 'calendar' ? headerLabel : ganttHeaderLabel }}
+            {{ headerLabel }}
           </h2>
           <span
             v-if="loading"
@@ -663,232 +580,172 @@ async function confirmDeleteEvent() {
           </span>
         </div>
 
-      <!-- Right: Calendar Controls (Only shown in Calendar mode) -->
-      <div v-if="mainViewMode === 'calendar'" class="flex items-center gap-1.5">
+        <!-- Right: Calendar Controls -->
+        <div class="flex items-center gap-1.5">
 
-        <!-- Month / Week tab toggle -->
-        <div class="flex items-center gap-0.5 p-0.5 bg-surface-subtle border border-border/60 rounded-xl">
-          <AppButton
-            variant="ghost"
-            size="sm"
-            @click="viewMode = 'month'"
-            class="px-2.5 py-1 text-xs sm:text-sm font-normal rounded-lg transition-all"
-            :class="viewMode === 'month' ? '!bg-white !text-violet-700 font-medium !shadow-2xs' : '!text-ink-muted'"
-          >
-            {{ t('calendar.monthView') }}
-          </AppButton>
-          <AppButton
-            variant="ghost"
-            size="sm"
-            @click="switchToCurrentWeek"
-            class="px-2.5 py-1 text-xs sm:text-sm font-normal rounded-lg transition-all"
-            :class="viewMode === 'week' ? '!bg-white !text-violet-700 font-medium !shadow-2xs' : '!text-ink-muted'"
-          >
-            {{ t('calendar.weekView') }}
-          </AppButton>
-        </div>
-
-        <!-- Auto Generate button -->
-        <AppButton
-          variant="ghost"
-          size="sm"
-          @click="openAutoRuleModal"
-          :title="t('calendar.autoGenerate')"
-          class="!px-2.5 !py-1 text-ink-muted hover:!text-violet-600 hover:!bg-violet-50"
-        >
-          <Sparkles class="w-4 h-4 text-amber-500" />
-        </AppButton>
-
-        <!-- Today button -->
-        <AppButton
-          variant="ghost"
-          size="sm"
-          @click="goToday"
-          class="!px-2.5 !py-1 text-xs sm:text-sm font-normal text-ink-muted hover:!text-ink"
-        >
-          {{ t('calendar.today') }}
-        </AppButton>
-
-        <!-- Prev / Next navigation -->
-        <div class="flex items-center gap-0.5">
-          <AppButton
-            variant="ghost"
-            size="sm"
-            @click="prevStep"
-            class="!p-1.5 text-ink-muted hover:!text-ink"
-          >
-            <ChevronLeft class="w-4.5 h-4.5" />
-          </AppButton>
-          <AppButton
-            variant="ghost"
-            size="sm"
-            @click="nextStep"
-            class="!p-1.5 text-ink-muted hover:!text-ink"
-          >
-            <ChevronRight class="w-4.5 h-4.5" />
-          </AppButton>
-        </div>
-
-      </div>
-
-      <!-- Right: Day-Gantt Controls (Cloned UI 1:1 with Calendar Header style) -->
-      <div v-else-if="mainViewMode === 'gantt'" class="flex items-center gap-1.5">
-        <!-- Add Task Icon Button -->
-        <!-- Focus to Current Time Icon Button -->
-        <AppButton
-          variant="ghost"
-          size="sm"
-          @click="handleFocusNow"
-          :title="t('calendar.gantt.focusNow')"
-          class="!px-2.5 !py-1 text-ink-muted hover:!text-violet-600 hover:!bg-violet-50"
-        >
-          <PawPrint class="w-4 h-4 text-violet-600" />
-
-        </AppButton>
-        <AppButton
-          variant="ghost"
-          size="sm"
-          @click="handleGanttAddTask(ganttActiveDateStr)"
-          :title="t('calendar.gantt.addTask')"
-          class="!px-2.5 !py-1 text-ink-muted hover:!text-violet-600 hover:!bg-violet-50"
-        >
-          <Sparkles class="w-4 h-4 text-amber-500" />
-        </AppButton>
-
-
-        <!-- Today button -->
-        <AppButton
-          variant="ghost"
-          size="sm"
-          @click="ganttGoToday"
-          class="!px-2.5 !py-1 text-xs sm:text-sm font-normal text-ink-muted hover:!text-ink"
-        >
-          {{ t('calendar.today') }}
-        </AppButton>
-
-        <!-- Prev / Next navigation -->
-        <div class="flex items-center gap-0.5">
-          <AppButton
-            variant="ghost"
-            size="sm"
-            @click="ganttPrevDay"
-            class="!p-1.5 text-ink-muted hover:!text-ink"
-          >
-            <ChevronLeft class="w-4.5 h-4.5" />
-          </AppButton>
-          <AppButton
-            variant="ghost"
-            size="sm"
-            @click="ganttNextDay"
-            class="!p-1.5 text-ink-muted hover:!text-ink"
-          >
-            <ChevronRight class="w-4.5 h-4.5" />
-          </AppButton>
-        </div>
-      </div>
-
-
-    </div>
-
-    <!-- SUB-VIEW 1: Scrollable Calendar Grid Area -->
-    <div v-if="mainViewMode === 'calendar'" class="flex-1 overflow-x-auto flex flex-col">
-      <div class="flex-1 flex flex-col min-w-[800px]">
-
-        <!-- Weekdays Header Row -->
-        <div class="grid grid-cols-7 border-b border-border/60 bg-surface-subtle/40 shrink-0">
-          <div
-            v-for="wd in weekDays"
-            :key="wd"
-            class="py-2.5 text-center text-xs font-medium uppercase tracking-wider text-ink-muted"
-          >
-            {{ wd }}
+          <!-- Month / Week tab toggle -->
+          <div class="flex items-center gap-0.5 p-0.5 bg-surface-subtle border border-border/60 rounded-xl">
+            <AppButton
+              variant="ghost"
+              size="sm"
+              @click="viewMode = 'month'"
+              class="px-2.5 py-1 text-xs sm:text-sm font-normal rounded-lg transition-all"
+              :class="viewMode === 'month' ? '!bg-white !text-violet-700 font-medium !shadow-2xs' : '!text-ink-muted'"
+            >
+              {{ t('calendar.monthView') }}
+            </AppButton>
+            <AppButton
+              variant="ghost"
+              size="sm"
+              @click="switchToCurrentWeek"
+              class="px-2.5 py-1 text-xs sm:text-sm font-normal rounded-lg transition-all"
+              :class="viewMode === 'week' ? '!bg-white !text-violet-700 font-medium !shadow-2xs' : '!text-ink-muted'"
+            >
+              {{ t('calendar.weekView') }}
+            </AppButton>
           </div>
+
+          <!-- Auto Generate button -->
+          <AppButton
+            variant="ghost"
+            size="sm"
+            @click="openAutoRuleModal"
+            :title="t('calendar.autoGenerate')"
+            class="!px-2.5 !py-1 text-ink-muted hover:!text-violet-600 hover:!bg-violet-50"
+          >
+            <Sparkles class="w-4 h-4 text-amber-500" />
+          </AppButton>
+
+          <!-- Today button -->
+          <AppButton
+            variant="ghost"
+            size="sm"
+            @click="goToday"
+            class="!px-2.5 !py-1 text-xs sm:text-sm font-normal text-ink-muted hover:!text-ink"
+          >
+            {{ t('calendar.today') }}
+          </AppButton>
+
+          <!-- Prev / Next navigation -->
+          <div class="flex items-center gap-0.5">
+            <AppButton
+              variant="ghost"
+              size="sm"
+              @click="prevStep"
+              class="!p-1.5 text-ink-muted hover:!text-ink"
+            >
+              <ChevronLeft class="w-4.5 h-4.5" />
+            </AppButton>
+            <AppButton
+              variant="ghost"
+              size="sm"
+              @click="nextStep"
+              class="!p-1.5 text-ink-muted hover:!text-ink"
+            >
+              <ChevronRight class="w-4.5 h-4.5" />
+            </AppButton>
+          </div>
+
         </div>
 
-        <!-- Days Grid -->
-        <div class="flex-1 grid grid-cols-7 divide-x divide-y divide-border/40 min-h-0 bg-white">
-          <div
-            v-for="(day, idx) in calendarDays"
-            :key="idx"
-            class="p-2.5 flex flex-col gap-1.5 transition-colors cursor-pointer group relative overflow-hidden"
-            :class="[
-              viewMode === 'week' ? 'min-h-[220px]' : 'min-h-[105px]',
-              !day.isCurrentMonth && viewMode === 'month'
-                ? 'bg-surface-subtle/40'
-                : 'bg-white hover:bg-violet-50/30',
-              day.isToday ? 'bg-violet-50/50' : '',
-            ]"
-          >
-            <!-- Day number row -->
-            <div class="flex items-center justify-between">
-              <span
-                class="w-6 h-6 rounded-full flex items-center justify-center text-xs sm:text-[13px] font-normal transition-all"
-                :class="[
-                  day.isToday
-                    ? 'bg-violet-600 text-white font-medium'
-                    : !day.isCurrentMonth && viewMode === 'month'
-                      ? 'text-ink-faint'
-                      : 'text-ink-muted group-hover:text-violet-700',
-                ]"
-              >
-                {{ day.dayNumber }}
-              </span>
+      </div>
 
-              <!-- Add note — ghost plus, hidden until hover -->
-              <button
-                type="button"
-                @click.stop="openSingleDayModal(day)"
-                class="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded-lg text-ink-faint hover:text-violet-600 hover:bg-white transition-all cursor-pointer"
-                :title="t('calendar.tabs.note')"
-              >
-                <Plus class="w-3.5 h-3.5" />
-              </button>
+      <!-- Scrollable Calendar Grid Area -->
+      <div class="flex-1 overflow-x-auto flex flex-col">
+        <div class="flex-1 flex flex-col min-w-[800px]">
+
+          <!-- Weekdays Header Row -->
+          <div class="grid grid-cols-7 border-b border-border/60 bg-surface-subtle/40 shrink-0">
+            <div
+              v-for="wd in weekDays"
+              :key="wd"
+              class="py-2.5 text-center text-xs font-medium uppercase tracking-wider text-ink-muted"
+            >
+              {{ wd }}
             </div>
+          </div>
 
-            <!-- Events — soft pill badges, normal weight text, click to edit (Only Note & Love) -->
-            <div class="flex flex-col gap-1 overflow-y-auto min-h-0">
-              <div
-                v-for="evt in day.events.filter(e => e.category !== 'task')"
-                :key="evt.event_id + evt.title"
-                @click.stop="openEventEditModal(evt)"
-                class="px-2 py-1.5 rounded-md text-xs font-normal truncate flex items-center gap-1.5 cursor-pointer transition-opacity hover:opacity-85"
-                :class="[
-                  evt.category === 'note'
-                    ? 'bg-violet-100/90 text-violet-800'
-                    : 'bg-rose-100/90 text-rose-700'
-                ]"
-              >
-                <StickyNote v-if="evt.category === 'note'" class="w-3 h-3 shrink-0" />
-                <Heart v-else class="w-3 h-3 fill-current shrink-0" />
-                <span class="truncate">{{ evt.title }}</span>
+          <!-- Days Grid -->
+          <div class="flex-1 grid grid-cols-7 divide-x divide-y divide-border/40 min-h-0 bg-white">
+            <div
+              v-for="(day, idx) in calendarDays"
+              :key="idx"
+              class="p-2.5 flex flex-col gap-1.5 transition-colors cursor-pointer group relative overflow-hidden"
+              :class="[
+                viewMode === 'week' ? 'min-h-[220px]' : 'min-h-[105px]',
+                !day.isCurrentMonth && viewMode === 'month'
+                  ? 'bg-surface-subtle/40'
+                  : 'bg-white hover:bg-violet-50/30',
+                day.isToday ? 'bg-violet-50/50' : '',
+              ]"
+            >
+              <!-- Day number row -->
+              <div class="flex items-center justify-between">
+                <span
+                  class="w-6 h-6 rounded-full flex items-center justify-center text-xs sm:text-[13px] font-normal transition-all"
+                  :class="[
+                    day.isToday
+                      ? 'bg-violet-600 text-white font-medium'
+                      : !day.isCurrentMonth && viewMode === 'month'
+                        ? 'text-ink-faint'
+                        : 'text-ink-muted group-hover:text-violet-700',
+                  ]"
+                >
+                  {{ day.dayNumber }}
+                </span>
+
+                <!-- Add note — ghost plus, hidden until hover -->
+                <button
+                  type="button"
+                  @click.stop="openSingleDayModal(day)"
+                  class="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded-lg text-ink-faint hover:text-violet-600 hover:bg-white transition-all cursor-pointer"
+                  :title="t('calendar.tabs.note')"
+                >
+                  <Plus class="w-3.5 h-3.5" />
+                </button>
               </div>
+
+              <!-- Events — soft pill badges, normal weight text, click to edit (Only Note & Love) -->
+              <div class="flex flex-col gap-1 overflow-y-auto min-h-0">
+                <div
+                  v-for="evt in day.events.filter(e => e.category !== 'task')"
+                  :key="evt.event_id + evt.title"
+                  @click.stop="openEventEditModal(evt)"
+                  class="px-2 py-1.5 rounded-md text-xs font-normal truncate flex items-center gap-1.5 cursor-pointer transition-opacity hover:opacity-85"
+                  :class="[
+                    evt.category === 'note'
+                      ? 'bg-violet-100/90 text-violet-800'
+                      : 'bg-rose-100/90 text-rose-700'
+                  ]"
+                >
+                  <StickyNote v-if="evt.category === 'note'" class="w-3 h-3 shrink-0" />
+                  <Heart v-else class="w-3 h-3 fill-current shrink-0" />
+                  <span class="truncate">{{ evt.title }}</span>
+                </div>
+              </div>
+
             </div>
-
-
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
 
-    <!-- SUB-VIEW 2: Day-Gantt Schedule Timeline -->
-    <div v-else-if="mainViewMode === 'gantt'" class="flex-1 overflow-hidden flex flex-col">
-      <DayGanttView
-        ref="ganttViewRef"
-        :active-date="ganttActiveDateStr"
-        @add-task="handleGanttAddTask"
-        @task-updated="fetchOccurrences"
-      />
-    </div>
-
-    </div>
+    <!-- SUB-VIEW 2: All Events List / Table View (Standalone Action Bar + Table Card) -->
+    <EventTableView
+      v-else-if="mainViewMode === 'list'"
+      ref="eventTableViewRef"
+      @add-event="openAutoRuleModal"
+      @edit-event="handleEditSpecialEvent"
+      @delete-event="handleDeleteSpecialEvent"
+    />
 
     <!-- Modal 1: Auto-Generate Rules (Create or Edit) -->
     <AutoRuleModal
       :show="showAutoRuleModal"
       :selected-event="selectedEvent"
       @close="showAutoRuleModal = false"
-      @saved="fetchOccurrences"
+      @saved="handleSavedEvent"
       @delete="handleDeleteFromModal"
     />
 
@@ -943,6 +800,15 @@ async function confirmDeleteEvent() {
           :rows="4"
           required
         />
+
+        <!-- AppSwitch for Couple Shared -->
+        <div class="p-3 bg-surface-subtle/40 border border-border/80 rounded-xl">
+          <AppSwitch
+            v-model="singleNoteIsShared"
+            :label="t('notes.shareWithPartner')"
+            :description="t('notes.shareWithPartnerDesc')"
+          />
+        </div>
 
         <div class="flex items-center justify-between pt-2 border-t border-border">
           <div>
@@ -1033,6 +899,15 @@ async function confirmDeleteEvent() {
             :placeholder="t('calendar.tasks.contentPlaceholder')"
             :rows="2"
           />
+
+          <!-- AppSwitch for Couple Shared Task -->
+          <div class="p-3 bg-white border border-border/80 rounded-xl">
+            <AppSwitch
+              v-model="newTaskIsShared"
+              :label="t('calendar.tasks.shareWithPartner')"
+              :description="t('calendar.tasks.shareWithPartnerDesc')"
+            />
+          </div>
 
           <div class="flex justify-end pt-1">
             <AppButton

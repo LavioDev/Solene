@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Optional, Sequence
 import uuid
-from sqlalchemy import desc, select
+from sqlalchemy import desc, select, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.repository import BaseRepository
+from app.modules.couples.models import Couple
 from app.modules.tasks.models import Task
 from app.modules.tasks.schemas import TaskCreate, TaskUpdate
 
@@ -13,7 +14,29 @@ class TaskRepository(BaseRepository[Task, TaskCreate, TaskUpdate]):
         super().__init__(model=Task, session=session)
 
     async def get_by_id_and_user(self, task_id: uuid.UUID, user_id: uuid.UUID) -> Optional[Task]:
-        stmt = select(Task).where(Task.id == task_id, Task.user_id == user_id)
+        couple_stmt = (
+            select(Couple)
+            .where(
+                or_(Couple.user1_id == user_id, Couple.user2_id == user_id),
+                Couple.status == "active",
+            )
+            .order_by(desc(Couple.created_at))
+        )
+        couple_res = await self.session.execute(couple_stmt)
+        couple = couple_res.scalars().first()
+        partner_id = None
+        if couple:
+            partner_id = couple.user2_id if couple.user1_id == user_id else couple.user1_id
+
+        if partner_id:
+            user_filter = or_(
+                Task.user_id == user_id,
+                and_(Task.user_id == partner_id, Task.is_shared == True),
+            )
+        else:
+            user_filter = (Task.user_id == user_id)
+
+        stmt = select(Task).where(Task.id == task_id, user_filter)
         result = await self.session.execute(stmt)
         return result.scalars().first()
 
@@ -27,7 +50,29 @@ class TaskRepository(BaseRepository[Task, TaskCreate, TaskUpdate]):
         skip: int = 0,
         limit: int = 100,
     ) -> Sequence[Task]:
-        stmt = select(Task).where(Task.user_id == user_id)
+        couple_stmt = (
+            select(Couple)
+            .where(
+                or_(Couple.user1_id == user_id, Couple.user2_id == user_id),
+                Couple.status == "active",
+            )
+            .order_by(desc(Couple.created_at))
+        )
+        couple_res = await self.session.execute(couple_stmt)
+        couple = couple_res.scalars().first()
+        partner_id = None
+        if couple:
+            partner_id = couple.user2_id if couple.user1_id == user_id else couple.user1_id
+
+        if partner_id:
+            user_filter = or_(
+                Task.user_id == user_id,
+                and_(Task.user_id == partner_id, Task.is_shared == True),
+            )
+        else:
+            user_filter = (Task.user_id == user_id)
+
+        stmt = select(Task).where(user_filter)
 
         if is_completed is not None:
             stmt = stmt.where(Task.is_completed == is_completed)

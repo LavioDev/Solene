@@ -21,6 +21,7 @@ export const noteService = {
     category?: string
     display_type?: 'DATE' | 'RANDOM'
     target_date?: string | null
+    is_shared?: boolean
   }): Promise<NoteItem> {
     const response = await apiClient.post<NoteItem>('/notes', payload)
     return response.data
@@ -36,6 +37,7 @@ export const noteService = {
       category?: string
       display_type?: string
       target_date?: string | null
+      is_shared?: boolean
     },
   ): Promise<NoteItem> {
     const response = await apiClient.put<NoteItem>(`/notes/${noteId}`, payload)

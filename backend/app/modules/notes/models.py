@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime
 from typing import List
-from sqlalchemy import String, Text, Date, DateTime, ForeignKey
+from sqlalchemy import String, Text, Date, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
@@ -19,6 +19,7 @@ class UserNote(Base):
     
     display_type: Mapped[str] = mapped_column(String(50), default="RANDOM") # 'DATE' or 'RANDOM'
     target_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    is_shared: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
