@@ -184,7 +184,7 @@ const modalTransformStyle = computed(() => {
           </div>
 
           <!-- Modal Body (Scrollable if tall) -->
-          <div class="flex-1 overflow-y-auto py-3 pr-1 space-y-4 min-h-0">
+            <div class="flex-1 overflow-y-auto py-3 pr-1 space-y-4 min-h-0">
             <slot />
           </div>
 

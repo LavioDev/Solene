@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { NoteItem } from '@/types/note'
-import { RotateCw, StickyNote } from 'lucide-vue-next'
+import { StickyNote } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppBadge from '@/components/ui/AppBadge.vue'
 import AppModal from '@/components/ui/AppModal.vue'
@@ -34,36 +34,61 @@ const modalTitle = computed(() => {
   }
   return t('home.randomNoteModal.defaultTitle')
 })
+
+// Thu thập toàn bộ ảnh được lưu (cả note.images mảng nhiều ảnh và note.image_url đơn)
+const allImages = computed<string[]>(() => {
+  if (!props.note) return []
+  const list: string[] = []
+
+  if (props.note.images && Array.isArray(props.note.images) && props.note.images.length > 0) {
+    for (const img of props.note.images) {
+      if (img?.file_path && !list.includes(img.file_path)) {
+        list.push(img.file_path)
+      }
+    }
+  }
+
+  if (props.note.image_url && !list.includes(props.note.image_url)) {
+    list.push(props.note.image_url)
+  }
+
+  return list
+})
 </script>
 
 <template>
   <AppModal
     :show="show"
     :title="modalTitle"
-    width="sm"
+    width="md"
     @close="emit('close')"
   >
     <div v-if="note" class="space-y-3 py-1">
       <div class="flex items-center justify-between gap-2">
         <h3 class="font-bold text-sm text-ink truncate">{{ note.title }}</h3>
-        <AppBadge variant="violet" size="sm">
+        <!-- <AppBadge variant="violet" size="sm">
           {{ note.target_date ? note.target_date : t('notes.badgeRandom') }}
-        </AppBadge>
+        </AppBadge> -->
       </div>
 
       <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
         {{ note.content }}
       </p>
 
-      <div
-        v-if="note.image_url"
-        class="mt-2 rounded-xl overflow-hidden max-h-56 w-full border border-border/60 shadow-2xs"
-      >
-        <img
-          :src="note.image_url"
-          :alt="note.title"
-          class="w-full h-full object-cover"
-        />
+      <!-- TOÀN BỘ ẢNH ĐƯỢC LƯU (Tỷ lệ Full, bám theo chiều rộng, không bị cắt) -->
+      <div v-if="allImages.length > 0" class="mt-3 space-y-3">
+        <div
+          v-for="(img, idx) in allImages"
+          :key="idx"
+          class="rounded-2xl overflow-hidden w-full border border-border/60 shadow-2xs bg-surface-subtle"
+        >
+          <img
+            :src="img"
+            :alt="`${note.title} ${idx + 1}`"
+            class="w-full h-auto block"
+            loading="lazy"
+          />
+        </div>
       </div>
     </div>
 
@@ -74,17 +99,6 @@ const modalTitle = computed(() => {
 
     <template #footer>
       <div class="flex items-center justify-end w-full">
-        <!-- <AppButton
-          variant="ghost"
-          size="sm"
-          @click="emit('shuffle')"
-          :disabled="!hasNotes"
-          class="text-xs font-semibold"
-        >
-          <RotateCw class="w-3.5 h-3.5 mr-1" :class="{ 'animate-spin': isShuffling }" />
-          {{ t('home.randomNoteModal.shuffle') }}
-        </AppButton> -->
-
         <AppButton
           variant="secondary"
           size="sm"
@@ -96,3 +110,4 @@ const modalTitle = computed(() => {
     </template>
   </AppModal>
 </template>
+

@@ -4,6 +4,7 @@ import type { Couple, UserPartnerSummary } from '@/types/couple'
 import type { PartnerActiveStatus } from '@/types/task'
 import { Heart, Plus } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
+import HomePartnerThoughtBubble from './HomePartnerThoughtBubble.vue'
 
 interface Props {
   couple: Couple | null
@@ -87,6 +88,15 @@ const { t } = useI18n()
           {{ t('home.since', { date: formattedStartDate }) }}
         </p>
       </div>
+    </div>
+
+    <!-- Right: Partner Thought Bubble (Logic Backend) -->
+    <div v-if="couple && partner" class="flex items-center gap-2">
+      <HomePartnerThoughtBubble
+        :partner-name="partner.full_name"
+        :task="partnerStatus?.active_task"
+        :is-busy="Boolean(partnerStatus?.is_busy)"
+      />
     </div>
 
     <!-- Fallback if No Couple Linked -->

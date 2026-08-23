@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/authStore'
-import { ArrowRight } from 'lucide-vue-next'
+import { ArrowRight, Sparkles } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppInput from '@/components/ui/AppInput.vue'
 import AppCard from '@/components/ui/AppCard.vue'
@@ -51,7 +51,7 @@ async function handleSubmit() {
       <!-- Wordmark -->
       <div class="text-center">
         <h1
-          class="tracking-tight select-none"
+          class="tracking-tight select-none inline-flex items-center justify-center gap-1.5"
           style="
             font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
             font-size: 2rem;
@@ -59,7 +59,11 @@ async function handleSubmit() {
             letter-spacing: -0.04em;
             color: #111111;
           "
-        >Solène</h1>
+        >
+          <span>Solène</span>
+
+          <Sparkles class="w-6 h-6 text-violet-600 animate-pulse ml-1" />
+        </h1>
       </div>
 
       <!-- Card -->

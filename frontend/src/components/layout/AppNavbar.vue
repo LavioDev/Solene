@@ -132,7 +132,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="h-14 bg-white border-b border-border/60 flex items-center justify-between px-6 shrink-0 z-30 select-none">
+  <header class="relative h-14 bg-white border-b border-border/60 flex items-center justify-between px-6 shrink-0 z-40 select-none">
 
     <!-- Left: Sidebar Toggle + Page Title / Breadcrumb -->
     <div class="flex items-center gap-3.5">
@@ -188,7 +188,7 @@ onUnmounted(() => {
         >
           <div
             v-if="isSearchOpen"
-            class="absolute right-0 top-full mt-1.5 w-64 bg-white/95 backdrop-blur-md border border-border rounded-xl shadow-xl p-1.5 space-y-1 z-50"
+            class="absolute right-0 top-full mt-1.5 w-64 bg-white/95 backdrop-blur-md border border-border rounded-xl shadow-xl p-1.5 space-y-1 z-[100]"
           >
             <div class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-faint">
               {{ t('nav.navigationPages') }}
@@ -265,7 +265,7 @@ onUnmounted(() => {
         >
           <div
             v-if="showUserMenu && authStore.user"
-            class="absolute right-0 top-full mt-2 w-56 p-3 bg-white/95 backdrop-blur-md border border-border rounded-2xl shadow-xl space-y-3 z-50"
+            class="absolute right-0 top-full mt-2 w-56 p-3 bg-white/95 backdrop-blur-md border border-border rounded-2xl shadow-xl space-y-3 z-[100]"
           >
             <!-- User Info Header -->
             <router-link

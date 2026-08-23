@@ -13,10 +13,10 @@ const tabStore = useTabStore()
   <div class="flex h-screen bg-surface-subtle overflow-hidden">
     <AppSidebar v-if="!tabStore.isContentFullscreen" />
     <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
-      <AppNavbar v-if="!tabStore.isContentFullscreen" />
+      <AppNavbar v-if="!tabStore.isContentFullscreen" class="relative z-40" />
       <!-- Vben-style Multiple Tabs Bar -->
-      <AppTabBar />
-      <main class="flex-1 overflow-y-auto relative">
+      <AppTabBar class="relative z-30" />
+      <main class="flex-1 overflow-y-auto relative z-10">
         <div v-if="tabStore.reloadFlag">
           <div v-if="route.name === 'Home'" class="h-full w-full">
             <router-view />
