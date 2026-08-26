@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useUiStore } from '@/stores/uiStore'
 import AppLayout from '@/components/layout/AppLayout.vue'
 
 const routes: RouteRecordRaw[] = [
@@ -68,8 +69,13 @@ export const router = createRouter({
   routes,
 })
 
-router.beforeEach(async (to, _from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+  const uiStore = useUiStore()
+
+  if (to.path !== from.path) {
+    uiStore.startPageLoading()
+  }
 
   if (authStore.isInitializing) {
     await authStore.checkAuth()
@@ -82,4 +88,16 @@ router.beforeEach(async (to, _from, next) => {
   } else {
     next()
   }
+})
+
+router.afterEach((to, from) => {
+  const uiStore = useUiStore()
+  if (to.path !== from.path) {
+    uiStore.stopPageLoading(500)
+  }
+})
+
+router.onError(() => {
+  const uiStore = useUiStore()
+  uiStore.stopPageLoading(500)
 })

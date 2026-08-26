@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { useTabStore } from '@/stores/tabStore'
+import { useUiStore } from '@/stores/uiStore'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AppNavbar from '@/components/layout/AppNavbar.vue'
 import AppTabBar from '@/components/layout/AppTabBar.vue'
+import AppPageLoader from '@/components/ui/AppPageLoader.vue'
 
 const route = useRoute()
 const tabStore = useTabStore()
+const uiStore = useUiStore()
 </script>
 
 <template>
@@ -17,6 +20,9 @@ const tabStore = useTabStore()
       <!-- Vben-style Multiple Tabs Bar -->
       <AppTabBar class="relative z-30" />
       <main class="flex-1 overflow-y-auto relative z-10">
+        <!-- Page Transition Loading Overlay (minimum 500ms) -->
+        <AppPageLoader :show="uiStore.isPageLoading" />
+
         <div v-if="tabStore.reloadFlag">
           <div v-if="route.name === 'Home'" class="h-full w-full">
             <router-view />

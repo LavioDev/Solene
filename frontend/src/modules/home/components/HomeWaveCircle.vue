@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Heart } from 'lucide-vue-next'
+import { Heart, RotateCcw, GripHorizontal } from 'lucide-vue-next'
 import type { MoodItem } from '@/types/mood'
 
 interface Props {
@@ -23,7 +24,146 @@ const emit = defineEmits<{
   (e: 'open-particle-heart'): void
 }>()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
+
+// Dragging state for partner note
+const noteRef = ref<HTMLElement | null>(null)
+const position = ref({ x: 0, y: 0 })
+const isDragging = ref(false)
+
+const isMoved = computed(() => Math.abs(position.value.x) > 1 || Math.abs(position.value.y) > 1)
+
+let startPointer = { x: 0, y: 0 }
+let startPosition = { x: 0, y: 0 }
+let startNoteRect = { left: 0, top: 0, width: 0, height: 0 }
+let containerBounds = { left: 0, top: 0, right: 0, bottom: 0 }
+
+const MARGIN = 12 // Safe margin to avoid overflowing layout sidebar, header, and screen edges
+
+function getContainerBounds() {
+  const mainEl = noteRef.value?.closest('main') || document.querySelector('main')
+  if (mainEl) {
+    const rect = mainEl.getBoundingClientRect()
+    return {
+      left: rect.left,
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+    }
+  }
+  return {
+    left: 0,
+    top: 0,
+    right: window.innerWidth,
+    bottom: window.innerHeight,
+  }
+}
+
+function handlePointerDown(event: PointerEvent) {
+  if (event.button !== 0 && event.pointerType === 'mouse') return
+  if (!noteRef.value) return
+
+  event.preventDefault()
+
+  const noteEl = noteRef.value
+  const noteRect = noteEl.getBoundingClientRect()
+  const bounds = getContainerBounds()
+
+  startPointer = { x: event.clientX, y: event.clientY }
+  startPosition = { x: position.value.x, y: position.value.y }
+  startNoteRect = {
+    left: noteRect.left,
+    top: noteRect.top,
+    width: noteRect.width,
+    height: noteRect.height,
+  }
+  containerBounds = bounds
+
+  isDragging.value = true
+
+  window.addEventListener('pointermove', handlePointerMove, { passive: false })
+  window.addEventListener('pointerup', handlePointerUp)
+  window.addEventListener('pointercancel', handlePointerUp)
+}
+
+function handlePointerMove(event: PointerEvent) {
+  if (!isDragging.value || !noteRef.value) return
+
+  const deltaX = event.clientX - startPointer.x
+  const deltaY = event.clientY - startPointer.y
+
+  const targetClientLeft = startNoteRect.left + deltaX
+  const targetClientTop = startNoteRect.top + deltaY
+
+  const minLeft = containerBounds.left + MARGIN
+  const maxLeft = containerBounds.right - startNoteRect.width - MARGIN
+  const minTop = containerBounds.top + MARGIN
+  const maxTop = containerBounds.bottom - startNoteRect.height - MARGIN
+
+  const clampedLeft = Math.max(minLeft, Math.min(maxLeft, targetClientLeft))
+  const clampedTop = Math.max(minTop, Math.min(maxTop, targetClientTop))
+
+  position.value = {
+    x: startPosition.x + (clampedLeft - startNoteRect.left),
+    y: startPosition.y + (clampedTop - startNoteRect.top),
+  }
+}
+
+function handlePointerUp() {
+  if (!isDragging.value) return
+  isDragging.value = false
+  window.removeEventListener('pointermove', handlePointerMove)
+  window.removeEventListener('pointerup', handlePointerUp)
+  window.removeEventListener('pointercancel', handlePointerUp)
+}
+
+function resetPosition() {
+  position.value = { x: 0, y: 0 }
+}
+
+function handleWindowResize() {
+  if (!noteRef.value || (!position.value.x && !position.value.y)) return
+  const noteRect = noteRef.value.getBoundingClientRect()
+  const bounds = getContainerBounds()
+
+  const minLeft = bounds.left + MARGIN
+  const maxLeft = bounds.right - noteRect.width - MARGIN
+  const minTop = bounds.top + MARGIN
+  const maxTop = bounds.bottom - noteRect.height - MARGIN
+
+  let adjustX = 0
+  let adjustY = 0
+
+  if (noteRect.left < minLeft) {
+    adjustX = minLeft - noteRect.left
+  } else if (noteRect.left > maxLeft && maxLeft >= minLeft) {
+    adjustX = maxLeft - noteRect.left
+  }
+
+  if (noteRect.top < minTop) {
+    adjustY = minTop - noteRect.top
+  } else if (noteRect.top > maxTop && maxTop >= minTop) {
+    adjustY = maxTop - noteRect.top
+  }
+
+  if (adjustX !== 0 || adjustY !== 0) {
+    position.value = {
+      x: position.value.x + adjustX,
+      y: position.value.y + adjustY,
+    }
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleWindowResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleWindowResize)
+  window.removeEventListener('pointermove', handlePointerMove)
+  window.removeEventListener('pointerup', handlePointerUp)
+  window.removeEventListener('pointercancel', handlePointerUp)
+})
 </script>
 
 <template>
@@ -75,22 +215,48 @@ const { t } = useI18n()
       </p>
     </div>
 
-    <!-- TỜ NOTE BÊN PHẢI SÁT MÉP (Biểu diễn ghi chú & cảm xúc trong ngày của đối phương chân thực nhất) -->
+    <!-- TỜ NOTE BÊN PHẢI SÁT MÉP (Biểu diễn ghi chú & cảm xúc trong ngày của đối phương chân thực nhất - Hỗ trợ kéo thả trên màn hình) -->
     <Transition name="partner-note">
       <div
+        ref="noteRef"
         v-if="partnerMood"
-        class="hidden md:flex flex-col absolute right-0 top-1/2 -translate-y-1/2 w-64 lg:w-72 p-4 pt-4.5 rounded-xl bg-[#fffef5] border border-amber-200/80 shadow-md shadow-amber-900/5 hover:shadow-xl rotate-1 hover:rotate-0 transition-all duration-300 text-left z-20 group"
+        :style="{
+          transform: `translate3d(${position.x}px, calc(-50% + ${position.y}px), 0)${isDragging ? ' scale(1.02) rotate(1.5deg)' : ''}`,
+        }"
+        class="hidden md:flex flex-col absolute right-0 top-1/2 w-64 lg:w-72 p-4 pt-4.5 rounded-xl bg-[#fffef5] border text-left select-none touch-none group"
+        :class="[
+          isDragging
+            ? 'cursor-grabbing shadow-2xl shadow-violet-500/20 z-40 transition-none ring-2 ring-violet-400/50 border-violet-500'
+            : 'cursor-grab border-amber-200/80 hover:border-violet-300/80 shadow-md shadow-amber-900/5 hover:shadow-xl rotate-1 hover:rotate-0 transition-all duration-300 z-20'
+        ]"
+        :title="isMoved ? t('home.doubleClickReset') : t('home.dragNoteHint')"
+        @pointerdown="handlePointerDown"
+        @dblclick="resetPosition"
       >
         <!-- Băng dính Washi Tape dán đầu tờ note -->
         <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-16 h-3.5 bg-amber-200/70 border border-amber-300/50 rounded-2xs shadow-2xs rotate-[-1.5deg] pointer-events-none backdrop-blur-xs"></div>
 
-        <!-- Header Note: Tiêu đề ghi chú & Huy hiệu cảm xúc -->
+        <!-- Header Note: Tiêu đề ghi chú & Huy hiệu cảm xúc & Nút Reset / Drag grip -->
         <div class="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-amber-200/50">
           <div class="flex items-center gap-1.5 min-w-0">
             <Heart class="w-3.5 h-3.5 text-rose-400 fill-rose-400 shrink-0" />
             <span class="text-xs font-bold text-amber-950 truncate font-sans">
-              {{ partnerName ? t('mood.partnerMessage', { name: partnerName }) : t('mood.partnerMessage', { name: 'người ấy' }) }}
+              {{ partnerName ? t('mood.partnerMessage', { name: partnerName }) : t('mood.partnerMessage', { name: t('mood.partnerDefault') }) }}
             </span>
+          </div>
+
+          <div class="flex items-center gap-1 shrink-0">
+            <button
+              v-if="isMoved"
+              type="button"
+              class="p-0.5 rounded text-amber-600 hover:text-amber-900 hover:bg-amber-100/80 transition-colors cursor-pointer"
+              :title="t('home.resetPosition')"
+              @pointerdown.stop
+              @click.stop="resetPosition"
+            >
+              <RotateCcw class="w-3 h-3" />
+            </button>
+            <GripHorizontal class="w-3.5 h-3.5 text-amber-400/80 group-hover:text-amber-600 transition-colors" />
           </div>
         </div>
 
@@ -100,7 +266,7 @@ const { t } = useI18n()
             “{{ partnerMood.note }}”
           </p>
           <p v-else class="text-xs text-amber-800/60 italic font-sans">
-            (Hôm nay cảm thấy {{ partnerMood.mood_tag || 'bình yên' }})
+            ({{ t('mood.feelingStatus', { tag: partnerMood.mood_tag ? (te('mood.tags.' + partnerMood.mood_tag) ? t('mood.tags.' + partnerMood.mood_tag) : partnerMood.mood_tag) : t('mood.tags.calm') }) }})
           </p>
         </div>
       </div>

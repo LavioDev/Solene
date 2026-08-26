@@ -480,7 +480,7 @@ onMounted(() => {
               </td>
 
               <!-- 4. Status Badge -->
-              <td class="py-3.5 px-4">
+              <td class="py-3.5 px-4 whitespace-nowrap">
                 <AppBadge
                   v-if="c.status === 'active'"
                   variant="ok"

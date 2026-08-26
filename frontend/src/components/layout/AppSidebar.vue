@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/authStore'
@@ -15,6 +15,8 @@ import {
   LogOut,
   User as UserIcon,
   Sparkles,
+  ShieldCheck,
+  ChevronDown,
 } from 'lucide-vue-next'
 import AppLangSwitcher from '@/components/ui/AppLangSwitcher.vue'
 import faviconImg from '@/img/favicon.png'
@@ -25,22 +27,39 @@ const authStore = useAuthStore()
 const uiStore = useUiStore()
 const { t } = useI18n()
 
-const navigation = computed(() => {
-  const items = [
-    { name: t('nav.home'),     path: '/',         icon: Home },
-    { name: t('nav.calendar'), path: '/calendar', icon: CalendarIcon },
-    { name: t('nav.schedule'), path: '/schedule', icon: Clock },
-    { name: t('nav.memories'), path: '/memories', icon: StickyNote },
-    { name: t('nav.moods'),    path: '/moods',    icon: Smile },
-    { name: t('nav.couples'),  path: '/couples',  icon: Heart },
+const isManagementOpen = ref(true)
+
+const primaryNavigation = computed(() => [
+  { name: t('nav.home'),     path: '/',         icon: Home },
+  { name: t('nav.calendar'), path: '/calendar', icon: CalendarIcon },
+  { name: t('nav.schedule'), path: '/schedule', icon: Clock },
+  { name: t('nav.memories'), path: '/memories', icon: StickyNote },
+  { name: t('nav.moods'),    path: '/moods',    icon: Smile },
+])
+
+const managementChildren = computed(() => {
+  const children = [
+    { name: t('nav.couples'), path: '/couples', icon: Heart },
   ]
-
   if (authStore.user?.role === 'admin') {
-    items.push({ name: t('nav.users'), path: '/users', icon: UsersIcon })
+    children.push({ name: t('nav.users'), path: '/users', icon: UsersIcon })
   }
-
-  return items
+  return children
 })
+
+const isManagementActive = computed(() => {
+  return route.path.startsWith('/couples') || route.path.startsWith('/users')
+})
+
+watch(
+  () => route.path,
+  (path) => {
+    if (path.startsWith('/couples') || path.startsWith('/users')) {
+      isManagementOpen.value = true
+    }
+  },
+  { immediate: true }
+)
 
 function isActive(path: string) {
   if (path === '/') return route.path === '/'
@@ -85,8 +104,9 @@ async function handleLogout() {
 
     <!-- Navigation Links -->
     <nav class="flex-1 overflow-y-auto p-2 space-y-1">
+      <!-- Primary Links -->
       <router-link
-        v-for="item in navigation"
+        v-for="item in primaryNavigation"
         :key="item.path"
         :to="item.path"
         :title="item.name"
@@ -110,6 +130,111 @@ async function handleLogout() {
           class="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500"
         />
       </router-link>
+
+      <!-- Grouped Management Navigation (Couples & Users) -->
+      <!-- Case A: Expanded Sidebar -->
+      <div v-if="!uiStore.isSidebarCollapsed" class="pt-1.5">
+        <!-- Parent Collapsible Button -->
+        <button
+          type="button"
+          @click="isManagementOpen = !isManagementOpen"
+          class="w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs sm:text-sm transition-all cursor-pointer select-none"
+          :class="[
+            isManagementActive
+              ? 'text-violet-800 font-semibold bg-violet-50/60'
+              : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-medium'
+          ]"
+          :title="t('nav.management')"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <ShieldCheck
+              class="w-4 h-4 shrink-0"
+              :class="isManagementActive ? 'text-violet-600' : 'text-ink-faint'"
+            />
+            <span class="truncate">{{ t('nav.management') }}</span>
+          </div>
+          <ChevronDown
+            class="w-3.5 h-3.5 shrink-0 text-ink-faint transition-transform duration-200"
+            :class="{ 'rotate-180': isManagementOpen }"
+          />
+        </button>
+
+        <!-- Submenu Children -->
+        <div
+          v-show="isManagementOpen"
+          class="mt-1 ml-3.5 pl-3 space-y-1 border-l border-violet-100 transition-all"
+        >
+          <router-link
+            v-for="sub in managementChildren"
+            :key="sub.path"
+            :to="sub.path"
+            :title="sub.name"
+            class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all"
+            :class="[
+              isActive(sub.path)
+                ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
+                : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-normal'
+            ]"
+          >
+            <component
+              :is="sub.icon"
+              class="w-3.5 h-3.5 shrink-0"
+              :class="isActive(sub.path) ? 'text-violet-600' : 'text-ink-faint'"
+            />
+            <span class="truncate">{{ sub.name }}</span>
+            <span
+              v-if="isActive(sub.path)"
+              class="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500"
+            />
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Case B: Collapsed Sidebar (Flyout popover on hover) -->
+      <div v-else class="pt-1 relative group/popover">
+        <button
+          type="button"
+          class="w-full flex items-center justify-center p-2.5 rounded-xl text-xs transition-all cursor-pointer"
+          :class="[
+            isManagementActive
+              ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
+              : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-normal'
+          ]"
+          :title="t('nav.management')"
+        >
+          <ShieldCheck
+            class="w-4 h-4 shrink-0"
+            :class="isManagementActive ? 'text-violet-600' : 'text-ink-faint'"
+          />
+        </button>
+
+        <!-- Hover Flyout Menu -->
+        <div
+          class="absolute left-full top-0 ml-2 hidden group-hover/popover:flex flex-col bg-white border border-border/80 rounded-xl shadow-xl shadow-violet-500/10 p-1.5 min-w-40 z-50 pointer-events-auto"
+        >
+          <div class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-faint border-b border-border/50 mb-1">
+            {{ t('nav.management') }}
+          </div>
+          <router-link
+            v-for="sub in managementChildren"
+            :key="sub.path"
+            :to="sub.path"
+            class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all"
+            :class="[
+              isActive(sub.path)
+                ? 'bg-violet-50 text-violet-700 font-semibold'
+                : 'text-ink-muted hover:bg-surface-raised hover:text-ink'
+            ]"
+          >
+            <component
+              :is="sub.icon"
+              class="w-3.5 h-3.5 shrink-0"
+              :class="isActive(sub.path) ? 'text-violet-600' : 'text-ink-faint'"
+            />
+            <span class="truncate">{{ sub.name }}</span>
+          </router-link>
+        </div>
+      </div>
     </nav>
 
     <!-- Bottom Minimal Section: Language & Account (Expanded vs Collapsed) -->

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { router } from '@/router'
+import { useUiStore } from '@/stores/uiStore'
 
 export interface TabItem {
   title: string
@@ -64,10 +65,13 @@ export const useTabStore = defineStore('tabs', () => {
   }
 
   function refreshTab() {
+    const uiStore = useUiStore()
+    uiStore.startPageLoading()
     reloadFlag.value = false
     setTimeout(() => {
       reloadFlag.value = true
-    }, 120)
+      uiStore.stopPageLoading(500)
+    }, 150)
   }
 
   function toggleContentFullscreen() {
