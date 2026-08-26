@@ -15,7 +15,7 @@ defineProps<{
         fullScreen
           ? 'fixed inset-0 z-50'
           : 'absolute inset-0 z-40',
-        'flex flex-col items-center justify-center bg-surface-subtle/85 backdrop-blur-xs select-none'
+        'flex flex-col items-center justify-center bg-surface-subtle select-none'
       ]"
     >
       <div class="flex flex-col items-center gap-4">

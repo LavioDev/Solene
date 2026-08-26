@@ -14,7 +14,7 @@ import {
   Layers,
 } from 'lucide-vue-next'
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const moodStore = useMoodStore()
 
 const currentYear = new Date().getFullYear()
@@ -34,6 +34,19 @@ const yearOptions = computed(() => {
 })
 
 const heatmapData = computed(() => moodStore.heatmapData)
+
+function getMoodTag(tag?: string): string {
+  if (!tag) return ''
+  const key = `mood.tags.${tag.toLowerCase()}`
+  if (te(key)) return t(key)
+  return tag.replace(/_/g, ' ')
+}
+
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return ''
+  const [y, m, d] = dateStr.split('-')
+  return `${d}/${m}/${y}`
+}
 
 async function loadData() {
   await moodStore.fetchHeatmap(selectedYear.value, true)
@@ -128,35 +141,43 @@ onMounted(() => {
       Loading...
     </div>
 
-    <!-- Recent Notes (Đơn giản & gọn gàng) -->
+    <!-- Recent Notes (Đơn giản & Tinh tế) -->
     <div v-if="moodStore.moods.length > 0" class="p-5 rounded-2xl bg-white border border-border/80 shadow-card space-y-3">
-      <h3 class="text-xs font-bold uppercase tracking-wider text-ink-muted flex items-center gap-1.5 pb-2 border-b border-border/60">
-        <Sparkles class="w-3.5 h-3.5 text-violet-600" />
-        <span>{{ t('mood.noteLabel') }}</span>
-      </h3>
+      <div class="flex items-center justify-between pb-2.5 border-b border-border/50">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
+          <Sparkles class="w-3.5 h-3.5 text-violet-600" />
+          <span>{{ t('mood.noteLabel') }}</span>
+        </h3>
+      </div>
 
       <div class="divide-y divide-border/40">
         <div
           v-for="item in moodStore.moods"
           :key="item.id"
-          class="py-2.5 flex items-start justify-between gap-3 text-xs"
+          class="py-2.5 px-2 -mx-2 rounded-xl hover:bg-surface-subtle/60 transition-colors flex items-start justify-between gap-4 text-xs"
         >
-          <div class="flex items-start gap-2.5 min-w-0">
-            <span class="text-base leading-none shrink-0 mt-0.5">
+          <div class="flex items-start gap-3 min-w-0">
+            <span class="text-lg leading-none shrink-0 mt-0.5 select-none">
               {{ getMoodByScore(item.mood_score)?.emoji || '😊' }}
             </span>
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="font-semibold text-ink capitalize">{{ item.mood_tag }}</span>
-                <span class="font-bold text-violet-700">({{ item.mood_score }}/10)</span>
-                <span v-if="item.user_full_name" class="text-[11px] text-ink-muted">· {{ item.user_full_name }}</span>
+            <div class="min-w-0 space-y-0.5">
+              <div class="flex flex-wrap items-center gap-1.5 leading-none">
+                <span class="font-bold text-ink">{{ item.mood_score }}/10</span>
+                <span v-if="item.mood_tag" class="text-ink-muted text-xs">
+                  · {{ getMoodTag(item.mood_tag) }}
+                </span>
+                <span v-if="item.user_full_name" class="text-[11px] text-ink-faint">
+                  ({{ item.user_full_name }})
+                </span>
               </div>
-              <p v-if="item.note" class="text-ink-muted mt-0.5 whitespace-pre-wrap font-sans text-xs">
-                {{ item.note }}
+              <p v-if="item.note" class="text-ink-muted text-xs leading-relaxed whitespace-pre-wrap font-sans italic pt-0.5">
+                “{{ item.note }}”
               </p>
             </div>
           </div>
-          <span class="text-[11px] text-ink-faint shrink-0 font-mono">{{ item.entry_date }}</span>
+          <span class="text-[11px] text-ink-faint shrink-0 font-mono pt-0.5">
+            {{ formatDate(item.entry_date) }}
+          </span>
         </div>
       </div>
     </div>

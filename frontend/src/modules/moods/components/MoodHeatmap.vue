@@ -14,7 +14,7 @@ const emit = defineEmits<{
   (e: 'select-day', day: HeatmapDayItem): void
 }>()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 
 // Tooltip state
 const hoveredDay = ref<HeatmapDayItem | null>(null)
@@ -128,6 +128,14 @@ function formatDateDisplay(dateStr: string): string {
   const [y, m, d] = dateStr.split('-')
   return `${d}/${m}/${y}`
 }
+
+function getMoodTagLabel(day: HeatmapDayItem): string {
+  const tag = (props.viewMode === 'partner' ? day.partner_tag : day.tag) || (day.score ? getMoodByScore(day.score)?.tag : '')
+  if (!tag) return ''
+  const key = `mood.tags.${tag.toLowerCase()}`
+  if (te(key)) return t(key)
+  return tag.replace(/_/g, ' ')
+}
 </script>
 
 <template>
@@ -225,36 +233,38 @@ function formatDateDisplay(dateStr: string): string {
       </div>
     </div>
 
-    <!-- Floating Tooltip -->
+    <!-- Floating Minimalist Tooltip -->
     <Teleport to="body">
       <Transition name="tooltip-fade">
         <div
           v-if="showTooltip && hoveredDay"
-          class="fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full px-3.5 py-2.5 bg-white text-ink text-xs rounded-2xl shadow-xl border border-violet-200/90 max-w-xs space-y-1.5 backdrop-blur-md"
+          class="fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full px-3 py-2 bg-white text-xs rounded-xl shadow-lg shadow-violet-950/5 border border-border/80 max-w-[240px] space-y-1 select-none"
           :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }"
         >
-          <div class="flex items-center justify-between gap-3 font-semibold text-ink border-b border-border/50 pb-1">
-            <span>{{ formatDateDisplay(hoveredDay.date) }}</span>
-            <span v-if="hoveredDay.is_today" class="px-1.5 py-0.5 rounded-full text-[10px] bg-violet-100 text-violet-700 border border-violet-200 font-bold">
-              Hôm nay
+          <!-- Top Row: Date & Today indicator -->
+          <div class="flex items-center justify-between gap-2 text-[11px]">
+            <span class="font-medium text-ink-muted">{{ formatDateDisplay(hoveredDay.date) }}</span>
+            <span v-if="hoveredDay.is_today" class="px-1.5 py-0.2 rounded-md text-[10px] font-semibold bg-violet-50 text-violet-700">
+              {{ t('calendar.today') }}
             </span>
-            <span v-else-if="hoveredDay.is_locked" class="text-[10px] text-ink-muted">🔒</span>
+            <span v-else-if="hoveredDay.is_locked" class="text-[10px] text-ink-faint">🔒</span>
           </div>
 
-          <div v-if="getEffectiveScore(hoveredDay)" class="flex items-center gap-2 pt-0.5">
-            <span class="text-base leading-none">{{ getMoodByScore(getEffectiveScore(hoveredDay))?.emoji }}</span>
-            <div>
-              <span class="font-bold text-violet-700">{{ getEffectiveScore(hoveredDay) }}/10</span>
-              <span class="text-ink-muted capitalize ml-1">({{ hoveredDay.tag || 'Mood' }})</span>
-            </div>
+          <!-- Score & Tag -->
+          <div v-if="getEffectiveScore(hoveredDay)" class="flex items-center gap-1.5 pt-0.5">
+            <span class="text-sm leading-none">{{ getMoodByScore(getEffectiveScore(hoveredDay))?.emoji }}</span>
+            <span class="font-bold text-ink">{{ getEffectiveScore(hoveredDay) }}/10</span>
+            <span v-if="getMoodTagLabel(hoveredDay)" class="text-ink-faint text-[11px] truncate">
+              · {{ getMoodTagLabel(hoveredDay) }}
+            </span>
           </div>
-          <div v-else class="text-ink-muted italic pt-0.5 text-[11px]">
+          <div v-else class="text-ink-faint italic text-[11px] pt-0.5">
             {{ t('mood.heatmap.unlogged') }}
           </div>
 
-          <!-- Note preview -->
-          <p v-if="getEffectiveNote(hoveredDay)" class="text-ink text-[11px] line-clamp-2 italic bg-violet-50/60 p-1.5 rounded-xl border border-violet-100">
-            "{{ getEffectiveNote(hoveredDay) }}"
+          <!-- Note (Clean, borderless text) -->
+          <p v-if="getEffectiveNote(hoveredDay)" class="text-ink-muted text-[11px] leading-relaxed line-clamp-2 italic pt-0.5">
+            “{{ getEffectiveNote(hoveredDay) }}”
           </p>
         </div>
       </Transition>

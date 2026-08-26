@@ -27,7 +27,7 @@ const uiStore = useUiStore()
           <div v-if="route.name === 'Home'" class="h-full w-full">
             <router-view />
           </div>
-          <div v-else class="max-w-7xl mx-auto px-6 py-6 lg:px-8 lg:py-8">
+          <div v-else class="mx-auto px-6 py-6 lg:px-8 lg:py-8">
             <router-view />
           </div>
         </div>

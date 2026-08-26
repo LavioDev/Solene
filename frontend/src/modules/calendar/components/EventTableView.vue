@@ -217,15 +217,15 @@ defineExpose({
 
       <!-- Table -->
       <div v-else class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table class="w-full min-w-[800px] text-left border-collapse">
           <thead>
-            <tr class="border-b border-border/80 bg-surface-subtle/40 text-[11px] font-bold text-ink-faint uppercase tracking-wider">
-              <th class="py-3.5 px-5">{{ t('calendar.list.colTitle') }}</th>
-              <th class="py-3.5 px-4">{{ t('calendar.list.colRecurrence') }}</th>
-              <th class="py-3.5 px-4">{{ t('calendar.list.colAnchorDate') }}</th>
-              <th class="py-3.5 px-4">{{ t('calendar.list.colInterval') }}</th>
-              <th class="py-3.5 px-4">{{ t('calendar.list.colCreatedAt') }}</th>
-              <th class="py-3.5 px-5 text-right">{{ t('calendar.list.colActions') }}</th>
+            <tr class="border-b border-border/80 bg-surface-subtle/60 text-[11px] font-bold text-ink-faint uppercase tracking-wider">
+              <th class="py-3.5 px-5 whitespace-nowrap select-none">{{ t('calendar.list.colTitle') }}</th>
+              <th class="py-3.5 px-4 whitespace-nowrap select-none">{{ t('calendar.list.colRecurrence') }}</th>
+              <th class="py-3.5 px-4 whitespace-nowrap select-none">{{ t('calendar.list.colAnchorDate') }}</th>
+              <th class="py-3.5 px-4 whitespace-nowrap select-none">{{ t('calendar.list.colInterval') }}</th>
+              <th class="py-3.5 px-4 whitespace-nowrap select-none">{{ t('calendar.list.colCreatedAt') }}</th>
+              <th class="py-3.5 px-5 text-right whitespace-nowrap select-none sticky right-0 z-20 bg-surface-subtle shadow-[-6px_0_10px_-4px_rgba(0,0,0,0.06)] border-l border-border/50">{{ t('calendar.list.colActions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border/60 text-xs sm:text-sm bg-white">
@@ -254,7 +254,7 @@ defineExpose({
               </td>
 
               <!-- Recurrence Badge -->
-              <td class="py-3.5 px-4">
+              <td class="py-3.5 px-4 whitespace-nowrap">
                 <AppBadge :variant="getRecurrenceBadgeVariant(evt.recurrence_type)" size="sm">
                   <Repeat class="w-3 h-3 mr-1" />
                   {{ getRecurrenceLabel(evt.recurrence_type) }}
@@ -262,7 +262,7 @@ defineExpose({
               </td>
 
               <!-- Anchor Date -->
-              <td class="py-3.5 px-4 text-ink-muted font-mono text-xs">
+              <td class="py-3.5 px-4 text-ink-muted font-mono text-xs whitespace-nowrap">
                 <div class="flex items-center gap-1.5">
                   <CalendarIcon class="w-3.5 h-3.5 text-ink-faint shrink-0" />
                   <span>{{ formatDate(evt.anchor_date) }}</span>
@@ -270,17 +270,17 @@ defineExpose({
               </td>
 
               <!-- Interval Detail -->
-              <td class="py-3.5 px-4 text-ink text-xs font-medium">
+              <td class="py-3.5 px-4 text-ink text-xs font-medium whitespace-nowrap">
                 {{ getIntervalDetail(evt) }}
               </td>
 
               <!-- Created Date -->
-              <td class="py-3.5 px-4 text-ink-faint font-mono text-xs">
+              <td class="py-3.5 px-4 text-ink-faint font-mono text-xs whitespace-nowrap">
                 {{ formatDate(evt.created_at) }}
               </td>
 
               <!-- Actions -->
-              <td class="py-3.5 px-5 text-right">
+              <td class="py-3.5 px-5 text-right whitespace-nowrap sticky right-0 z-10 bg-white group-hover:bg-surface-raised/80 transition-colors shadow-[-6px_0_10px_-4px_rgba(0,0,0,0.06)] border-l border-border/50" @click.stop>
                 <div class="flex items-center justify-end gap-1">
                   <button
                     type="button"
