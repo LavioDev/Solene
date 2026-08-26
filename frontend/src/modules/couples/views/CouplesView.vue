@@ -176,6 +176,7 @@ async function fetchData() {
 }
 
 function openCreateCoupleModal() {
+  if (!authStore.isAdmin && !authStore.hasPermission('couples:create')) return
   editingCouple.value = null
   formCoupleUser1Id.value = authStore.user?.id || ''
   formCoupleUser2Id.value = ''
@@ -188,6 +189,7 @@ function openCreateCoupleModal() {
 }
 
 function openEditCoupleModal(c: Couple) {
+  if (!authStore.isAdmin && !authStore.hasPermission('couples:update')) return
   editingCouple.value = c
   formCoupleUser1Id.value = c.user1_id || ''
   formCoupleUser2Id.value = c.user2_id || ''
@@ -254,6 +256,7 @@ async function handleSaveCouple() {
 }
 
 function promptDeleteCouple(c: Couple) {
+  if (!authStore.isAdmin) return
   deletingCouple.value = c
   showDeleteCoupleModal.value = true
 }
@@ -351,7 +354,12 @@ onMounted(() => {
             size="sm"
           />
         </div>
-        <AppButton size="md" @click="openCreateCoupleModal" class="h-[42px] py-2.5 px-4 shrink-0 shadow-2xs rounded-xl text-xs font-semibold inline-flex items-center justify-center">
+        <AppButton
+          v-if="authStore.isAdmin || authStore.hasPermission('couples:create')"
+          size="md"
+          @click="openCreateCoupleModal"
+          class="h-[42px] py-2.5 px-4 shrink-0 shadow-2xs rounded-xl text-xs font-semibold inline-flex items-center justify-center"
+        >
           <Sparkles class="w-3.5 h-3.5 mr-1 text-white" />
           {{ t('users.couples.addCouple') }}
         </AppButton>
@@ -373,7 +381,12 @@ onMounted(() => {
         </div>
         <p class="text-sm font-semibold text-ink">{{ t('users.couples.emptyTitle') }}</p>
         <p class="text-xs text-ink-muted max-w-sm mx-auto">{{ t('users.couples.emptySubtitle') }}</p>
-        <AppButton size="sm" @click="openCreateCoupleModal" class="mx-auto mt-2">
+        <AppButton
+          v-if="authStore.isAdmin || authStore.hasPermission('couples:create')"
+          size="sm"
+          @click="openCreateCoupleModal"
+          class="mx-auto mt-2"
+        >
           <Sparkles class="w-3.5 h-3.5 mr-1 text-white" />
           {{ t('users.couples.addCouple') }}
         </AppButton>
@@ -396,8 +409,13 @@ onMounted(() => {
             <tr
               v-for="c in filteredCouples"
               :key="c.id"
-              @click="openEditCoupleModal(c)"
-              class="hover:bg-violet-50/40 transition-colors group cursor-pointer"
+              @click="(authStore.isAdmin || authStore.hasPermission('couples:update')) && openEditCoupleModal(c)"
+              class="transition-colors group"
+              :class="[
+                (authStore.isAdmin || authStore.hasPermission('couples:update'))
+                  ? 'cursor-pointer hover:bg-violet-50/40'
+                  : 'cursor-default hover:bg-surface-raised/40'
+              ]"
             >
               <!-- 1. Couple Common Model (Thumbnail / Nickname / Days Together) -->
               <td class="py-3.5 px-5">
@@ -513,6 +531,7 @@ onMounted(() => {
               <td class="py-3.5 px-5 text-right whitespace-nowrap sticky right-0 z-10 bg-white group-hover:bg-[#f8f6fe] transition-colors shadow-[-6px_0_10px_-4px_rgba(0,0,0,0.06)] border-l border-border/50" @click.stop>
                 <div class="flex items-center justify-end gap-1">
                   <button
+                    v-if="authStore.isAdmin || authStore.hasPermission('couples:update')"
                     type="button"
                     @click="openEditCoupleModal(c)"
                     class="p-1.5 rounded-lg text-ink-faint hover:text-violet-600 hover:bg-violet-50 transition-colors cursor-pointer"
@@ -521,6 +540,7 @@ onMounted(() => {
                     <Edit2 class="w-3.5 h-3.5" />
                   </button>
                   <button
+                    v-if="authStore.isAdmin"
                     type="button"
                     @click="promptDeleteCouple(c)"
                     class="p-1.5 rounded-lg text-ink-faint hover:text-err-text hover:bg-err-bg transition-colors cursor-pointer"

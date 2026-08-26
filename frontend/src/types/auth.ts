@@ -1,3 +1,11 @@
+export interface Permission {
+  id: string
+  code: string
+  name: string
+  module: string
+  description?: string | null
+}
+
 export interface User {
   id: string
   email: string
@@ -5,6 +13,7 @@ export interface User {
   role: string
   is_active: boolean
   avatar_url?: string | null
+  permissions?: string[]
   created_at?: string
   updated_at?: string
 }
@@ -33,6 +42,7 @@ export interface UserCreatePayload {
   role?: string
   avatar_url?: string | null
   is_active?: boolean
+  permission_ids?: string[]
 }
 
 export interface UserUpdatePayload {
@@ -42,6 +52,11 @@ export interface UserUpdatePayload {
   role?: string
   avatar_url?: string | null
   is_active?: boolean
+  permission_ids?: string[]
+}
+
+export interface AssignPermissionsPayload {
+  permission_ids: string[]
 }
 
 export interface UserFilterParams {
@@ -53,5 +68,3 @@ export interface UserFilterParams {
   is_active?: boolean
   search?: string
 }
-
-

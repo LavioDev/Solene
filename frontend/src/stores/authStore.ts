@@ -10,6 +10,15 @@ export const useAuthStore = defineStore('auth', () => {
   const isInitializing = ref<boolean>(true)
 
   const isAuthenticated = computed(() => Boolean(accessToken.value && user.value))
+  const isAdmin = computed(() => user.value?.role === 'admin')
+  const isManager = computed(() => user.value?.role === 'manager')
+
+  function hasPermission(permissionCode: string): boolean {
+    if (!user.value) return false
+    if (user.value.role === 'admin') return true
+    if (!user.value.permissions) return false
+    return user.value.permissions.includes(permissionCode) || user.value.permissions.includes('*')
+  }
 
   function setAccessToken(token: string | null) {
     accessToken.value = token
@@ -76,6 +85,9 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     isInitializing,
     isAuthenticated,
+    isAdmin,
+    isManager,
+    hasPermission,
     setAccessToken,
     setUser,
     login,

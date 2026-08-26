@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_admin_user, get_current_user
+from app.api.deps import get_current_admin_user, get_current_user, require_permission
 from app.core.database import get_async_db
 from app.core.exceptions import ForbiddenException
 from app.core.pagination import PaginatedResponse, paginate_response
@@ -17,11 +17,11 @@ router = APIRouter(prefix="/users", tags=["Users Management"])
 @router.post("", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def create_user(
     payload: UserCreate,
-    admin: User = Depends(get_current_admin_user),
+    caller: User = Depends(require_permission("users:create")),
     session: AsyncSession = Depends(get_async_db),
 ) -> UserOut:
-    """Create a new user account (Admin only)."""
-    user = await UserService.create_user(session=session, payload=payload)
+    """Create a new user account (Admin or Manager with 'users:create' permission)."""
+    user = await UserService.create_user(session=session, payload=payload, actor=caller)
     return UserOut.model_validate(user)
 
 
@@ -34,10 +34,10 @@ async def list_users(
     role: Optional[str] = Query(None, description="Filter by user role"),
     is_active: Optional[bool] = Query(None, description="Filter by active status"),
     search: Optional[str] = Query(None, description="Search by email or full name"),
-    admin: User = Depends(get_current_admin_user),
+    caller: User = Depends(require_permission("users:read")),
     session: AsyncSession = Depends(get_async_db),
 ) -> PaginatedResponse[UserOut]:
-    """List users with pagination, filters, and search (Admin only, per-page: 15)."""
+    """List users with pagination, filters, and search (Admin or Manager with 'users:read')."""
     actual_page = page
     actual_per_page = limit if limit is not None else per_page
     if skip is not None and limit is not None:
@@ -45,6 +45,7 @@ async def list_users(
 
     users, total = await UserService.list_users(
         session=session,
+        actor=caller,
         page=actual_page,
         per_page=actual_per_page,
         skip=skip,
@@ -67,11 +68,14 @@ async def get_user(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_db),
 ) -> UserOut:
-    """Get user details by ID (Admin or the user themselves)."""
-    if current_user.role != "admin" and current_user.id != user_id:
+    """Get user details by ID (Admin, Manager with 'users:read', or self)."""
+    if current_user.role == "manager":
+        checker = require_permission("users:read")
+        await checker(current_user=current_user, session=session)
+    elif current_user.role != "admin" and current_user.id != user_id:
         raise ForbiddenException("Insufficient permissions to view this user profile.")
 
-    user = await UserService.get_user(session=session, user_id=user_id)
+    user = await UserService.get_user(session=session, user_id=user_id, actor=current_user)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return UserOut.model_validate(user)
@@ -84,18 +88,19 @@ async def update_user(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_db),
 ) -> UserOut:
-    """Update user information."""
-    if current_user.role != "admin" and current_user.id != user_id:
+    """Update user information (Admin, Manager with 'users:update', or self)."""
+    if current_user.role == "manager":
+        checker = require_permission("users:update")
+        await checker(current_user=current_user, session=session)
+    elif current_user.role != "admin" and current_user.id != user_id:
         raise ForbiddenException("Insufficient permissions to update this user.")
 
-    # Non-admin cannot elevate role or change is_active status
-    if current_user.role != "admin":
-        if payload.role is not None and payload.role != current_user.role:
-            raise ForbiddenException("Cannot change your own role.")
-        if payload.is_active is not None and payload.is_active != current_user.is_active:
-            raise ForbiddenException("Cannot change your own active status.")
-
-    updated_user = await UserService.update_user(session=session, user_id=user_id, payload=payload)
+    updated_user = await UserService.update_user(
+        session=session,
+        user_id=user_id,
+        payload=payload,
+        actor=current_user,
+    )
     if not updated_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return UserOut.model_validate(updated_user)
@@ -118,8 +123,8 @@ async def delete_user(
     admin: User = Depends(get_current_admin_user),
     session: AsyncSession = Depends(get_async_db),
 ) -> None:
-    """Delete a user account (Admin only). Cannot delete self."""
-    deleted = await UserService.delete_user(session=session, user_id=user_id, current_user_id=admin.id)
+    """Delete a user account (Strict Admin only). Cannot delete self."""
+    deleted = await UserService.delete_user(session=session, user_id=user_id, actor=admin)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return None

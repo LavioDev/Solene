@@ -1,10 +1,32 @@
-from typing import Any, Optional, Sequence
+from typing import Any, List, Optional, Sequence
 import uuid
-from sqlalchemy import desc, func, or_, select
+from sqlalchemy import delete, desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.repository import BaseRepository
-from app.modules.auth.models import User
-from app.modules.auth.schemas import UserCreate, UserUpdate
+from app.modules.auth.models import Permission, User, UserPermission
+from app.modules.auth.schemas import PermissionCreate, UserCreate, UserUpdate
+
+
+class PermissionRepository(BaseRepository[Permission, PermissionCreate, Any]):
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(model=Permission, session=session)
+
+    async def get_by_code(self, code: str) -> Optional[Permission]:
+        stmt = select(Permission).where(Permission.code == code)
+        result = await self.session.execute(stmt)
+        return result.scalars().first()
+
+    async def get_by_ids(self, ids: Sequence[uuid.UUID]) -> Sequence[Permission]:
+        if not ids:
+            return []
+        stmt = select(Permission).where(Permission.id.in_(ids))
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def list_all(self) -> Sequence[Permission]:
+        stmt = select(Permission).order_by(Permission.module, Permission.code)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
 
 
 class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
@@ -72,9 +94,11 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
         email: str,
         hashed_password: str,
         full_name: str = "User",
-        role: str = "admin",
+        role: str = "user",
         avatar_url: Optional[str] = None,
         is_active: bool = True,
+        permission_ids: Optional[Sequence[uuid.UUID]] = None,
+        assigned_by: Optional[uuid.UUID] = None,
     ) -> User:
         user = User(
             email=email,
@@ -85,6 +109,17 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
             is_active=is_active,
         )
         self.session.add(user)
+        await self.session.flush()
+
+        if permission_ids:
+            for pid in permission_ids:
+                up = UserPermission(
+                    user_id=user.id,
+                    permission_id=pid,
+                    assigned_by=assigned_by,
+                )
+                self.session.add(up)
+
         await self.session.commit()
         await self.session.refresh(user)
         return user
@@ -98,8 +133,48 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
         await self.session.refresh(user)
         return user
 
-
     async def delete_user(self, *, user: User) -> None:
         await self.session.delete(user)
         await self.session.commit()
 
+    async def get_user_permission_codes(self, user_id: uuid.UUID) -> List[str]:
+        stmt = (
+            select(Permission.code)
+            .join(UserPermission, UserPermission.permission_id == Permission.id)
+            .where(UserPermission.user_id == user_id)
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_user_permissions(self, user_id: uuid.UUID) -> Sequence[Permission]:
+        stmt = (
+            select(Permission)
+            .join(UserPermission, UserPermission.permission_id == Permission.id)
+            .where(UserPermission.user_id == user_id)
+            .order_by(Permission.module, Permission.code)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def assign_permissions(
+        self,
+        *,
+        user_id: uuid.UUID,
+        permission_ids: Sequence[uuid.UUID],
+        assigned_by: Optional[uuid.UUID] = None,
+    ) -> Sequence[Permission]:
+        # Delete existing permissions
+        del_stmt = delete(UserPermission).where(UserPermission.user_id == user_id)
+        await self.session.execute(del_stmt)
+
+        # Insert new permissions
+        for pid in permission_ids:
+            up = UserPermission(
+                user_id=user_id,
+                permission_id=pid,
+                assigned_by=assigned_by,
+            )
+            self.session.add(up)
+
+        await self.session.commit()
+        return await self.get_user_permissions(user_id)

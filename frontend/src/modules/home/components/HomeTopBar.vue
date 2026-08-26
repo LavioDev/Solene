@@ -6,7 +6,7 @@ import type { Couple, UserPartnerSummary } from '@/types/couple'
 import type { PartnerActiveStatus } from '@/types/task'
 import type { MoodItem } from '@/types/mood'
 import { getMoodByScore } from '@/constants/moods'
-import { Heart, Plus, Smile, FileText } from 'lucide-vue-next'
+import { Heart, Smile, FileText, Sparkles } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import HomePartnerThoughtBubble from './HomePartnerThoughtBubble.vue'
 
@@ -126,7 +126,7 @@ const myUser = computed(() => {
         <Heart class="w-4 h-4 text-violet-500" />
         <span>{{ t('home.noCoupleDesc') }}</span>
         <AppButton size="sm" class="ml-2" @click="emit('link-couple')">
-          <Plus class="w-3.5 h-3.5 mr-1" />
+          <Sparkles class="w-3.5 h-3.5 mr-1" />
           {{ t('home.linkCoupleBtn') }}
         </AppButton>
       </div>

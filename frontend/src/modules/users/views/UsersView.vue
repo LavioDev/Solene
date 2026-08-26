@@ -3,7 +3,8 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/authStore'
 import { userService } from '@/services/userService'
-import type { User, UserCreatePayload, UserUpdatePayload } from '@/types/auth'
+import type { Permission, User, UserCreatePayload, UserUpdatePayload } from '@/types/auth'
+import defaultAvatar from '@/img/avatar.jpg'
 import {
   Search,
   Edit2,
@@ -11,9 +12,14 @@ import {
   ShieldCheck,
   UserX,
   User as UserIcon,
+  UserCog,
   CheckCircle2,
   AlertCircle,
   Sparkles,
+  Check,
+  Users,
+  Heart,
+  KeyRound,
 } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppModal from '@/components/ui/AppModal.vue'
@@ -44,6 +50,10 @@ const searchQuery = ref('')
 const selectedRole = ref<string>('ALL')
 const selectedStatus = ref<string>('ALL')
 
+// Dynamic system permissions loaded purely from Backend / DB
+const allPermissions = ref<Permission[]>([])
+const permissionsLoading = ref(false)
+
 // User Add / Edit Modal State
 const showUserModal = ref(false)
 const editingUser = ref<User | null>(null)
@@ -56,6 +66,7 @@ const formPassword = ref('')
 const formRole = ref('user')
 const formAvatarUrl = ref<string | null>(null)
 const formIsActive = ref('true')
+const selectedPermissionIds = ref<string[]>([])
 
 // User Delete Modal State
 const showDeleteModal = ref(false)
@@ -66,6 +77,7 @@ const deleteLoading = ref(false)
 const roleFilterOptions = computed(() => [
   { label: t('users.roleAll'), value: 'ALL' },
   { label: t('users.roleAdmin'), value: 'admin' },
+  { label: t('users.roleManager'), value: 'manager' },
   { label: t('users.roleUser'), value: 'user' },
 ])
 
@@ -75,17 +87,47 @@ const statusFilterOptions = computed(() => [
   { label: t('users.statusInactive'), value: 'false' },
 ])
 
-const modalRoleOptions = computed(() => [
-  { label: t('users.roleAdmin'), value: 'admin' },
-  { label: t('users.roleUser'), value: 'user' },
-])
+const modalRoleOptions = computed(() => {
+  if (authStore.user?.role === 'manager') {
+    return [{ label: t('users.roleUser'), value: 'user' }]
+  }
+  return [
+    { label: t('users.roleAdmin'), value: 'admin' },
+    { label: t('users.roleManager'), value: 'manager' },
+    { label: t('users.roleUser'), value: 'user' },
+  ]
+})
 
 const modalStatusOptions = computed(() => [
   { label: t('users.statusActive'), value: 'true' },
   { label: t('users.statusInactive'), value: 'false' },
 ])
 
-// Filtered users list (rendered directly from server pagination response)
+// Dynamically grouped permissions from DB records
+const groupedPermissions = computed(() => {
+  const groupMap = new Map<string, { title: string; icon: any; perms: Permission[] }>()
+
+  allPermissions.value.forEach((p) => {
+    const mod = (p.module || 'other').toLowerCase()
+    if (!groupMap.has(mod)) {
+      let title = mod.toUpperCase()
+      let icon: any = KeyRound
+      if (mod === 'users') {
+        title = t('users.permissionsModuleUsers')
+        icon = Users
+      } else if (mod === 'couples') {
+        title = t('users.permissionsModuleCouples')
+        icon = Heart
+      }
+      groupMap.set(mod, { title, icon, perms: [] })
+    }
+    groupMap.get(mod)!.perms.push(p)
+  })
+
+  return Array.from(groupMap.entries())
+})
+
+// Filtered users list
 const filteredUsers = computed(() => users.value)
 
 let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -106,6 +148,18 @@ watch(searchQuery, () => {
   }, 300)
 })
 
+async function loadSystemPermissions() {
+  permissionsLoading.value = true
+  try {
+    const perms = await userService.getAllPermissions()
+    allPermissions.value = perms || []
+  } catch (err) {
+    console.error('Failed to load system permissions from API:', err)
+  } finally {
+    permissionsLoading.value = false
+  }
+}
+
 async function fetchUsers() {
   loading.value = true
   errorMessage.value = null
@@ -114,7 +168,7 @@ async function fetchUsers() {
       page: currentPage.value,
       per_page: perPage.value,
       role: selectedRole.value === 'ALL' ? undefined : selectedRole.value,
-      is_active: selectedStatus.value === 'ALL' ? undefined : (selectedStatus.value === 'true'),
+      is_active: selectedStatus.value === 'ALL' ? undefined : selectedStatus.value === 'true',
       search: searchQuery.value.trim() || undefined,
     })
     users.value = res.items
@@ -129,7 +183,7 @@ async function fetchUsers() {
   }
 }
 
-function openCreateModal() {
+async function openCreateModal() {
   editingUser.value = null
   formFullName.value = ''
   formEmail.value = ''
@@ -137,11 +191,16 @@ function openCreateModal() {
   formRole.value = 'user'
   formAvatarUrl.value = null
   formIsActive.value = 'true'
+  selectedPermissionIds.value = []
   modalError.value = null
   showUserModal.value = true
+
+  if (allPermissions.value.length === 0) {
+    await loadSystemPermissions()
+  }
 }
 
-function openEditModal(user: User) {
+async function openEditModal(user: User) {
   editingUser.value = user
   formFullName.value = user.full_name || ''
   formEmail.value = user.email || ''
@@ -149,8 +208,46 @@ function openEditModal(user: User) {
   formRole.value = user.role || 'user'
   formAvatarUrl.value = user.avatar_url || null
   formIsActive.value = user.is_active ? 'true' : 'false'
+  selectedPermissionIds.value = []
   modalError.value = null
   showUserModal.value = true
+
+  if (allPermissions.value.length === 0) {
+    await loadSystemPermissions()
+  }
+
+  // Load manager permissions if editing a manager
+  if (user.role === 'manager') {
+    try {
+      const userPerms = await userService.getUserPermissions(user.id)
+      if (userPerms && userPerms.length > 0) {
+        selectedPermissionIds.value = userPerms.map((p) => p.id)
+      }
+    } catch (err) {
+      console.error('Failed to fetch user permissions:', err)
+    }
+  }
+}
+
+function isPermissionSelected(perm: Permission): boolean {
+  return selectedPermissionIds.value.includes(perm.id)
+}
+
+function togglePermission(perm: Permission) {
+  const idx = selectedPermissionIds.value.indexOf(perm.id)
+  if (idx > -1) {
+    selectedPermissionIds.value.splice(idx, 1)
+  } else {
+    selectedPermissionIds.value.push(perm.id)
+  }
+}
+
+function selectAllPermissions() {
+  selectedPermissionIds.value = allPermissions.value.map((p) => p.id)
+}
+
+function deselectAllPermissions() {
+  selectedPermissionIds.value = []
 }
 
 async function handleSaveUser() {
@@ -166,6 +263,9 @@ async function handleSaveUser() {
 
   modalSubmitting.value = true
   try {
+    const isManagerRole = formRole.value === 'manager'
+    const permissionIdsToSend = isManagerRole ? selectedPermissionIds.value : []
+
     if (editingUser.value) {
       const payload: UserUpdatePayload = {
         full_name: formFullName.value.trim(),
@@ -173,6 +273,7 @@ async function handleSaveUser() {
         role: formRole.value,
         avatar_url: formAvatarUrl.value,
         is_active: formIsActive.value === 'true',
+        permission_ids: isManagerRole ? permissionIdsToSend : undefined,
       }
       if (formPassword.value.trim()) {
         payload.password = formPassword.value.trim()
@@ -187,6 +288,7 @@ async function handleSaveUser() {
         role: formRole.value,
         avatar_url: formAvatarUrl.value,
         is_active: formIsActive.value === 'true',
+        permission_ids: isManagerRole ? permissionIdsToSend : undefined,
       }
       await userService.createUser(payload)
       showSuccess(t('users.createSuccess'))
@@ -251,20 +353,9 @@ function formatDate(dateStr?: string) {
   return d.toLocaleDateString(loc, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
-function getUserInitials(name?: string, email?: string): string {
-  if (name && name.trim()) {
-    const parts = name.trim().split(' ')
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
-    }
-    return name.slice(0, 2).toUpperCase()
-  }
-  if (email) return email.slice(0, 2).toUpperCase()
-  return 'U'
-}
-
 onMounted(() => {
   fetchUsers()
+  loadSystemPermissions()
 })
 </script>
 
@@ -296,7 +387,7 @@ onMounted(() => {
 
       <!-- Dropdown Filters & Actions -->
       <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-        <div class="w-36 sm:w-40">
+        <div class="w-36 sm:w-48">
           <AppSelect
             v-model="selectedRole"
             :options="roleFilterOptions"
@@ -340,7 +431,7 @@ onMounted(() => {
 
       <!-- Table -->
       <div v-else class="overflow-x-auto">
-        <table class="w-full min-w-[800px] text-left border-collapse">
+        <table class="w-full min-w-[850px] text-left border-collapse">
           <thead>
             <tr class="border-b border-border/80 bg-surface-subtle/60 text-[11px] font-bold text-ink-faint uppercase tracking-wider">
               <th class="py-3.5 px-5 whitespace-nowrap select-none">{{ t('users.colUser') }}</th>
@@ -360,18 +451,13 @@ onMounted(() => {
               <td class="py-3.5 px-5">
                 <div class="flex items-center gap-3">
                   <div
-                    class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs border overflow-hidden"
-                    :class="u.role === 'admin'
-                      ? 'bg-violet-100 text-violet-700 border-violet-200'
-                      : 'bg-violet-50 text-violet-600 border-violet-200/70'"
+                    class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs border overflow-hidden bg-surface-subtle border-violet-200/80"
                   >
                     <img
-                      v-if="u.avatar_url"
-                      :src="u.avatar_url"
+                      :src="u.avatar_url || defaultAvatar"
                       :alt="u.full_name"
-                      class="w-full h-full object-cover object-center"
+                      class="w-full h-full object-cover object-center aspect-square"
                     />
-                    <span v-else>{{ getUserInitials(u.full_name, u.email) }}</span>
                   </div>
                   <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
@@ -393,6 +479,10 @@ onMounted(() => {
                 <AppBadge v-if="u.role === 'admin'" variant="violet" size="sm">
                   <ShieldCheck class="w-3 h-3 mr-0.5" />
                   {{ t('users.roleAdmin') }}
+                </AppBadge>
+                <AppBadge v-else-if="u.role === 'manager'" variant="violet" size="sm">
+                  <UserCog class="w-3 h-3 mr-0.5" />
+                  {{ t('users.roleManager') }}
                 </AppBadge>
                 <AppBadge v-else variant="neutral" size="sm">
                   <UserIcon class="w-3 h-3 mr-0.5" />
@@ -427,6 +517,7 @@ onMounted(() => {
                     <Edit2 class="w-3.5 h-3.5" />
                   </button>
                   <button
+                    v-if="authStore.user?.role === 'admin'"
                     type="button"
                     @click="promptDeleteUser(u)"
                     :disabled="Boolean(authStore.user && u.id === authStore.user.id)"
@@ -455,12 +546,12 @@ onMounted(() => {
     </div>
 
     <!-- ============================================================= -->
-    <!-- MODALS: USER CREATE / EDIT & DELETE                           -->
+    <!-- MODALS: USER CREATE / EDIT (Dynamic Width & Simplified UI)    -->
     <!-- ============================================================= -->
     <AppModal
       :show="showUserModal"
       :title="editingUser ? t('users.editUser') : t('users.addUser')"
-      width="md"
+      :width="formRole === 'manager' ? '1000' : 'md'"
       @close="showUserModal = false"
     >
       <form @submit.prevent="handleSaveUser" class="space-y-4">
@@ -468,52 +559,189 @@ onMounted(() => {
           {{ modalError }}
         </div>
 
-        <div class="flex justify-center pb-2">
-          <AppAvatarCropper
-            v-model="formAvatarUrl"
-            :name="formFullName || 'User'"
-            size="lg"
-          />
+        <!-- 2-Column Clean Layout when Role is Manager -->
+        <div v-if="formRole === 'manager'" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <!-- Left Column: Account Details -->
+          <div class="lg:col-span-5 space-y-3.5">
+            <div class="flex justify-center pb-0.5">
+              <AppAvatarCropper
+                v-model="formAvatarUrl"
+                :name="formFullName || 'User'"
+                size="lg"
+              />
+            </div>
+
+            <AppInput
+              v-model="formFullName"
+              :label="t('auth.fullName')"
+              :placeholder="t('users.fullNamePlaceholder')"
+              required
+            />
+
+            <AppInput
+              v-model="formEmail"
+              type="email"
+              :label="t('auth.email')"
+              :placeholder="t('users.emailPlaceholder')"
+              required
+            />
+
+            <AppInput
+              v-model="formPassword"
+              type="password"
+              :label="t('auth.password')"
+              :placeholder="editingUser ? t('users.passwordHint') : t('users.passwordPlaceholder')"
+              :required="!editingUser"
+            />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <AppSelect
+                v-model="formRole"
+                :label="t('users.colRole')"
+                :options="modalRoleOptions"
+              />
+
+              <AppSelect
+                v-model="formIsActive"
+                :label="t('users.colStatus')"
+                :options="modalStatusOptions"
+              />
+            </div>
+          </div>
+
+          <!-- Right Column: Minimalist Permission Matrix -->
+          <div class="lg:col-span-7 space-y-4 pt-1">
+            <!-- Header bar with title and quick actions -->
+            <div class="flex items-center justify-between pb-2 border-b border-border/60 gap-2">
+              <h4 class="text-sm font-bold text-ink">{{ t('users.permissionsLabel') }}</h4>
+
+              <!-- Quick Select All / Deselect All -->
+              <div v-if="allPermissions.length > 0" class="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  @click="selectAllPermissions"
+                  class="text-xs font-semibold text-violet-600 hover:text-violet-700 hover:underline cursor-pointer"
+                >
+                  {{ t('users.selectAll') }}
+                </button>
+                <span class="text-border">|</span>
+                <button
+                  type="button"
+                  @click="deselectAllPermissions"
+                  class="text-xs font-medium text-ink-muted hover:text-ink hover:underline cursor-pointer"
+                >
+                  {{ t('users.deselectAll') }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Loading indicator -->
+            <div v-if="permissionsLoading" class="py-10 text-center text-sm text-ink-muted">
+              <div class="animate-spin w-5 h-5 border-2 border-violet-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+              <span>Đang tải danh mục quyền...</span>
+            </div>
+
+            <!-- Empty permissions state -->
+            <div v-else-if="allPermissions.length === 0" class="py-6 text-center text-sm text-ink-muted">
+              Chưa có dữ liệu danh mục quyền trong cơ sở dữ liệu.
+            </div>
+
+            <!-- Dynamic Permission Modules List -->
+            <div v-else class="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+              <div
+                v-for="[key, group] in groupedPermissions"
+                :key="key"
+                class="space-y-2"
+              >
+                <!-- Group Title -->
+                <div class="text-xs font-bold text-ink-muted uppercase tracking-wider">
+                  {{ group.title }}
+                </div>
+
+                <!-- Group Items Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div
+                    v-for="perm in group.perms"
+                    :key="perm.id"
+                    @click="togglePermission(perm)"
+                    class="flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none bg-white"
+                    :class="isPermissionSelected(perm)
+                      ? 'border-violet-500 bg-violet-50/40 ring-1 ring-violet-400/20'
+                      : 'border-border hover:border-violet-300'"
+                  >
+                    <div
+                      class="w-4.5 h-4.5 rounded-md flex items-center justify-center shrink-0 border transition-all"
+                      :class="isPermissionSelected(perm)
+                        ? 'bg-violet-600 border-violet-600 text-white'
+                        : 'border-border bg-white'"
+                    >
+                      <Check v-if="isPermissionSelected(perm)" class="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <p class="text-sm font-medium leading-tight truncate" :class="isPermissionSelected(perm) ? 'text-ink font-semibold' : 'text-ink'">
+                        {{ perm.name }}
+                      </p>
+                      <p class="text-xs font-mono text-ink-muted leading-tight mt-0.5 truncate">
+                        {{ perm.code }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <AppInput
-          v-model="formFullName"
-          :label="t('auth.fullName')"
-          :placeholder="t('users.fullNamePlaceholder')"
-          required
-        />
+        <!-- Single Column Layout when Role != Manager (Compact Modal Width) -->
+        <div v-else class="space-y-3.5">
+          <div class="flex justify-center pb-0.5">
+            <AppAvatarCropper
+              v-model="formAvatarUrl"
+              :name="formFullName || 'User'"
+              size="lg"
+            />
+          </div>
 
-        <AppInput
-          v-model="formEmail"
-          type="email"
-          :label="t('auth.email')"
-          :placeholder="t('users.emailPlaceholder')"
-          required
-        />
-
-        <AppInput
-          v-model="formPassword"
-          type="password"
-          :label="t('auth.password')"
-          :placeholder="editingUser ? t('users.passwordHint') : t('users.passwordPlaceholder')"
-          :required="!editingUser"
-        />
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <AppSelect
-            v-model="formRole"
-            :label="t('users.colRole')"
-            :options="modalRoleOptions"
+          <AppInput
+            v-model="formFullName"
+            :label="t('auth.fullName')"
+            :placeholder="t('users.fullNamePlaceholder')"
+            required
           />
 
-          <AppSelect
-            v-model="formIsActive"
-            :label="t('users.colStatus')"
-            :options="modalStatusOptions"
+          <AppInput
+            v-model="formEmail"
+            type="email"
+            :label="t('auth.email')"
+            :placeholder="t('users.emailPlaceholder')"
+            required
           />
+
+          <AppInput
+            v-model="formPassword"
+            type="password"
+            :label="t('auth.password')"
+            :placeholder="editingUser ? t('users.passwordHint') : t('users.passwordPlaceholder')"
+            :required="!editingUser"
+          />
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <AppSelect
+              v-model="formRole"
+              :label="t('users.colRole')"
+              :options="modalRoleOptions"
+            />
+
+            <AppSelect
+              v-model="formIsActive"
+              :label="t('users.colStatus')"
+              :options="modalStatusOptions"
+            />
+          </div>
         </div>
 
-        <div class="flex items-center justify-end gap-2 pt-3 border-t border-border">
+        <!-- Footer Actions -->
+        <div class="flex items-center justify-end gap-2 pt-3">
           <AppButton variant="outline" type="button" size="sm" @click="showUserModal = false">
             {{ t('common.cancel') }}
           </AppButton>
@@ -535,6 +763,5 @@ onMounted(() => {
       @confirm="confirmDeleteUser"
       @close="showDeleteModal = false"
     />
-
   </div>
 </template>

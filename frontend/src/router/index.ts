@@ -44,11 +44,13 @@ const routes: RouteRecordRaw[] = [
         path: 'users',
         name: 'Users',
         component: () => import('@/modules/users/views/UsersView.vue'),
+        meta: { requiresAuth: true, permission: 'users:read' },
       },
       {
         path: 'couples',
         name: 'Couples',
         component: () => import('@/modules/couples/views/CouplesView.vue'),
+        meta: { requiresAuth: true, permission: 'couples:read' },
       },
       {
         path: 'profile',
@@ -84,6 +86,8 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
   } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    next('/')
+  } else if (to.meta.permission && !authStore.hasPermission(to.meta.permission as string)) {
     next('/')
   } else {
     next()

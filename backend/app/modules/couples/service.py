@@ -1,7 +1,8 @@
 from typing import Optional, Sequence
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.exceptions import BadRequestException, NotFoundException
+from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
+from app.modules.auth.models import User
 from app.modules.auth.repository import UserRepository
 from app.modules.couples.models import Couple
 from app.modules.couples.repository import CoupleRepository
@@ -14,10 +15,11 @@ class CoupleService:
         session: AsyncSession,
         current_user_id: uuid.UUID,
         payload: CoupleCreate,
-        is_admin: bool = False,
+        actor: Optional[User] = None,
     ) -> Couple:
         user_repo = UserRepository(session)
-        user1_id = payload.user1_id if (payload.user1_id and is_admin) else (payload.user1_id or current_user_id)
+        is_management = actor and (actor.role in ["admin", "manager"])
+        user1_id = payload.user1_id if (payload.user1_id and is_management) else (payload.user1_id or current_user_id)
         user2_id = payload.user2_id
 
         if user1_id == user2_id:
@@ -50,10 +52,11 @@ class CoupleService:
         session: AsyncSession,
         couple_id: uuid.UUID,
         user_id: uuid.UUID,
-        is_admin: bool = False,
+        actor: Optional[User] = None,
     ) -> Optional[Couple]:
         repo = CoupleRepository(session)
-        if is_admin:
+        is_management = actor and (actor.role in ["admin", "manager"])
+        if is_management:
             return await repo.get_by_id_with_users(couple_id)
         return await repo.get_couple_for_user(couple_id=couple_id, user_id=user_id)
 
@@ -61,7 +64,7 @@ class CoupleService:
     async def list_couples(
         session: AsyncSession,
         user_id: uuid.UUID,
-        is_admin: bool = False,
+        actor: Optional[User] = None,
         status: Optional[str] = None,
         page: int = 1,
         per_page: int = 15,
@@ -71,7 +74,8 @@ class CoupleService:
         repo = CoupleRepository(session)
         actual_skip = skip if skip is not None else max(0, (page - 1) * per_page)
         actual_limit = limit if limit is not None else per_page
-        if is_admin:
+        is_management = actor and (actor.role in ["admin", "manager"])
+        if is_management:
             items = await repo.list_all(status=status, skip=actual_skip, limit=actual_limit)
             total = await repo.count_all(status=status)
         else:
@@ -85,10 +89,11 @@ class CoupleService:
         couple_id: uuid.UUID,
         user_id: uuid.UUID,
         payload: CoupleUpdate,
-        is_admin: bool = False,
+        actor: Optional[User] = None,
     ) -> Optional[Couple]:
         repo = CoupleRepository(session)
-        couple = await repo.get_by_id_with_users(couple_id) if is_admin else await repo.get_couple_for_user(couple_id=couple_id, user_id=user_id)
+        is_management = actor and (actor.role in ["admin", "manager"])
+        couple = await repo.get_by_id_with_users(couple_id) if is_management else await repo.get_couple_for_user(couple_id=couple_id, user_id=user_id)
         if not couple:
             return None
 
@@ -99,9 +104,14 @@ class CoupleService:
         session: AsyncSession,
         couple_id: uuid.UUID,
         user_id: uuid.UUID,
-        is_admin: bool = False,
+        actor: Optional[User] = None,
     ) -> bool:
+        # Invariant Guard: Manager CANNOT delete couples
+        if actor and actor.role == "manager":
+            raise ForbiddenException("Managers do not have permission to delete couple records.")
+
         repo = CoupleRepository(session)
+        is_admin = actor and actor.role == "admin"
         couple = await repo.get_by_id_with_users(couple_id) if is_admin else await repo.get_couple_for_user(couple_id=couple_id, user_id=user_id)
         if not couple:
             return False

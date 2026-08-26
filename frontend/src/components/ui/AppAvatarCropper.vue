@@ -15,6 +15,7 @@ import {
 } from 'lucide-vue-next'
 import AppModal from '@/components/ui/AppModal.vue'
 import AppButton from '@/components/ui/AppButton.vue'
+import defaultAvatar from '@/img/avatar.jpg'
 
 interface Props {
   modelValue?: string | null
@@ -77,14 +78,6 @@ const cameraIconSizeClass = computed(() => {
   }
 })
 
-function getUserInitials(name?: string): string {
-  if (!name || !name.trim()) return 'U'
-  const parts = name.trim().split(' ')
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
-  }
-  return name.slice(0, 2).toUpperCase()
-}
 
 function triggerFileInput() {
   if (props.disabled || !props.editable) return
@@ -203,15 +196,12 @@ function closeModal() {
           editable && !disabled ? 'group-hover:ring-2 group-hover:ring-violet-400/40 group-hover:border-violet-400' : ''
         ]"
       >
-        <!-- Actual Avatar Image -->
+        <!-- Actual Avatar Image or Default Avatar -->
         <img
-          v-if="modelValue"
-          :src="modelValue"
+          :src="modelValue || defaultAvatar"
           :alt="name"
           class="w-full h-full object-cover object-center shrink-0 aspect-square"
         />
-        <!-- Initials Fallback (Guaranteed Square & Centered) -->
-        <span v-else class="select-none leading-none tracking-tight">{{ getUserInitials(name) }}</span>
       </div>
 
       <!-- Hover Edit Camera Overlay -->

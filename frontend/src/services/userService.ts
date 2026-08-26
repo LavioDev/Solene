@@ -1,5 +1,5 @@
 import { apiClient } from '@/services/apiClient'
-import type { User, UserCreatePayload, UserFilterParams, UserUpdatePayload } from '@/types/auth'
+import type { Permission, User, UserCreatePayload, UserFilterParams, UserUpdatePayload } from '@/types/auth'
 import type { PaginatedResponse } from '@/types/pagination'
 
 export const userService = {
@@ -25,5 +25,22 @@ export const userService = {
 
   async deleteUser(userId: string): Promise<void> {
     await apiClient.delete(`/users/${userId}`)
+  },
+
+  async getAllPermissions(): Promise<Permission[]> {
+    const response = await apiClient.get<Permission[]>('/permissions')
+    return response.data
+  },
+
+  async getUserPermissions(userId: string): Promise<Permission[]> {
+    const response = await apiClient.get<Permission[]>(`/permissions/users/${userId}`)
+    return response.data
+  },
+
+  async assignUserPermissions(userId: string, permissionIds: string[]): Promise<Permission[]> {
+    const response = await apiClient.put<Permission[]>(`/permissions/users/${userId}`, {
+      permission_ids: permissionIds,
+    })
+    return response.data
   },
 }

@@ -124,12 +124,9 @@ async def test_couple_full_crud_and_security() -> None:
         assert get_a.status_code == 200
         assert get_a.json()["id"] == couple_id
 
-        get_b = await ac.get(f"/api/v1/couples/{couple_id}", headers=headers_b)
-        assert get_b.status_code == 200
-
-        # Security: User C cannot access couple A & B
+        # Security: User C (role 'user') cannot access couple endpoints (403 Forbidden)
         get_c = await ac.get(f"/api/v1/couples/{couple_id}", headers=headers_c)
-        assert get_c.status_code == 404
+        assert get_c.status_code == 403
 
         # 10. List couples
         list_a = await ac.get("/api/v1/couples", headers=headers_a)
@@ -138,9 +135,15 @@ async def test_couple_full_crud_and_security() -> None:
         assert len(list_a.json()["items"]) >= 1
 
         list_c = await ac.get("/api/v1/couples", headers=headers_c)
-        assert list_c.status_code == 200
-        assert "items" in list_c.json()
-        assert len(list_c.json()["items"]) == 0
+        assert list_c.status_code == 403
+
+        # Security: User C cannot create couples
+        create_c = await ac.post(
+            "/api/v1/couples",
+            json={"user2_id": user_a_id, "start_date": "2023-01-01"},
+            headers=headers_c,
+        )
+        assert create_c.status_code == 403
 
         # 11. Update Couple (PUT)
         update_payload = {
@@ -150,13 +153,13 @@ async def test_couple_full_crud_and_security() -> None:
         }
         # Security: User C cannot update
         put_c = await ac.put(f"/api/v1/couples/{couple_id}", json=update_payload, headers=headers_c)
-        assert put_c.status_code == 404
+        assert put_c.status_code == 403
 
-        # User B can update
-        put_b = await ac.put(f"/api/v1/couples/{couple_id}", json=update_payload, headers=headers_b)
-        assert put_b.status_code == 200
-        assert put_b.json()["nickname"] == "A & B Forever and Always"
-        assert put_b.json()["cover_url"] == "https://example.com/new_cover.jpg"
+        # Admin (User A) can update
+        put_a = await ac.put(f"/api/v1/couples/{couple_id}", json=update_payload, headers=headers_a)
+        assert put_a.status_code == 200
+        assert put_a.json()["nickname"] == "A & B Forever and Always"
+        assert put_a.json()["cover_url"] == "https://example.com/new_cover.jpg"
 
         # 12. Partial Update (PATCH)
         new_start_date = date.today() - timedelta(days=200)
@@ -171,9 +174,9 @@ async def test_couple_full_crud_and_security() -> None:
         # 13. Delete Couple
         # Security: User C cannot delete
         del_c = await ac.delete(f"/api/v1/couples/{couple_id}", headers=headers_c)
-        assert del_c.status_code == 404
+        assert del_c.status_code == 403
 
-        # User A deletes
+        # User A (Admin) deletes
         del_a = await ac.delete(f"/api/v1/couples/{couple_id}", headers=headers_a)
         assert del_a.status_code == 204
 

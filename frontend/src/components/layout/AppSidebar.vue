@@ -38,10 +38,11 @@ const primaryNavigation = computed(() => [
 ])
 
 const managementChildren = computed(() => {
-  const children = [
-    { name: t('nav.couples'), path: '/couples', icon: Heart },
-  ]
-  if (authStore.user?.role === 'admin') {
+  const children = []
+  if (authStore.isAdmin || authStore.hasPermission('couples:read')) {
+    children.push({ name: t('nav.couples'), path: '/couples', icon: Heart })
+  }
+  if (authStore.isAdmin || authStore.hasPermission('users:read')) {
     children.push({ name: t('nav.users'), path: '/users', icon: UsersIcon })
   }
   return children
@@ -133,7 +134,7 @@ async function handleLogout() {
 
       <!-- Grouped Management Navigation (Couples & Users) -->
       <!-- Case A: Expanded Sidebar -->
-      <div v-if="!uiStore.isSidebarCollapsed" class="pt-1.5">
+      <div v-if="!uiStore.isSidebarCollapsed && managementChildren.length > 0" class="pt-1.5">
         <!-- Parent Collapsible Button -->
         <button
           type="button"
@@ -191,7 +192,7 @@ async function handleLogout() {
       </div>
 
       <!-- Case B: Collapsed Sidebar (Flyout popover on hover) -->
-      <div v-else class="pt-1 relative group/popover">
+      <div v-else-if="uiStore.isSidebarCollapsed && managementChildren.length > 0" class="pt-1 relative group/popover">
         <button
           type="button"
           class="w-full flex items-center justify-center p-2.5 rounded-xl text-xs transition-all cursor-pointer"
