@@ -8,10 +8,89 @@ from app.core.database import get_async_db
 from app.core.exceptions import ForbiddenException
 from app.core.pagination import PaginatedResponse, paginate_response
 from app.modules.auth.models import User
-from app.modules.couples.schemas import CoupleCreate, CoupleOut, CoupleUpdate
+from app.modules.couples.schemas import (
+    CoupleCreate,
+    CoupleInvitationAcceptPayload,
+    CoupleInvitationCreateResponse,
+    CoupleInvitationInfoResponse,
+    CoupleOut,
+    CoupleUpdate,
+)
 from app.modules.couples.service import CoupleService
 
 router = APIRouter(prefix="/couples", tags=["Couples & Relationships"])
+
+
+# --- Self-service Couple Invitation & Pairing Endpoints ---
+
+
+@router.post("/invitations", response_model=CoupleInvitationCreateResponse, status_code=status.HTTP_201_CREATED)
+async def create_couple_invitation(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_db),
+) -> CoupleInvitationCreateResponse:
+    """Create a new couple pairing invitation code/link for the current user."""
+    return await CoupleService.create_invitation(
+        session=session,
+        current_user_id=current_user.id,
+    )
+
+
+@router.get("/invitations/current", response_model=Optional[CoupleInvitationCreateResponse])
+async def get_current_couple_invitation(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_db),
+) -> Optional[CoupleInvitationCreateResponse]:
+    """Get the active pending couple invitation created by the current user, if any."""
+    return await CoupleService.get_current_invitation(
+        session=session,
+        current_user_id=current_user.id,
+    )
+
+
+@router.delete("/invitations/current", status_code=status.HTTP_204_NO_CONTENT)
+async def revoke_current_couple_invitation(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_db),
+) -> None:
+    """Revoke/cancel the current user's active pending couple invitation."""
+    revoked = await CoupleService.revoke_current_invitation(
+        session=session,
+        current_user_id=current_user.id,
+    )
+    if not revoked:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No active invitation found to revoke.",
+        )
+    return None
+
+
+@router.get("/invitations/info", response_model=CoupleInvitationInfoResponse)
+async def get_couple_invitation_info(
+    code: str = Query(..., min_length=3, max_length=30, description="The invitation code"),
+    session: AsyncSession = Depends(get_async_db),
+) -> CoupleInvitationInfoResponse:
+    """Get preview information about a couple invitation code (inviter name, avatar, validity)."""
+    return await CoupleService.get_invitation_info(
+        session=session,
+        code=code,
+    )
+
+
+@router.post("/invitations/accept", response_model=CoupleOut, status_code=status.HTTP_200_OK)
+async def accept_couple_invitation(
+    payload: CoupleInvitationAcceptPayload,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_db),
+) -> CoupleOut:
+    """Accept a couple invitation and pair with the inviter."""
+    return await CoupleService.accept_invitation(
+        session=session,
+        current_user_id=current_user.id,
+        payload=payload,
+    )
+
 
 
 @router.post("", response_model=CoupleOut, status_code=status.HTTP_201_CREATED)
@@ -30,24 +109,20 @@ async def create_couple(
     return couple
 
 
-@router.get("/me", response_model=CoupleOut)
+@router.get("/me", response_model=Optional[CoupleOut])
 async def get_my_couple(
     status_filter: Optional[str] = Query(None, alias="status", description="Filter by couple status"),
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_db),
-) -> CoupleOut:
+) -> Optional[CoupleOut]:
     """Get the active couple relationship profile for the authenticated user."""
     couple = await CoupleService.get_my_couple(
         session=session,
         user_id=current_user.id,
         status=status_filter,
     )
-    if not couple:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No couple profile found for the current user.",
-        )
     return couple
+
 
 
 @router.get("", response_model=PaginatedResponse[CoupleOut])

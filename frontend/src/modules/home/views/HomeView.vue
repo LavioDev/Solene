@@ -11,11 +11,14 @@ import HomeUpcomingEvents from '../components/HomeUpcomingEvents.vue'
 import HomeQuickActions from '../components/HomeQuickActions.vue'
 import HomeMemoryModal from '../components/HomeMemoryModal.vue'
 import HomeParticleHeartView from '../components/HomeParticleHeartView.vue'
+import CoupleInviteModal from '@/modules/couples/components/CoupleInviteModal.vue'
 
 const router = useRouter()
 const moodStore = useMoodStore()
 const showParticleHeart = ref(false)
 const showDailyMoodWidget = ref(false)
+const showInviteModal = ref(false)
+
 
 const {
   loading,
@@ -74,7 +77,7 @@ function navigateTo(path: string) {
           :my-mood="moodStore.myTodayMood"
           :get-user-initials="getUserInitials"
           :format-task-time="formatTaskTime"
-          @link-couple="navigateTo('/couples')"
+          @link-couple="showInviteModal = true"
           @refresh-partner="refreshPartnerStatusOnly"
           @toggle-mood="showDailyMoodWidget = !showDailyMoodWidget"
         />
@@ -133,8 +136,15 @@ function navigateTo(path: string) {
       @close="closeRandomMemoryModal"
       @shuffle="pickRandomMemory"
     />
+
+    <!-- Couple Invite & Link Modal -->
+    <CoupleInviteModal
+      :show="showInviteModal"
+      @close="showInviteModal = false"
+    />
   </div>
 </template>
+
 
 <style scoped>
 .fade-enter-active,

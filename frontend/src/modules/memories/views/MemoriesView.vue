@@ -10,6 +10,7 @@ import {
   Edit2,
   Image as ImageIcon,
   Loader2,
+  Search,
 } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppModal from '@/components/ui/AppModal.vue'
@@ -17,7 +18,6 @@ import AppInput from '@/components/ui/AppInput.vue'
 import AppSelect from '@/components/ui/AppSelect.vue'
 import AppTextarea from '@/components/ui/AppTextarea.vue'
 import AppBadge from '@/components/ui/AppBadge.vue'
-import AppCard from '@/components/ui/AppCard.vue'
 import AppImageUpload from '@/components/ui/AppImageUpload.vue'
 import AppConfirmModal from '@/components/ui/AppConfirmModal.vue'
 import AppSwitch from '@/components/ui/AppSwitch.vue'
@@ -39,8 +39,16 @@ const totalCount = ref(0)
 const sentinelRef = ref<HTMLElement | null>(null)
 let observer: IntersectionObserver | null = null
 
-// Filter state
-const filterType = ref<'ALL' | 'DATE' | 'RANDOM'>('ALL')
+// Filter & Search state
+const searchQuery = ref('')
+const filterType = ref<string>('ALL')
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
+const filterTypeOptions = computed(() => [
+  { label: t('memories.filterAll'), value: 'ALL' },
+  { label: t('memories.statusOptions.date'), value: 'DATE' },
+  { label: t('memories.statusOptions.random'), value: 'RANDOM' },
+])
 
 const filteredMemories = computed(() => memories.value)
 
@@ -75,6 +83,7 @@ async function fetchMemories(reset = false) {
       page: page.value,
       per_page: perPage.value,
       display_type: filterType.value === 'ALL' ? undefined : filterType.value,
+      search: searchQuery.value.trim() ? searchQuery.value.trim() : undefined,
     })
 
     if (reset) {
@@ -94,6 +103,21 @@ async function fetchMemories(reset = false) {
     loadingMore.value = false
   }
 }
+
+function handleFilterChange() {
+  fetchMemories(true)
+}
+
+watch(filterType, () => {
+  handleFilterChange()
+})
+
+watch(searchQuery, () => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+  searchDebounceTimer = setTimeout(() => {
+    handleFilterChange()
+  }, 300)
+})
 
 function loadMore() {
   if (loading.value || loadingMore.value || !hasMore.value) return
@@ -126,10 +150,6 @@ function setupObserver() {
     observer.observe(sentinelRef.value)
   }
 }
-
-watch(filterType, () => {
-  fetchMemories(true)
-})
 
 watch(sentinelRef, (newEl) => {
   if (newEl && observer) {
@@ -227,12 +247,6 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString(loc, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
-const counts = computed(() => ({
-  all: totalCount.value || memories.value.length,
-  date: memories.value.filter(n => n.display_type === 'DATE').length,
-  random: memories.value.filter(n => n.display_type === 'RANDOM').length,
-}))
-
 onMounted(() => {
   fetchMemories(true).then(() => {
     setupObserver()
@@ -248,72 +262,81 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex gap-6 items-start select-none pb-10">
+  <div class="space-y-4 px-4 sm:px-6 lg:px-8 pt-1 sm:pt-2 pb-16 w-full select-none">
+    <!-- Page Header (Chuẩn UsersView / ScheduleView) -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl sm:text-2xl font-bold text-ink font-sans tracking-tight">
+            {{ t('memories.title') }}
+          </h1>
+        </div>
+        <p class="text-xs sm:text-sm text-ink-muted mt-0.5">
+          {{ t('memories.subtitle') }}
+        </p>
+      </div>
+    </div>
 
-    <!-- ─── Left Panel ─── -->
-    <div class="w-60 shrink-0 sticky top-6 bg-white border border-border rounded-2xl p-5 shadow-card space-y-4">
-      <!-- Title -->
-      <div class="flex items-center gap-2 pb-3 border-b border-border/60">
-        <Heart class="w-4 h-4 text-violet-500 shrink-0" />
-        <h1 class="text-sm font-bold text-ink">{{ t('memories.title') }}</h1>
+    <!-- Action Bar (Search, Filters, Actions theo pattern của UsersView) -->
+    <div class="bg-white border border-border rounded-2xl p-3.5 shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <!-- Search Input -->
+      <div class="relative flex-1 max-w-md">
+        <Search class="w-3.5 h-3.5 text-ink-faint absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <input
+          v-model="searchQuery"
+          type="text"
+          :placeholder="t('memories.searchPlaceholder')"
+          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-500 transition-all shadow-2xs"
+        />
       </div>
 
-      <!-- Filter List -->
-      <div class="space-y-1">
-        <button
-          v-for="f in ([
-            { key: 'ALL', label: t('common.all'), count: counts.all },
-            { key: 'DATE', label: t('memories.statusOptions.date'), count: counts.date },
-            { key: 'RANDOM', label: t('memories.statusOptions.random'), count: counts.random },
-          ] as const)"
-          :key="f.key"
-          type="button"
-          @click="filterType = f.key"
-          class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer"
-          :class="filterType === f.key
-            ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
-            : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-medium'"
-        >
-          <span>{{ f.label }}</span>
-          <span
-            class="text-[10px] font-mono px-1.5 py-0.5 rounded-md"
-            :class="filterType === f.key ? 'bg-violet-100 text-violet-600' : 'bg-surface-raised text-ink-faint'"
-          >
-            {{ f.count }}
-          </span>
-        </button>
-      </div>
-
-      <!-- Add Button -->
-      <div class="pt-3 border-t border-border/60">
-        <AppButton class="w-full" size="sm" @click="openAddModal">
+      <!-- Dropdown Filters & Actions -->
+      <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div class="w-44 sm:w-52">
+          <AppSelect
+            v-model="filterType"
+            :options="filterTypeOptions"
+            size="sm"
+          />
+        </div>
+        <AppButton size="md" @click="openAddModal" class="h-[42px] py-2.5 px-4 shrink-0 shadow-2xs rounded-xl text-xs font-semibold inline-flex items-center justify-center">
           <Sparkles class="w-3.5 h-3.5 mr-1 text-white" />
           {{ t('memories.addMemory') }}
         </AppButton>
       </div>
     </div>
 
-    <!-- ─── Main Content Area ─── -->
-    <div class="flex-1 min-w-0">
-
+    <!-- Content: Memories Cards Grid -->
+    <div>
       <!-- Loading Placeholder -->
       <div v-if="loading" class="py-20 text-center text-sm text-ink-faint">
+        <div class="animate-spin w-6 h-6 border-2 border-violet-600 border-t-transparent rounded-full mx-auto mb-2"></div>
         {{ t('memories.loading') }}
       </div>
 
-      <!-- Empty State -->
-      <AppCard v-else-if="filteredMemories.length === 0">
-        <div class="py-12 text-center space-y-3">
-          <div class="w-10 h-10 rounded-full bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-400 mx-auto">
-            <Heart class="w-5 h-5" />
-          </div>
-          <p class="text-sm font-medium text-ink">{{ t('memories.emptyTitle') }}</p>
-          <p class="text-xs text-ink-muted">{{ t('memories.emptySubtitle') }}</p>
+      <!-- Empty State (Clean & Pastel Native UI) -->
+      <div
+        v-else-if="filteredMemories.length === 0"
+        @click="openAddModal"
+        class="border-2 border-dashed border-violet-200/80 bg-surface-subtle/40 hover:bg-violet-50/40 hover:border-violet-300 rounded-3xl py-16 px-6 text-center transition-all duration-200 cursor-pointer group select-none"
+      >
+        <div class="w-14 h-14 rounded-2xl bg-white border border-violet-100 shadow-xs flex items-center justify-center text-violet-500 mx-auto group-hover:scale-105 group-hover:border-violet-200 group-hover:shadow-card transition-all duration-200">
+          <Heart class="w-6 h-6 fill-violet-100 text-violet-500 group-hover:text-violet-600 transition-colors" />
         </div>
-      </AppCard>
+        <h3 class="text-sm sm:text-base font-bold text-ink mt-3.5">
+          {{ t('memories.emptyTitle') }}
+        </h3>
+        <p class="text-xs text-ink-muted max-w-sm mx-auto mt-1 leading-relaxed">
+          {{ t('memories.emptySubtitle') }}
+        </p>
+        <div class="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-xl bg-white border border-border/80 text-xs font-semibold text-violet-700 shadow-2xs group-hover:border-violet-300 group-hover:bg-violet-50/60 transition-all">
+          <Sparkles class="w-3.5 h-3.5 text-violet-600" />
+          <span>{{ t('memories.addMemory') }}</span>
+        </div>
+      </div>
 
-      <!-- Memories Grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      <!-- Memories Grid (Cards layout) -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         <div
           v-for="memory in filteredMemories"
           :key="memory.id"
@@ -509,6 +532,5 @@ onUnmounted(() => {
       @confirm="confirmDeleteMemory"
       @close="showDeleteConfirmModal = false"
     />
-
   </div>
 </template>

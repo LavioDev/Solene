@@ -78,9 +78,11 @@ async def test_couple_full_crud_and_security() -> None:
         )
         assert res_self.status_code == 400
 
-        # 4. Check /me before creating couple -> 404
+        # 4. Check /me before creating couple -> 200 with null
         me_before = await ac.get("/api/v1/couples/me", headers=headers_a)
-        assert me_before.status_code == 404
+        assert me_before.status_code == 200
+        assert me_before.json() is None
+
 
         # 5. Create couple (User A with User B)
         start_date = date.today() - timedelta(days=100)
@@ -115,9 +117,11 @@ async def test_couple_full_crud_and_security() -> None:
         assert me_b.status_code == 200
         assert me_b.json()["id"] == couple_id
 
-        # 8. User C gets /me -> 404
+        # 8. User C gets /me -> 200 with null
         me_c = await ac.get("/api/v1/couples/me", headers=headers_c)
-        assert me_c.status_code == 404
+        assert me_c.status_code == 200
+        assert me_c.json() is None
+
 
         # 9. Get specific couple by ID
         get_a = await ac.get(f"/api/v1/couples/{couple_id}", headers=headers_a)
@@ -185,4 +189,6 @@ async def test_couple_full_crud_and_security() -> None:
         assert get_deleted.status_code == 404
 
         me_after = await ac.get("/api/v1/couples/me", headers=headers_a)
-        assert me_after.status_code == 404
+        assert me_after.status_code == 200
+        assert me_after.json() is None
+

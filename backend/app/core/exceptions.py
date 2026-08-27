@@ -24,3 +24,9 @@ class ForbiddenException(AppException):
 class BadRequestException(AppException):
     def __init__(self, detail: str = "Bad request parameters") -> None:
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+
+
+class ConflictException(AppException):
+    def __init__(self, detail: str = "Resource conflict") -> None:
+        super().__init__(status_code=status.HTTP_409_CONFLICT, detail=detail)
+

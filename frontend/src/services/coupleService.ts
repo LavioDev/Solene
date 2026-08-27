@@ -1,5 +1,12 @@
 import { apiClient } from '@/services/apiClient'
-import type { Couple, CoupleCreatePayload, CoupleUpdatePayload } from '@/types/couple'
+import type {
+  Couple,
+  CoupleCreatePayload,
+  CoupleInvitation,
+  CoupleInvitationAcceptPayload,
+  CoupleInvitationInfo,
+  CoupleUpdatePayload,
+} from '@/types/couple'
 import type { PaginatedResponse } from '@/types/pagination'
 
 export const coupleService = {
@@ -16,10 +23,11 @@ export const coupleService = {
     return response.data
   },
 
-  async getMyCouple(): Promise<Couple> {
-    const response = await apiClient.get<Couple>('/couples/me')
+  async getMyCouple(): Promise<Couple | null> {
+    const response = await apiClient.get<Couple | null>('/couples/me')
     return response.data
   },
+
 
   async getCouple(coupleId: string): Promise<Couple> {
     const response = await apiClient.get<Couple>(`/couples/${coupleId}`)
@@ -39,4 +47,33 @@ export const coupleService = {
   async deleteCouple(coupleId: string): Promise<void> {
     await apiClient.delete(`/couples/${coupleId}`)
   },
+
+  // --- Couple Invitations & Pairing ---
+
+  async createInvitation(): Promise<CoupleInvitation> {
+    const response = await apiClient.post<CoupleInvitation>('/couples/invitations')
+    return response.data
+  },
+
+  async getCurrentInvitation(): Promise<CoupleInvitation | null> {
+    const response = await apiClient.get<CoupleInvitation | null>('/couples/invitations/current')
+    return response.data
+  },
+
+  async revokeCurrentInvitation(): Promise<void> {
+    await apiClient.delete('/couples/invitations/current')
+  },
+
+  async getInvitationInfo(code: string): Promise<CoupleInvitationInfo> {
+    const response = await apiClient.get<CoupleInvitationInfo>('/couples/invitations/info', {
+      params: { code },
+    })
+    return response.data
+  },
+
+  async acceptInvitation(payload: CoupleInvitationAcceptPayload): Promise<Couple> {
+    const response = await apiClient.post<Couple>('/couples/invitations/accept', payload)
+    return response.data
+  },
 }
+

@@ -70,7 +70,7 @@ onMounted(() => {
 
 <template>
   <div class="space-y-4 px-4 sm:px-6 lg:px-8 pt-1 sm:pt-2 pb-16 w-full select-none">
-    <!-- Page Header & Stats Row -->
+    <!-- Page Header & Controls -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <div class="flex items-center gap-2">
@@ -84,7 +84,7 @@ onMounted(() => {
       </div>
 
       <!-- Controls: Year Selector & View Mode Switcher -->
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <!-- View Mode Segmented Pill -->
         <div class="flex bg-surface-raised p-1 rounded-xl border border-border/80 text-xs font-medium">
           <button
@@ -126,8 +126,6 @@ onMounted(() => {
         </div>
       </div>
     </div>
-
-    
 
     <!-- The GitHub-Style Contribution Heatmap Matrix -->
     <MoodHeatmap

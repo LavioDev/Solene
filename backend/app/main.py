@@ -80,3 +80,4 @@ async def root() -> dict[str, str]:
 # Include API and WebSocket routers
 app.include_router(api_v1_router, prefix=settings.API_V1_STR)
 app.include_router(ws_router)
+

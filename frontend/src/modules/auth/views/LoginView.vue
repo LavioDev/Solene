@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/authStore'
 import { ArrowRight, Sparkles } from 'lucide-vue-next'
@@ -9,6 +9,7 @@ import AppInput from '@/components/ui/AppInput.vue'
 import AppCard from '@/components/ui/AppCard.vue'
 import AppLangSwitcher from '@/components/ui/AppLangSwitcher.vue'
 
+const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const { t } = useI18n()
@@ -29,13 +30,15 @@ async function handleSubmit() {
     } else {
       await authStore.login({ email: email.value, password: password.value })
     }
-    router.push('/')
+    const redirectPath = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+    router.push(redirectPath)
   } catch (err: any) {
     errorMessage.value = err.response?.data?.detail || t('auth.authFailed')
   } finally {
     loading.value = false
   }
 }
+
 </script>
 
 <template>

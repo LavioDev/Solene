@@ -37,3 +37,31 @@ export interface CoupleUpdatePayload {
   status?: string
   cover_url?: string | null
 }
+
+export interface CoupleInvitation {
+  id: string
+  inviter_id: string
+  code: string
+  status: string
+  expires_at: string
+  created_at: string
+  invite_url?: string
+  inviter?: UserPartnerSummary | null
+}
+
+export interface CoupleInvitationInfo {
+  code: string
+  status: string
+  is_valid: boolean
+  expires_at: string
+  inviter?: UserPartnerSummary | null
+  error_reason?: string | null
+}
+
+export interface CoupleInvitationAcceptPayload {
+  code: string
+  start_date: string
+  nickname?: string | null
+  cover_url?: string | null
+}
+

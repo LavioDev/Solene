@@ -195,11 +195,15 @@ export function useHomeDashboard() {
     try {
       // 1. Fetch Couple Profile
       try {
-        couple.value = await coupleService.getMyCouple()
-        updateLoveCounter()
+        const myCouple = await coupleService.getMyCouple()
+        couple.value = myCouple
+        if (myCouple) {
+          updateLoveCounter()
+        }
       } catch {
         couple.value = null
       }
+
 
       // 2. Fetch Partner Active Status & Today Mood
       try {

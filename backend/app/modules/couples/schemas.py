@@ -67,3 +67,35 @@ class CoupleOut(BaseModel):
             delta = (today - self.start_date).days
             self.days_together = max(0, delta)
         return self
+
+
+class CoupleInvitationCreateResponse(BaseModel):
+    id: UUID
+    inviter_id: UUID
+    code: str
+    status: str
+    expires_at: datetime
+    created_at: datetime
+    invite_url: Optional[str] = None
+    inviter: Optional[UserPartnerSummary] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CoupleInvitationInfoResponse(BaseModel):
+    code: str
+    status: str
+    is_valid: bool
+    expires_at: datetime
+    inviter: Optional[UserPartnerSummary] = None
+    error_reason: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CoupleInvitationAcceptPayload(BaseModel):
+    code: str
+    start_date: date
+    nickname: Optional[str] = None
+    cover_url: Optional[str] = None
+

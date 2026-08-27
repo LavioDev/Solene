@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { HeatmapDayItem } from '@/types/mood'
 import { getMoodByScore } from '@/constants/moods'
+import { Calendar } from 'lucide-vue-next'
 
 const props = defineProps<{
   days: HeatmapDayItem[]
@@ -29,12 +30,15 @@ interface WeekColumn {
   days: (HeatmapDayItem | null)[] // 7 rows (0=Sun, 1=Mon, ..., 6=Sat)
 }
 
+const monthKeys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+
 const weeksGrid = computed<WeekColumn[]>(() => {
   if (!props.days || props.days.length === 0) return []
 
   const weeks: WeekColumn[] = []
   let currentWeek: (HeatmapDayItem | null)[] = new Array(7).fill(null)
   let lastMonth = -1
+  let currentWeekMonthLabel: string | undefined = undefined
   let weekIdx = 0
 
   props.days.forEach((dayItem) => {
@@ -44,11 +48,12 @@ const weeksGrid = computed<WeekColumn[]>(() => {
     const dayOfWeek = dateObj.getDay() // 0=Sun, 1=Mon, ..., 6=Sat
     const month = dateObj.getMonth()
 
-    let monthLabel: string | undefined = undefined
     if (month !== lastMonth) {
-      // New month label on this week
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-      monthLabel = monthNames[month]
+      const key = monthKeys[month]
+      const transKey = `mood.heatmap.months.${key}`
+      currentWeekMonthLabel = te(transKey)
+        ? t(transKey)
+        : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month]
       lastMonth = month
     }
 
@@ -58,15 +63,16 @@ const weeksGrid = computed<WeekColumn[]>(() => {
     if (dayOfWeek === 6) {
       weeks.push({
         weekIndex: weekIdx++,
-        monthLabel,
+        monthLabel: currentWeekMonthLabel,
         days: [...currentWeek],
       })
       currentWeek = new Array(7).fill(null)
+      currentWeekMonthLabel = undefined
     } else if (month === 11 && d === 31) {
       // Last day of year
       weeks.push({
         weekIndex: weekIdx++,
-        monthLabel,
+        monthLabel: currentWeekMonthLabel,
         days: [...currentWeek],
       })
     }
@@ -141,8 +147,11 @@ function getMoodTagLabel(day: HeatmapDayItem): string {
 <template>
   <div class="bg-white text-ink rounded-2xl p-5 sm:p-6 border border-border/80 shadow-card overflow-hidden">
     <!-- Header info bar inside heatmap -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-border/60">
-      <div class="flex items-center gap-2">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5 pb-3.5 border-b border-border/60">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-violet-100/70 text-violet-600 flex items-center justify-center shrink-0">
+          <Calendar class="w-4 h-4" />
+        </div>
         <h3 class="text-sm font-bold text-ink tracking-tight font-sans">
           {{ t('mood.heatmap.title') }} — {{ year }}
         </h3>
@@ -152,45 +161,51 @@ function getMoodTagLabel(day: HeatmapDayItem): string {
       </p>
     </div>
 
-    <!-- Heatmap Matrix Scroll Area -->
-    <div class="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-violet-200">
-      <div class="inline-block min-w-full">
-        <!-- Month Headers -->
-        <div class="flex ml-8 mb-1.5 text-[10px] sm:text-[11px] font-semibold text-ink-muted select-none">
+    <!-- Heatmap Matrix Scroll Area (Always Centered) -->
+    <div class="w-full overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-violet-200">
+      <div class="w-fit mx-auto min-w-max py-1">
+        <!-- Month Headers (Exact week-aligned) -->
+        <div class="flex items-center gap-1 sm:gap-1.5 ml-7 sm:ml-8 mb-2 h-4 select-none">
           <div
             v-for="col in weeksGrid"
             :key="`m-${col.weekIndex}`"
-            class="w-3 sm:w-3.5 mr-1 text-left shrink-0"
+            class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 relative flex items-center"
           >
+            <span
+              v-if="col.monthLabel"
+              class="absolute left-0 top-0 text-[10px] sm:text-[11px] font-semibold text-ink-muted whitespace-nowrap leading-none"
+            >
+              {{ col.monthLabel }}
+            </span>
           </div>
         </div>
 
-        <!-- Heatmap Grid (7 rows Mon..Sun) -->
+        <!-- Heatmap Grid (7 rows Sun..Sat) -->
         <div class="flex items-start">
-          <!-- Weekday Row Labels (Mon=1, Wed=3, Fri=5) -->
-          <div class="w-8 flex flex-col justify-between pr-2 text-[10px] font-medium text-ink-faint select-none shrink-0 py-0.5">
-            <span class="h-3 sm:h-3.5 leading-3"></span>
-            <span class="h-3 sm:h-3.5 leading-3">{{ t('mood.heatmap.mon') }}</span>
-            <span class="h-3 sm:h-3.5 leading-3"></span>
-            <span class="h-3 sm:h-3.5 leading-3">{{ t('mood.heatmap.wed') }}</span>
-            <span class="h-3 sm:h-3.5 leading-3"></span>
-            <span class="h-3 sm:h-3.5 leading-3">{{ t('mood.heatmap.fri') }}</span>
-            <span class="h-3 sm:h-3.5 leading-3"></span>
+          <!-- Weekday Row Labels (Mon=1, Wed=3, Fri=5 with matching heights) -->
+          <div class="w-7 sm:w-8 flex flex-col gap-1 sm:gap-1.5 pr-2 text-[10px] font-medium text-ink-faint select-none shrink-0">
+            <span class="h-3.5 sm:h-4 flex items-center justify-end leading-none"></span>
+            <span class="h-3.5 sm:h-4 flex items-center justify-end leading-none text-ink-muted">{{ t('mood.heatmap.mon') }}</span>
+            <span class="h-3.5 sm:h-4 flex items-center justify-end leading-none"></span>
+            <span class="h-3.5 sm:h-4 flex items-center justify-end leading-none text-ink-muted">{{ t('mood.heatmap.wed') }}</span>
+            <span class="h-3.5 sm:h-4 flex items-center justify-end leading-none"></span>
+            <span class="h-3.5 sm:h-4 flex items-center justify-end leading-none text-ink-muted">{{ t('mood.heatmap.fri') }}</span>
+            <span class="h-3.5 sm:h-4 flex items-center justify-end leading-none"></span>
           </div>
 
           <!-- 53 Week Columns -->
-          <div class="flex gap-1 shrink-0">
+          <div class="flex gap-1 sm:gap-1.5 shrink-0">
             <div
               v-for="col in weeksGrid"
               :key="`col-${col.weekIndex}`"
-              class="flex flex-col gap-1 shrink-0"
+              class="flex flex-col gap-1 sm:gap-1.5 shrink-0"
             >
               <!-- 7 Day Cells in each column (0=Sun, 1=Mon, ..., 6=Sat) -->
               <div
                 v-for="(day, dayIdx) in col.days"
                 :key="`d-${col.weekIndex}-${dayIdx}`"
                 :class="[
-                  'w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-[3px] transition-transform duration-100',
+                  'w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3.5px] sm:rounded-[4px] transition-all duration-150',
                   getCellColorClass(day),
                   day && day.is_today ? 'ring-2 ring-violet-600 ring-offset-1 ring-offset-white' : '',
                   day ? 'cursor-pointer hover:scale-125 hover:z-20 shadow-2xs' : ''
@@ -206,10 +221,10 @@ function getMoodTagLabel(day: HeatmapDayItem): string {
     </div>
 
     <!-- Footer Legend Bar -->
-    <div class="flex flex-wrap items-center justify-between text-xs text-ink-muted mt-4 pt-3 border-t border-border/60 gap-2 select-none">
+    <div class="flex flex-wrap items-center justify-between text-xs text-ink-muted mt-5 pt-3.5 border-t border-border/60 gap-2 select-none">
       <div class="flex items-center gap-3">
         <span class="inline-flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded-[3px] bg-slate-100 border border-slate-200"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-slate-100 border border-slate-200"></span>
           <span>{{ t('mood.heatmap.unlogged') }}</span>
         </span>
         <span class="text-border">•</span>
@@ -222,12 +237,12 @@ function getMoodTagLabel(day: HeatmapDayItem): string {
       <div class="flex items-center gap-1.5 font-medium">
         <span>{{ t('mood.heatmap.less') }}</span>
         <div class="flex gap-1 items-center px-1">
-          <span class="w-3 h-3 rounded-[3px] bg-slate-100 border border-slate-200" title="0"></span>
-          <span class="w-3 h-3 rounded-[3px] bg-violet-100 border border-violet-200" title="1-2"></span>
-          <span class="w-3 h-3 rounded-[3px] bg-violet-200 border border-violet-300" title="3-4"></span>
-          <span class="w-3 h-3 rounded-[3px] bg-violet-400 border border-violet-400" title="5-6"></span>
-          <span class="w-3 h-3 rounded-[3px] bg-violet-600 border border-violet-600" title="7-8"></span>
-          <span class="w-3 h-3 rounded-[3px] bg-purple-600 border border-purple-600" title="9-10"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-slate-100 border border-slate-200" title="0"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-violet-100 border border-violet-200" title="1-2"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-violet-200 border border-violet-300" title="3-4"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-violet-400 border border-violet-400" title="5-6"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-violet-600 border border-violet-600" title="7-8"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-purple-600 border border-purple-600" title="9-10"></span>
         </div>
         <span>{{ t('mood.heatmap.more') }}</span>
       </div>

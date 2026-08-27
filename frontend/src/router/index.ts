@@ -11,7 +11,13 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresGuest: true },
   },
   {
+    path: '/pair',
+    name: 'Pair',
+    component: () => import('@/modules/couples/views/PairView.vue'),
+  },
+  {
     path: '/',
+
     component: AppLayout,
     meta: { requiresAuth: true },
     children: [
