@@ -15,7 +15,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="p-5 rounded-2xl bg-white border border-border/60 shadow-2xs space-y-3">
+  <div class="p-4 sm:p-5 rounded-2xl bg-white border border-border/60 shadow-2xs space-y-3">
     <!-- Header -->
     <div class="flex items-center justify-between border-b border-border/40 pb-3">
       <h2 class="text-xs font-bold uppercase tracking-wider text-ink font-mono flex items-center gap-1.5">

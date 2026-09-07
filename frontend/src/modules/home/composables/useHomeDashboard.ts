@@ -250,12 +250,17 @@ export function useHomeDashboard() {
 
   async function refreshPartnerStatusOnly() {
     isRefreshingPartner.value = true
+    const startTime = Date.now()
     try {
       partnerStatus.value = await taskService.getPartnerActiveStatus()
       await moodStore.fetchTodayMood()
     } catch {
       // catch background polling error
     } finally {
+      const elapsed = Date.now() - startTime
+      if (elapsed < 500) {
+        await new Promise((resolve) => setTimeout(resolve, 500 - elapsed))
+      }
       isRefreshingPartner.value = false
     }
   }

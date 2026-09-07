@@ -113,7 +113,7 @@ function formatDateDisplay(dateStr?: string): string {
       <!-- Actions -->
       <div class="flex justify-end pt-2">
         <AppButton variant="secondary" size="sm" @click="emit('close')">
-          Close
+          {{ t('common.close') }}
         </AppButton>
       </div>
     </div>

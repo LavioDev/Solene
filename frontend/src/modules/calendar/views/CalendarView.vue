@@ -573,11 +573,11 @@ async function confirmDeleteEvent() {
       </div>
     </div>
 
-    <!-- SUB-VIEW 1: Calendar Grid Mode Card Container -->
-    <div
-      v-if="mainViewMode === 'calendar'"
-      class="w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[600px] h-[calc(100vh-210px)]"
-    >
+    <!-- SUB-VIEW 1: Calendar Grid Mode Card Container (Wrapped in responsive overflow container) -->
+    <div v-if="mainViewMode === 'calendar'" class="w-full max-w-full overflow-x-auto pb-2">
+      <div
+        class="min-w-[800px] w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[600px] h-[calc(100vh-210px)]"
+      >
       <!-- Header Toolbar inside calendar card -->
       <div class="h-14 px-6 border-b border-border/60 flex items-center justify-between bg-white shrink-0">
 
@@ -664,11 +664,9 @@ async function confirmDeleteEvent() {
 
       </div>
 
-      <!-- Scrollable Calendar Grid Area -->
-      <div class="flex-1 overflow-x-auto flex flex-col">
-        <div class="flex-1 flex flex-col min-w-[800px]">
-
-          <!-- Weekdays Header Row -->
+      <!-- Calendar Grid Area -->
+      <div class="flex-1 flex flex-col min-h-0">
+        <!-- Weekdays Header Row -->
           <div class="grid grid-cols-7 border-b border-border/60 bg-surface-subtle/40 shrink-0">
             <div
               v-for="wd in weekDays"

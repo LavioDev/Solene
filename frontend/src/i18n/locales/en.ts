@@ -390,6 +390,8 @@ export default {
     copy: 'Copy',
     copied: 'Copied!',
     close: 'Close',
+    maximize: 'Maximize to full screen',
+    restore: 'Restore',
     pagination: {
       showing: 'Showing {start} to {end} of {total} entries',
       prev: 'Previous',

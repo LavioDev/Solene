@@ -51,14 +51,14 @@ const myUser = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-4 pb-3 border-b border-border/60 select-none">
+  <div class="flex items-center justify-between gap-3 sm:gap-4 pb-3 border-b border-border/60 select-none">
     <!-- Left Group: Couple Avatars (Tôi bên trái, Đối phương bên phải & nằm đè bên trên) + Nickname -->
-    <div class="flex items-center gap-3 min-w-0">
-      <div v-if="couple" class="flex items-center gap-3 shrink-0">
+    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+      <div v-if="couple" class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
         <!-- 2 Overlapping Avatars: Tôi bên trái (z-10), Đối phương bên phải & đè lên trên (z-20) -->
         <div class="relative flex items-center shrink-0">
           <!-- 1. My Avatar (Bên trái, z-10) -->
-          <div class="relative w-9 h-9 rounded-full bg-violet-600 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-2xs z-10">
+          <div class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-violet-600 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-2xs z-10">
             <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
               <img
                 v-if="myUser?.avatar_url"
@@ -72,7 +72,7 @@ const myUser = computed(() => {
 
           <!-- 2. Partner Avatar (Bên phải, nằm đè lên trên z-20, hover mọc duy nhất bong bóng suy nghĩ) -->
           <div
-            class="relative -ml-3.5 w-9 h-9 rounded-full bg-purple-500 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-md z-20 cursor-pointer transition-transform hover:scale-110 hover:z-30"
+            class="relative -ml-3 sm:-ml-3.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-purple-500 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-md z-20 cursor-pointer transition-transform hover:scale-110 hover:z-30"
             @mouseenter="isPartnerHovered = true"
             @mouseleave="isPartnerHovered = false"
           >
@@ -111,21 +111,21 @@ const myUser = computed(() => {
         </div>
 
         <!-- Couple Nickname & Since Date -->
-        <div>
-          <h1 class="text-sm font-bold text-ink flex items-center gap-1.5">
-            <span>{{ coupleNickname }}</span>
+        <div class="min-w-0 flex-1">
+          <h1 class="text-xs sm:text-sm font-bold text-ink flex items-center gap-1.5 truncate">
+            <span class="truncate">{{ coupleNickname }}</span>
           </h1>
-          <p class="text-[11px] text-ink-muted font-mono">
+          <p class="text-[10px] sm:text-[11px] text-ink-muted font-mono truncate">
             {{ t('home.since', { date: formattedStartDate }) }}
           </p>
         </div>
       </div>
 
       <!-- Fallback if No Couple Linked -->
-      <div v-if="!loading && !couple" class="flex items-center gap-2 text-xs text-ink-muted">
-        <Heart class="w-4 h-4 text-violet-500" />
-        <span>{{ t('home.noCoupleDesc') }}</span>
-        <AppButton size="sm" class="ml-2" @click="emit('link-couple')">
+      <div v-if="!loading && !couple" class="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
+        <Heart class="w-4 h-4 text-violet-500 shrink-0" />
+        <span class="truncate">{{ t('home.noCoupleDesc') }}</span>
+        <AppButton size="sm" class="ml-1 sm:ml-2" @click="emit('link-couple')">
           <Sparkles class="w-3.5 h-3.5 mr-1" />
           {{ t('home.linkCoupleBtn') }}
         </AppButton>
@@ -133,7 +133,7 @@ const myUser = computed(() => {
     </div>
 
     <!-- Right Controls: Nút Cảm xúc hôm nay (Sát phải) -->
-    <div class="flex items-center gap-2.5 ml-auto shrink-0">
+    <div class="flex items-center gap-2 sm:gap-2.5 ml-auto shrink-0">
       <div
         class="relative inline-flex items-center"
         @mouseenter="isMoodHovered = true"
@@ -141,7 +141,7 @@ const myUser = computed(() => {
       >
         <button
           type="button"
-          class="relative flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-200 cursor-pointer text-xs select-none shadow-md"
+          class="relative flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-2xl border transition-all duration-200 cursor-pointer text-xs select-none shadow-md"
           :class="[
             isMoodOpen
               ? 'bg-violet-600 text-white border-violet-600 shadow-violet-500/20 ring-2 ring-violet-400/30 font-bold scale-102 -translate-y-0.5'
@@ -177,7 +177,7 @@ const myUser = computed(() => {
         <Transition name="bubble-pop">
           <div
             v-if="isMoodHovered && myMood?.note && !isMoodOpen"
-            class="absolute right-0 top-full mt-2.5 w-72 p-3 rounded-2xl bg-white/98 backdrop-blur-xl border border-violet-200/90 shadow-xl shadow-violet-900/10 z-30 text-left pointer-events-none"
+            class="absolute right-0 top-full mt-2.5 w-64 sm:w-72 max-w-[calc(100vw-2rem)] p-3 rounded-2xl bg-white/98 backdrop-blur-xl border border-violet-200/90 shadow-xl shadow-violet-900/10 z-30 text-left pointer-events-none"
           >
             <div class="flex items-center justify-between gap-2 pb-1.5 border-b border-border/50 mb-1.5">
               <div class="flex items-center gap-1.5 min-w-0">

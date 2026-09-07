@@ -143,9 +143,6 @@ onMounted(() => {
             <h3 class="text-sm font-bold text-ink leading-tight font-sans">
               {{ t('mood.title') }}
             </h3>
-            <p class="text-xs text-ink-muted">
-              {{ t('mood.howAreYouFeeling') }}
-            </p>
           </div>
         </div>
 
@@ -164,14 +161,14 @@ onMounted(() => {
           </div>
 
           <!-- View Annual Heatmap Button -->
-          <button
+          <!-- <button
             type="button"
             class="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 hover:text-violet-900 bg-violet-50 hover:bg-violet-100 px-3 py-1.5 rounded-xl border border-violet-200 transition-colors cursor-pointer"
             @click="navigateToHeatmap"
           >
             <span>{{ t('mood.viewHeatmap') }}</span>
             <ChevronRight class="w-3.5 h-3.5" />
-          </button>
+          </button> -->
         </div>
       </div>
     </template>
@@ -277,12 +274,12 @@ onMounted(() => {
             size="sm"
             @click="emit('close')"
           >
-            Đóng
+            {{ t('common.close') }}
           </AppButton>
           <AppButton
             variant="primary"
             size="sm"
-            :loading="isSaving"
+            :disabled="isSaving"
             @click="() => saveMood()"
           >
             <Send class="w-3.5 h-3.5 mr-1" />

@@ -390,6 +390,8 @@ export default {
     copy: 'Sao chép',
     copied: 'Đã sao chép!',
     close: 'Đóng',
+    maximize: 'Phóng to toàn màn hình',
+    restore: 'Thu nhỏ',
     pagination: {
       showing: 'Hiển thị {start} đến {end} trên tổng số {total} mục',
       prev: 'Trước',

@@ -11,7 +11,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="pt-2 flex items-center justify-center gap-3">
+  <div class="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
     <AppButton
       variant="secondary"
       size="sm"

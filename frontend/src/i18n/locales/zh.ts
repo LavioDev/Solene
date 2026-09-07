@@ -390,6 +390,8 @@ export default {
     copy: '复制',
     copied: '已复制！',
     close: '关闭',
+    maximize: '全屏最大化',
+    restore: '还原',
     pagination: {
       showing: '显示第 {start} 至 {end} 项，共 {total} 项',
       prev: '上一页',

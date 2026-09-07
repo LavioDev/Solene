@@ -63,7 +63,7 @@ function navigateTo(path: string) {
       </div>
 
       <!-- 2. Main Dashboard (Màn hình chính mặc định) -->
-      <div v-else class="space-y-6 px-6 py-6 pb-12 min-w-[800px] max-w-5xl mx-auto">
+      <div v-else class="w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 sm:py-6 pb-12 space-y-5 sm:space-y-6">
         <!-- Top Bar: Couple Profile (Left) & Mood Button / Partner Active Status (Right) -->
         <HomeTopBar
           :couple="couple"
@@ -102,7 +102,7 @@ function navigateTo(path: string) {
         />
 
         <!-- White Cards: Today & Upcoming Events -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <!-- Column 1: Today's Events & Date Memories -->
           <HomeTodayEvents
             :occurrences="todayOccurrences"

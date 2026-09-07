@@ -391,6 +391,8 @@ export default {
     copy: 'Copier',
     copied: 'Copié !',
     close: 'Fermer',
+    maximize: 'Agrandir en plein écran',
+    restore: 'Réduire',
     pagination: {
       showing: 'Affichage de {start} à {end} sur {total} entrées',
       prev: 'Précédent',

@@ -3,19 +3,36 @@ import { ref } from 'vue'
 
 export const useUiStore = defineStore('ui', () => {
   const isSidebarCollapsed = ref(localStorage.getItem('solene_sidebar_collapsed') === 'true')
+  const isMobileSidebarOpen = ref(false)
   const isPageLoading = ref(false)
 
   let loadingStartTime = 0
   let loadingTimer: ReturnType<typeof setTimeout> | null = null
 
   function toggleSidebar() {
-    isSidebarCollapsed.value = !isSidebarCollapsed.value
-    localStorage.setItem('solene_sidebar_collapsed', String(isSidebarCollapsed.value))
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      isMobileSidebarOpen.value = !isMobileSidebarOpen.value
+    } else {
+      isSidebarCollapsed.value = !isSidebarCollapsed.value
+      localStorage.setItem('solene_sidebar_collapsed', String(isSidebarCollapsed.value))
+    }
   }
 
   function setSidebarCollapsed(collapsed: boolean) {
     isSidebarCollapsed.value = collapsed
     localStorage.setItem('solene_sidebar_collapsed', String(collapsed))
+  }
+
+  function openMobileSidebar() {
+    isMobileSidebarOpen.value = true
+  }
+
+  function closeMobileSidebar() {
+    isMobileSidebarOpen.value = false
+  }
+
+  function toggleMobileSidebar() {
+    isMobileSidebarOpen.value = !isMobileSidebarOpen.value
   }
 
   function startPageLoading() {
@@ -39,9 +56,13 @@ export const useUiStore = defineStore('ui', () => {
 
   return {
     isSidebarCollapsed,
+    isMobileSidebarOpen,
     isPageLoading,
     toggleSidebar,
     setSidebarCollapsed,
+    openMobileSidebar,
+    closeMobileSidebar,
+    toggleMobileSidebar,
     startPageLoading,
     stopPageLoading,
   }

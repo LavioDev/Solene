@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Maximize2, Minimize2, X } from 'lucide-vue-next'
+
+const { t } = useI18n()
 
 interface Props {
   show: boolean
@@ -164,7 +167,7 @@ const modalTransformStyle = computed(() => {
                 v-if="maximizable"
                 type="button"
                 class="text-ink-faint hover:text-violet-600 hover:bg-violet-50 rounded-lg p-1.5 transition-colors cursor-pointer"
-                :title="isMaximized ? 'Thu nhỏ' : 'Phóng to toàn màn hình'"
+                :title="isMaximized ? t('common.restore') : t('common.maximize')"
                 @click.stop="toggleMaximize"
               >
                 <Minimize2 v-if="isMaximized" class="w-4 h-4" />
@@ -176,7 +179,7 @@ const modalTransformStyle = computed(() => {
                 type="button"
                 class="text-ink-faint hover:text-ink hover:bg-surface-subtle rounded-lg p-1.5 transition-colors cursor-pointer"
                 @click.stop="emit('close')"
-                title="Đóng"
+                :title="t('common.close')"
               >
                 <X class="w-4 h-4" />
               </button>

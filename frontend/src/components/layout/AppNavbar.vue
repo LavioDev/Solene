@@ -113,6 +113,21 @@ async function handleLogout() {
   router.push('/login')
 }
 
+const isMobile = ref(false)
+
+function checkMobile() {
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.innerWidth < 1024
+  }
+}
+
+const sidebarToggleTitle = computed(() => {
+  if (isMobile.value) {
+    return uiStore.isMobileSidebarOpen ? t('nav.collapseSidebar') : t('nav.expandSidebar')
+  }
+  return uiStore.isSidebarCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')
+})
+
 // Click outside handling
 function handleClickOutside(e: MouseEvent) {
   const target = e.target as Node
@@ -125,26 +140,29 @@ function handleClickOutside(e: MouseEvent) {
 }
 
 onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('fullscreenchange', handleFullscreenChange)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile)
   document.removeEventListener('click', handleClickOutside)
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
 })
 </script>
 
 <template>
-  <header class="relative h-14 bg-white border-b border-border/60 flex items-center justify-between px-6 shrink-0 z-40 select-none">
+  <header class="relative h-14 bg-white border-b border-border/60 flex items-center justify-between px-3 sm:px-6 shrink-0 z-30 select-none">
 
     <!-- Left: Sidebar Toggle + Page Title / Breadcrumb -->
-    <div class="flex items-center gap-3.5">
+    <div class="flex items-center gap-2.5 sm:gap-3.5">
       <!-- Sidebar Toggle Icon Button -->
       <button
         type="button"
         @click="uiStore.toggleSidebar"
-        :title="uiStore.isSidebarCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')"
+        :title="sidebarToggleTitle"
         class="p-1.5 rounded-xl text-ink-muted hover:text-ink hover:bg-surface-raised transition-colors cursor-pointer border border-border/40 hover:border-border shadow-2xs"
       >
         <PanelLeft class="w-4 h-4 text-ink-muted hover:text-ink" />
@@ -153,20 +171,20 @@ onUnmounted(() => {
       <div class="h-4 w-px bg-border/60"></div>
 
       <!-- Page Title & Breadcrumb -->
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-bold text-ink tracking-tight capitalize">
+      <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+        <span class="text-xs sm:text-sm font-bold text-ink tracking-tight capitalize truncate max-w-[130px] sm:max-w-none">
           {{ pageTitle }}
         </span>
-        <span class="text-xs text-ink-faint">/</span>
-        <span class="text-xs text-ink-muted font-mono">solène</span>
+        <span class="hidden sm:inline text-xs text-ink-faint">/</span>
+        <span class="hidden sm:inline text-xs text-ink-muted font-mono">solène</span>
       </div>
     </div>
 
     <!-- Right: Nav Search Input + Lang Switcher Icon + Fullscreen F11 + User Avatar Icon -->
-    <div class="flex items-center gap-2.5">
+    <div class="flex items-center gap-1.5 sm:gap-2.5">
 
       <!-- 1. Quick Navigation Search Input -->
-      <div ref="searchContainerRef" class="relative">
+      <div ref="searchContainerRef" class="relative hidden sm:block">
         <div class="relative flex items-center">
           <Search class="w-3.5 h-3.5 text-ink-faint absolute left-3 pointer-events-none" />
           <input
@@ -221,7 +239,7 @@ onUnmounted(() => {
         </transition>
       </div>
 
-      <div class="h-4 w-px bg-border/60"></div>
+      <div class="hidden sm:block h-4 w-px bg-border/60"></div>
 
       <!-- 2. Language Switcher (Icon Only) -->
       <div class="flex items-center">
@@ -233,13 +251,13 @@ onUnmounted(() => {
         type="button"
         @click="toggleFullscreen"
         :title="isFullscreen ? t('nav.exitFullscreen') : t('nav.enterFullscreen')"
-        class="p-2 rounded-xl text-ink-muted hover:text-violet-600 hover:bg-surface-raised transition-colors cursor-pointer border border-transparent hover:border-border/60"
+        class="hidden sm:flex p-2 rounded-xl text-ink-muted hover:text-violet-600 hover:bg-surface-raised transition-colors cursor-pointer border border-transparent hover:border-border/60"
       >
         <Minimize v-if="isFullscreen" class="w-4 h-4" />
         <Maximize v-else class="w-4 h-4" />
       </button>
 
-      <div class="h-4 w-px bg-border/60"></div>
+      <div class="hidden sm:block h-4 w-px bg-border/60"></div>
 
       <!-- 4. User Avatar Icon & Dropdown Menu -->
       <div ref="userMenuRef" class="relative">

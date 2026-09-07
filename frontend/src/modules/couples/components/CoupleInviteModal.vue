@@ -75,12 +75,17 @@ async function fetchOrCreateInvitation() {
 async function handleRegenerate() {
   actionLoading.value = true
   errorMessage.value = null
+  const startTime = Date.now()
   try {
     invitation.value = await coupleService.createInvitation()
     startCountdown()
   } catch (err: any) {
     errorMessage.value = err.response?.data?.detail || t('couples.invite.createError')
   } finally {
+    const elapsed = Date.now() - startTime
+    if (elapsed < 500) {
+      await new Promise((resolve) => setTimeout(resolve, 500 - elapsed))
+    }
     actionLoading.value = false
   }
 }
@@ -88,6 +93,7 @@ async function handleRegenerate() {
 async function handleRevoke() {
   actionLoading.value = true
   errorMessage.value = null
+  const startTime = Date.now()
   try {
     await coupleService.revokeCurrentInvitation()
     invitation.value = null
@@ -95,6 +101,10 @@ async function handleRevoke() {
   } catch (err: any) {
     errorMessage.value = err.response?.data?.detail || t('couples.invite.revokeError')
   } finally {
+    const elapsed = Date.now() - startTime
+    if (elapsed < 500) {
+      await new Promise((resolve) => setTimeout(resolve, 500 - elapsed))
+    }
     actionLoading.value = false
   }
 }

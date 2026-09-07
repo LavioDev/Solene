@@ -84,40 +84,42 @@ onMounted(() => {
       </div>
 
       <!-- Controls: Year Selector & View Mode Switcher -->
-      <div class="flex flex-wrap items-center gap-3">
-        <!-- View Mode Segmented Pill -->
-        <div class="flex bg-surface-raised p-1 rounded-xl border border-border/80 text-xs font-medium">
-          <button
-            type="button"
-            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
-            :class="viewMode === 'my' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
-            @click="viewMode = 'my'"
-          >
-            <User class="w-4 h-4" />
-            <span class="text-xs">{{ t('mood.heatmap.myMood') }}</span>
-          </button>
-          <button
-            type="button"
-            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
-            :class="viewMode === 'partner' ? 'bg-white text-pink-600 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
-            @click="viewMode = 'partner'"
-          >
-            <Heart class="w-4 h-4" />
-            <span class="text-xs">{{ t('mood.heatmap.partnerMood') }}</span>
-          </button>
-          <button
-            type="button"
-            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
-            :class="viewMode === 'combined' ? 'bg-white text-emerald-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
-            @click="viewMode = 'combined'"
-          >
-            <Layers class="w-4 h-4" />
-            <span class="text-xs">{{ t('mood.heatmap.combinedMood') }}</span>
-          </button>
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full sm:w-auto">
+        <!-- View Mode Segmented Pill (Responsive scrollable tabs) -->
+        <div class="w-full sm:w-auto overflow-x-auto pb-1 max-w-full">
+          <div class="flex bg-surface-raised p-1 rounded-xl border border-border/80 text-xs font-medium shrink-0 w-max">
+            <button
+              type="button"
+              class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium shrink-0 whitespace-nowrap"
+              :class="viewMode === 'my' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+              @click="viewMode = 'my'"
+            >
+              <User class="w-4 h-4" />
+              <span class="text-xs">{{ t('mood.heatmap.myMood') }}</span>
+            </button>
+            <button
+              type="button"
+              class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium shrink-0 whitespace-nowrap"
+              :class="viewMode === 'partner' ? 'bg-white text-pink-600 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+              @click="viewMode = 'partner'"
+            >
+              <Heart class="w-4 h-4" />
+              <span class="text-xs">{{ t('mood.heatmap.partnerMood') }}</span>
+            </button>
+            <button
+              type="button"
+              class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium shrink-0 whitespace-nowrap"
+              :class="viewMode === 'combined' ? 'bg-white text-emerald-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+              @click="viewMode = 'combined'"
+            >
+              <Layers class="w-4 h-4" />
+              <span class="text-xs">{{ t('mood.heatmap.combinedMood') }}</span>
+            </button>
+          </div>
         </div>
 
         <!-- Year Selector -->
-        <div class="w-24">
+        <div class="w-24 shrink-0">
           <AppSelect
             :model-value="selectedYear"
             :options="yearOptions"
@@ -169,7 +171,7 @@ onMounted(() => {
                 </span>
               </div>
               <p v-if="item.note" class="text-ink-muted text-xs leading-relaxed whitespace-pre-wrap font-sans italic pt-0.5">
-                “{{ item.note }}”
+                {{ item.note }}
               </p>
             </div>
           </div>

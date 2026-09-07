@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/authStore'
@@ -17,6 +17,7 @@ import {
   Sparkles,
   ShieldCheck,
   ChevronDown,
+  X,
 } from 'lucide-vue-next'
 import AppLangSwitcher from '@/components/ui/AppLangSwitcher.vue'
 import faviconImg from '@/img/favicon.png'
@@ -28,6 +29,38 @@ const uiStore = useUiStore()
 const { t } = useI18n()
 
 const isManagementOpen = ref(true)
+const isMobile = ref(false)
+
+function updateMobileState() {
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.innerWidth < 1024
+    if (!isMobile.value && uiStore.isMobileSidebarOpen) {
+      uiStore.closeMobileSidebar()
+    }
+  }
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && uiStore.isMobileSidebarOpen) {
+    uiStore.closeMobileSidebar()
+  }
+}
+
+onMounted(() => {
+  updateMobileState()
+  window.addEventListener('resize', updateMobileState)
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateMobileState)
+  window.removeEventListener('keydown', handleKeydown)
+})
+
+const isEffectivelyCollapsed = computed(() => {
+  if (isMobile.value) return false
+  return uiStore.isSidebarCollapsed
+})
 
 const primaryNavigation = computed(() => [
   { name: t('nav.home'),     path: '/',         icon: Home },
@@ -58,6 +91,9 @@ watch(
     if (path.startsWith('/couples') || path.startsWith('/users')) {
       isManagementOpen.value = true
     }
+    if (uiStore.isMobileSidebarOpen) {
+      uiStore.closeMobileSidebar()
+    }
   },
   { immediate: true }
 )
@@ -75,18 +111,23 @@ async function handleLogout() {
 
 <template>
   <aside
-    class="bg-white border-r border-border/80 flex flex-col h-screen sticky top-0 shrink-0 select-none z-30 transition-all duration-300 ease-in-out"
-    :class="uiStore.isSidebarCollapsed ? 'w-16' : 'w-60'"
+    class="bg-white border-r border-border/80 flex flex-col h-screen select-none transition-all duration-300 ease-in-out fixed inset-y-0 left-0 z-50 lg:static lg:top-0 lg:shrink-0 lg:z-30"
+    :class="[
+      uiStore.isMobileSidebarOpen
+        ? 'translate-x-0 shadow-2xl pointer-events-auto'
+        : '-translate-x-full lg:translate-x-0 pointer-events-none lg:pointer-events-auto',
+      isEffectivelyCollapsed ? 'w-16' : 'w-64 lg:w-60'
+    ]"
   >
 
     <!-- Wordmark / Brand Header -->
     <div
       class="h-14 flex items-center border-b border-border/60 transition-all"
-      :class="uiStore.isSidebarCollapsed ? 'justify-center px-2' : 'px-5'"
+      :class="isEffectivelyCollapsed ? 'justify-center px-2' : 'px-5 justify-between'"
     >
       <router-link to="/" class="group flex items-center gap-2">
         <span
-          v-if="!uiStore.isSidebarCollapsed"
+          v-if="!isEffectivelyCollapsed"
           class="select-none tracking-tight text-ink font-bold text-lg group-hover:text-violet-700 transition-colors inline-flex items-center gap-1.5"
           style="font-family: 'Plus Jakarta Sans', sans-serif;"
         >
@@ -101,6 +142,17 @@ async function handleLogout() {
           title="Solène"
         />
       </router-link>
+
+      <!-- Close button on mobile drawer -->
+      <button
+        v-if="isMobile"
+        type="button"
+        @click="uiStore.closeMobileSidebar"
+        class="p-1.5 rounded-xl text-ink-muted hover:text-ink hover:bg-surface-raised transition-colors cursor-pointer"
+        :title="t('nav.collapseSidebar')"
+      >
+        <X class="w-4 h-4" />
+      </button>
     </div>
 
     <!-- Navigation Links -->
@@ -113,7 +165,7 @@ async function handleLogout() {
         :title="item.name"
         class="flex items-center rounded-xl text-xs sm:text-sm transition-all"
         :class="[
-          uiStore.isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-2.5 px-3 py-2',
+          isEffectivelyCollapsed ? 'justify-center p-2.5' : 'gap-2.5 px-3 py-2',
           isActive(item.path)
             ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
             : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-normal'
@@ -124,17 +176,17 @@ async function handleLogout() {
           class="w-4 h-4 shrink-0"
           :class="isActive(item.path) ? 'text-violet-600' : 'text-ink-faint'"
         />
-        <span v-if="!uiStore.isSidebarCollapsed" class="truncate">{{ item.name }}</span>
+        <span v-if="!isEffectivelyCollapsed" class="truncate">{{ item.name }}</span>
         <!-- Active indicator -->
         <span
-          v-if="!uiStore.isSidebarCollapsed && isActive(item.path)"
+          v-if="!isEffectivelyCollapsed && isActive(item.path)"
           class="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500"
         />
       </router-link>
 
       <!-- Grouped Management Navigation (Couples & Users) -->
       <!-- Case A: Expanded Sidebar -->
-      <div v-if="!uiStore.isSidebarCollapsed && managementChildren.length > 0" class="pt-1.5">
+      <div v-if="!isEffectivelyCollapsed && managementChildren.length > 0" class="pt-1.5">
         <!-- Parent Collapsible Button -->
         <button
           type="button"
@@ -192,7 +244,7 @@ async function handleLogout() {
       </div>
 
       <!-- Case B: Collapsed Sidebar (Flyout popover on hover) -->
-      <div v-else-if="uiStore.isSidebarCollapsed && managementChildren.length > 0" class="pt-1 relative group/popover">
+      <div v-else-if="isEffectivelyCollapsed && managementChildren.length > 0" class="pt-1 relative group/popover">
         <button
           type="button"
           class="w-full flex items-center justify-center p-2.5 rounded-xl text-xs transition-all cursor-pointer"
@@ -241,19 +293,19 @@ async function handleLogout() {
     <!-- Bottom Minimal Section: Language & Account (Expanded vs Collapsed) -->
     <div
       class="p-2 border-t border-border/60 mt-auto bg-surface-subtle/30 space-y-1 transition-all"
-      :class="uiStore.isSidebarCollapsed ? 'flex flex-col items-center' : ''"
+      :class="isEffectivelyCollapsed ? 'flex flex-col items-center' : ''"
     >
 
       <!-- Language Selector -->
       <AppLangSwitcher
-        :collapsed="uiStore.isSidebarCollapsed"
+        :collapsed="isEffectivelyCollapsed"
         direction="up"
-        :align="uiStore.isSidebarCollapsed ? 'left' : 'left'"
+        :align="isEffectivelyCollapsed ? 'left' : 'left'"
       />
 
       <!-- User Account Row (Expanded) -->
       <div
-        v-if="!uiStore.isSidebarCollapsed && authStore.user"
+        v-if="!isEffectivelyCollapsed && authStore.user"
         class="flex items-center justify-between p-1.5 pl-2 rounded-xl hover:bg-surface-raised/80 transition-colors group"
       >
         <router-link to="/profile" class="flex items-center gap-2 min-w-0 flex-1 group/user" :title="t('nav.profile')">
@@ -285,7 +337,7 @@ async function handleLogout() {
 
       <!-- User Account Row (Collapsed) -->
       <div
-        v-else-if="uiStore.isSidebarCollapsed && authStore.user"
+        v-else-if="isEffectivelyCollapsed && authStore.user"
         class="flex flex-col items-center gap-1 pt-1"
       >
         <router-link

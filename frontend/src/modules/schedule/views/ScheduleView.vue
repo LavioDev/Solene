@@ -174,13 +174,13 @@ onMounted(() => {
         </p>
       </div>
 
-      <!-- Controls: View Mode Segmented Pill (Chuẩn 1:1 theo MoodsView) -->
-      <div class="flex items-center gap-3">
+      <!-- Controls: View Mode Segmented Pill (Responsive scrollable tabs) -->
+      <div class="w-full sm:w-auto overflow-x-auto pb-1 max-w-full">
         <!-- View Mode Segmented Pill -->
-        <div class="flex bg-surface-raised p-1 rounded-xl border border-border/80 text-xs font-medium shrink-0">
+        <div class="flex bg-surface-raised p-1 rounded-xl border border-border/80 text-xs font-medium shrink-0 w-max">
           <button
             type="button"
-            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
+            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium shrink-0 whitespace-nowrap"
             :class="viewMode === 'my' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
             @click="viewMode = 'my'"
           >
@@ -190,7 +190,7 @@ onMounted(() => {
 
           <button
             type="button"
-            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
+            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium shrink-0 whitespace-nowrap"
             :class="viewMode === 'partner' ? 'bg-white text-pink-600 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
             @click="viewMode = 'partner'"
           >
@@ -200,7 +200,7 @@ onMounted(() => {
 
           <button
             type="button"
-            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
+            class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium shrink-0 whitespace-nowrap"
             :class="viewMode === 'combined' ? 'bg-white text-emerald-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
             @click="viewMode = 'combined'"
           >
@@ -211,8 +211,9 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Main Card Container (Đảm bảo chiều cao tối thiểu min-h-[600px] và mở rộng chiều ngang) -->
-    <div class="w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[600px] h-[calc(100vh-210px)]">
+    <!-- Main Card Container (Wrapped in responsive overflow container) -->
+    <div class="w-full max-w-full overflow-x-auto pb-2">
+      <div class="min-w-[800px] w-full flex flex-col bg-white border border-border rounded-2xl shadow-card overflow-hidden min-h-[600px] h-[calc(100vh-210px)]">
 
       <!-- Header Toolbar inside card -->
       <div class="h-14 px-6 border-b border-border/60 flex items-center justify-between bg-white shrink-0">
@@ -291,6 +292,7 @@ onMounted(() => {
       </div>
 
     </div>
+  </div>
 
     <!-- Modal: Independent Day Tasks Modal -->
     <AppModal
