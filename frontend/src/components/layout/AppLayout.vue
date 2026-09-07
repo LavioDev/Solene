@@ -13,7 +13,7 @@ const uiStore = useUiStore()
 </script>
 
 <template>
-  <div class="flex h-screen bg-surface-subtle overflow-hidden relative">
+  <div class="fixed inset-0 lg:relative lg:inset-auto flex h-full lg:h-screen w-full bg-surface-subtle overflow-hidden">
     <!-- Backdrop overlay for mobile drawer -->
     <transition
       enter-active-class="transition-opacity duration-300 ease-out"
@@ -31,15 +31,15 @@ const uiStore = useUiStore()
     </transition>
 
     <AppSidebar v-if="!tabStore.isContentFullscreen" />
-    <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
-      <AppNavbar v-if="!tabStore.isContentFullscreen" class="relative z-30" />
+    <div class="flex flex-col flex-1 min-w-0 h-full overflow-hidden">
+      <AppNavbar v-if="!tabStore.isContentFullscreen" class="shrink-0 w-full z-30 lg:relative" />
       <!-- Vben-style Multiple Tabs Bar: hidden on small screens (< 1024px) -->
-      <AppTabBar class="hidden lg:flex relative z-20" />
-      <main class="flex-1 overflow-y-auto relative z-10">
+      <AppTabBar class="hidden lg:flex shrink-0 relative z-20" />
+      <main class="flex-1 min-h-0 overflow-y-auto relative z-10 overscroll-y-contain lg:overscroll-y-auto [webkit-overflow-scrolling:touch]">
         <!-- Page Transition Loading Overlay (minimum 500ms) -->
         <AppPageLoader :show="uiStore.isPageLoading" />
 
-        <div v-if="tabStore.reloadFlag">
+        <div v-if="tabStore.reloadFlag" class="min-h-full">
           <div v-if="route.name === 'Home'" class="h-full w-full">
             <router-view />
           </div>

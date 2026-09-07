@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useMoodStore } from '@/stores/moodStore'
 import { MOOD_DEFINITIONS, getMoodByScore } from '@/constants/moods'
@@ -9,7 +8,6 @@ import AppButton from '@/components/ui/AppButton.vue'
 import AppTextarea from '@/components/ui/AppTextarea.vue'
 import {
   Heart,
-  ChevronRight,
   Send,
   Trash2,
   CheckCircle2,
@@ -28,7 +26,6 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-const router = useRouter()
 const { t } = useI18n()
 const moodStore = useMoodStore()
 
@@ -116,11 +113,6 @@ async function handleDelete() {
     noteText.value = ''
     selectedScore.value = 7
   }
-}
-
-function navigateToHeatmap() {
-  emit('close')
-  router.push('/moods')
 }
 
 onMounted(() => {

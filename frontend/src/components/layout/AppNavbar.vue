@@ -154,7 +154,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="relative h-14 bg-white border-b border-border/60 flex items-center justify-between px-3 sm:px-6 shrink-0 z-30 select-none">
+  <header class="w-full h-14 bg-white border-b border-border/60 flex items-center justify-between px-3 sm:px-6 shrink-0 z-30 select-none">
 
     <!-- Left: Sidebar Toggle + Page Title / Breadcrumb -->
     <div class="flex items-center gap-2.5 sm:gap-3.5">
