@@ -91,7 +91,7 @@ onMounted(() => {
             <button
               type="button"
               class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium shrink-0 whitespace-nowrap"
-              :class="viewMode === 'my' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+              :class="viewMode === 'my' ? 'bg-white text-primary-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
               @click="viewMode = 'my'"
             >
               <User class="w-4 h-4" />
@@ -145,7 +145,7 @@ onMounted(() => {
     <div v-if="moodStore.moods.length > 0" class="p-5 rounded-2xl bg-white border border-border/80 shadow-card space-y-3">
       <div class="flex items-center justify-between pb-2.5 border-b border-border/50">
         <h3 class="text-xs font-bold uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
-          <Sparkles class="w-3.5 h-3.5 text-violet-600" />
+          <Sparkles class="w-3.5 h-3.5 text-primary-600" />
           <span>{{ t('mood.noteLabel') }}</span>
         </h3>
       </div>

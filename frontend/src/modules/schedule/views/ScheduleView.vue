@@ -181,7 +181,7 @@ onMounted(() => {
           <button
             type="button"
             class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium shrink-0 whitespace-nowrap"
-            :class="viewMode === 'my' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+            :class="viewMode === 'my' ? 'bg-white text-primary-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
             @click="viewMode = 'my'"
           >
             <User class="w-4 h-4" />
@@ -233,9 +233,9 @@ onMounted(() => {
             size="sm"
             @click="handleFocusNow"
             :title="t('calendar.gantt.focusNow')"
-            class="!px-2.5 !py-1 text-ink-muted hover:!text-violet-600 hover:!bg-violet-50"
+            class="!px-2.5 !py-1 text-ink-muted hover:!text-primary-600 hover:!bg-primary-50"
           >
-            <PawPrint class="w-4 h-4 text-violet-600" />
+            <PawPrint class="w-4 h-4 text-primary-600" />
           </AppButton>
           <!-- Add Task Icon Button -->
           <AppButton
@@ -243,7 +243,7 @@ onMounted(() => {
             size="sm"
             @click="handleGanttAddTask(ganttActiveDateStr)"
             :title="t('calendar.gantt.addTask')"
-            class="!px-2.5 !py-1 text-ink-muted hover:!text-violet-600 hover:!bg-violet-50"
+            class="!px-2.5 !py-1 text-ink-muted hover:!text-primary-600 hover:!bg-primary-50"
           >
             <Sparkles class="w-4 h-4 text-amber-500" />
           </AppButton>
@@ -321,7 +321,7 @@ onMounted(() => {
                 <input
                   type="time"
                   v-model="newTaskStartTime"
-                  class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-violet-300 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-400/20"
+                  class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-primary-300 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-400/20"
                 />
               </div>
             </div>
@@ -334,7 +334,7 @@ onMounted(() => {
                 <input
                   type="time"
                   v-model="newTaskEndTime"
-                  class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-violet-300 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-400/20"
+                  class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-primary-300 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-400/20"
                 />
               </div>
             </div>
@@ -374,7 +374,7 @@ onMounted(() => {
               :loading="addingTask"
               :disabled="!newTaskTitle.trim()"
               @click="handleCreateTaskForDay"
-              class="!bg-violet-600 hover:!bg-violet-700 text-white font-medium cursor-pointer"
+              class="!bg-primary-600 hover:!bg-primary-700 text-white font-medium cursor-pointer"
             >
               <Plus class="w-3.5 h-3.5 mr-1" />
               {{ t('calendar.tasks.addTask') }}

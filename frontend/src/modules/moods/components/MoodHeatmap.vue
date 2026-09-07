@@ -105,15 +105,15 @@ function getCellColorClass(day: HeatmapDayItem | null): string {
   const score = getEffectiveScore(day)
   if (!score || score < 1) {
     // Empty cell in clean pastel Solene theme
-    return 'bg-slate-100/80 border border-slate-200/70 hover:border-violet-400'
+    return 'bg-slate-100/80 border border-slate-200/70 hover:border-primary-400'
   }
 
-  // Solène Violet/Purple palette representing emotion intensity
-  if (score <= 2) return 'bg-violet-100 border border-violet-200'
-  if (score <= 4) return 'bg-violet-200 border border-violet-300'
-  if (score <= 6) return 'bg-violet-400 border border-violet-400'
-  if (score <= 8) return 'bg-violet-600 border border-violet-600'
-  return 'bg-purple-600 border border-purple-600 shadow-2xs' // 9-10 Awesome
+  // Solène palette representing emotion intensity
+  if (score <= 2) return 'bg-primary-100 border border-primary-200'
+  if (score <= 4) return 'bg-primary-200 border border-primary-300'
+  if (score <= 6) return 'bg-primary-400 border border-primary-400'
+  if (score <= 8) return 'bg-primary-600 border border-primary-600'
+  return 'bg-primary-800 border border-primary-800 shadow-2xs' // 9-10 Awesome
 }
 
 function handleMouseEnter(event: MouseEvent, day: HeatmapDayItem | null) {
@@ -149,7 +149,7 @@ function getMoodTagLabel(day: HeatmapDayItem): string {
     <!-- Header info bar inside heatmap -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5 pb-3.5 border-b border-border/60">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-violet-100/70 text-violet-600 flex items-center justify-center shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-primary-100/70 text-primary-600 flex items-center justify-center shrink-0">
           <Calendar class="w-4 h-4" />
         </div>
         <h3 class="text-sm font-bold text-ink tracking-tight font-sans">
@@ -162,7 +162,7 @@ function getMoodTagLabel(day: HeatmapDayItem): string {
     </div>
 
     <!-- Heatmap Matrix Scroll Area (Always Centered) -->
-    <div class="w-full overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-violet-200">
+    <div class="w-full overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary-200">
       <div class="w-fit mx-auto min-w-max py-1">
         <!-- Month Headers (Exact week-aligned) -->
         <div class="flex items-center gap-1 sm:gap-1.5 ml-7 sm:ml-8 mb-2 h-4 select-none">
@@ -207,7 +207,7 @@ function getMoodTagLabel(day: HeatmapDayItem): string {
                 :class="[
                   'w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3.5px] sm:rounded-[4px] transition-all duration-150',
                   getCellColorClass(day),
-                  day && day.is_today ? 'ring-2 ring-violet-600 ring-offset-1 ring-offset-white' : '',
+                  day && day.is_today ? 'ring-2 ring-primary-600 ring-offset-1 ring-offset-white' : '',
                   day ? 'cursor-pointer hover:scale-125 hover:z-20 shadow-2xs' : ''
                 ]"
                 @mouseenter="handleMouseEnter($event, day)"
@@ -238,11 +238,11 @@ function getMoodTagLabel(day: HeatmapDayItem): string {
         <span>{{ t('mood.heatmap.less') }}</span>
         <div class="flex gap-1 items-center px-1">
           <span class="w-3.5 h-3.5 rounded-[3.5px] bg-slate-100 border border-slate-200" title="0"></span>
-          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-violet-100 border border-violet-200" title="1-2"></span>
-          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-violet-200 border border-violet-300" title="3-4"></span>
-          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-violet-400 border border-violet-400" title="5-6"></span>
-          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-violet-600 border border-violet-600" title="7-8"></span>
-          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-purple-600 border border-purple-600" title="9-10"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-primary-100 border border-primary-200" title="1-2"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-primary-200 border border-primary-300" title="3-4"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-primary-400 border border-primary-400" title="5-6"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-primary-600 border border-primary-600" title="7-8"></span>
+          <span class="w-3.5 h-3.5 rounded-[3.5px] bg-primary-800 border border-primary-800" title="9-10"></span>
         </div>
         <span>{{ t('mood.heatmap.more') }}</span>
       </div>
@@ -253,13 +253,13 @@ function getMoodTagLabel(day: HeatmapDayItem): string {
       <Transition name="tooltip-fade">
         <div
           v-if="showTooltip && hoveredDay"
-          class="fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full px-3 py-2 bg-white text-xs rounded-xl shadow-lg shadow-violet-950/5 border border-border/80 max-w-[240px] space-y-1 select-none"
+          class="fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full px-3 py-2 bg-white text-xs rounded-xl shadow-lg shadow-primary-950/5 border border-border/80 max-w-[240px] space-y-1 select-none"
           :style="{ left: `${tooltipX}px`, top: `${tooltipY}px` }"
         >
           <!-- Top Row: Date & Today indicator -->
           <div class="flex items-center justify-between gap-2 text-[11px]">
             <span class="font-medium text-ink-muted">{{ formatDateDisplay(hoveredDay.date) }}</span>
-            <span v-if="hoveredDay.is_today" class="px-1.5 py-0.2 rounded-md text-[10px] font-semibold bg-violet-50 text-violet-700">
+            <span v-if="hoveredDay.is_today" class="px-1.5 py-0.2 rounded-md text-[10px] font-semibold bg-primary-50 text-primary-700">
               {{ t('calendar.today') }}
             </span>
             <span v-else-if="hoveredDay.is_locked" class="text-[10px] text-ink-faint">🔒</span>

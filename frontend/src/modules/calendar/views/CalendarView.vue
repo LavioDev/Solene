@@ -555,7 +555,7 @@ async function confirmDeleteEvent() {
             type="button"
             @click="mainViewMode = 'calendar'"
             class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
-            :class="mainViewMode === 'calendar' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+            :class="mainViewMode === 'calendar' ? 'bg-white text-primary-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
           >
             <CalendarIcon class="w-4 h-4" />
             <span class="text-xs">{{ t('calendar.subnav.calendar') }}</span>
@@ -564,7 +564,7 @@ async function confirmDeleteEvent() {
             type="button"
             @click="mainViewMode = 'list'"
             class="px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs font-medium"
-            :class="mainViewMode === 'list' ? 'bg-white text-violet-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
+            :class="mainViewMode === 'list' ? 'bg-white text-primary-700 font-semibold shadow-2xs' : 'text-ink-muted hover:text-ink'"
           >
             <List class="w-4 h-4" />
             <span class="text-xs">{{ t('calendar.subnav.list') }}</span>
@@ -604,7 +604,7 @@ async function confirmDeleteEvent() {
               size="sm"
               @click="viewMode = 'month'"
               class="px-2.5 py-1 text-xs sm:text-sm font-normal rounded-lg transition-all"
-              :class="viewMode === 'month' ? '!bg-white !text-violet-700 font-medium !shadow-2xs' : '!text-ink-muted'"
+              :class="viewMode === 'month' ? '!bg-white !text-primary-700 font-medium !shadow-2xs' : '!text-ink-muted'"
             >
               {{ t('calendar.monthView') }}
             </AppButton>
@@ -613,7 +613,7 @@ async function confirmDeleteEvent() {
               size="sm"
               @click="switchToCurrentWeek"
               class="px-2.5 py-1 text-xs sm:text-sm font-normal rounded-lg transition-all"
-              :class="viewMode === 'week' ? '!bg-white !text-violet-700 font-medium !shadow-2xs' : '!text-ink-muted'"
+              :class="viewMode === 'week' ? '!bg-white !text-primary-700 font-medium !shadow-2xs' : '!text-ink-muted'"
             >
               {{ t('calendar.weekView') }}
             </AppButton>
@@ -625,7 +625,7 @@ async function confirmDeleteEvent() {
             size="sm"
             @click="openAutoRuleModal"
             :title="t('calendar.autoGenerate')"
-            class="!px-2.5 !py-1 text-ink-muted hover:!text-violet-600 hover:!bg-violet-50"
+            class="!px-2.5 !py-1 text-ink-muted hover:!text-primary-600 hover:!bg-primary-50"
           >
             <Sparkles class="w-4 h-4 text-amber-500" />
           </AppButton>
@@ -687,8 +687,8 @@ async function confirmDeleteEvent() {
                 viewMode === 'week' ? 'min-h-[220px]' : 'min-h-[105px]',
                 !day.isCurrentMonth && viewMode === 'month'
                   ? 'bg-surface-subtle/40'
-                  : 'bg-white hover:bg-violet-50/30',
-                day.isToday ? 'bg-violet-50/50' : '',
+                  : 'bg-white hover:bg-primary-50/30',
+                day.isToday ? 'bg-primary-50/50' : '',
               ]"
             >
               <!-- Day number row -->
@@ -697,10 +697,10 @@ async function confirmDeleteEvent() {
                   class="w-6 h-6 rounded-full flex items-center justify-center text-xs sm:text-[13px] font-normal transition-all"
                   :class="[
                     day.isToday
-                      ? 'bg-violet-600 text-white font-medium'
+                      ? 'bg-primary-600 text-white font-medium'
                       : !day.isCurrentMonth && viewMode === 'month'
                         ? 'text-ink-faint'
-                        : 'text-ink-muted group-hover:text-violet-700',
+                        : 'text-ink-muted group-hover:text-primary-700',
                   ]"
                 >
                   {{ day.dayNumber }}
@@ -710,7 +710,7 @@ async function confirmDeleteEvent() {
                 <button
                   type="button"
                   @click.stop="openSingleDayModal(day)"
-                  class="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded-lg text-ink-faint hover:text-violet-600 hover:bg-white transition-all cursor-pointer"
+                  class="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center rounded-lg text-ink-faint hover:text-primary-600 hover:bg-white transition-all cursor-pointer"
                   :title="t('calendar.tabs.note')"
                 >
                   <Plus class="w-3.5 h-3.5" />
@@ -726,7 +726,7 @@ async function confirmDeleteEvent() {
                   class="px-2 py-1.5 rounded-md text-xs font-normal truncate flex items-center gap-1.5 cursor-pointer transition-opacity hover:opacity-85"
                   :class="[
                     evt.category === 'note'
-                      ? 'bg-violet-100/90 text-violet-800'
+                      ? 'bg-primary-100/90 text-primary-800'
                       : 'bg-rose-100/90 text-rose-700'
                   ]"
                 >
@@ -875,7 +875,7 @@ async function confirmDeleteEvent() {
                 <input
                   type="time"
                   v-model="newTaskStartTime"
-                  class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-violet-300 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-400/20"
+                  class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-primary-300 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-400/20"
                 />
               </div>
             </div>
@@ -888,7 +888,7 @@ async function confirmDeleteEvent() {
                 <input
                   type="time"
                   v-model="newTaskEndTime"
-                  class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-violet-300 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-400/20"
+                  class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-primary-300 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-400/20"
                 />
               </div>
             </div>
@@ -928,7 +928,7 @@ async function confirmDeleteEvent() {
               :loading="addingTask"
               :disabled="!newTaskTitle.trim()"
               @click="handleCreateTaskForDay"
-              class="!bg-violet-600 hover:!bg-violet-700 text-white font-medium cursor-pointer"
+              class="!bg-primary-600 hover:!bg-primary-700 text-white font-medium cursor-pointer"
             >
               <Plus class="w-3.5 h-3.5 mr-1" />
               {{ t('calendar.tasks.addTask') }}
@@ -962,7 +962,7 @@ async function confirmDeleteEvent() {
             <input
               type="time"
               v-model="editTaskStartTime"
-              class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-violet-300 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-400/20"
+              class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-primary-300 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-400/20"
             />
           </div>
 
@@ -973,7 +973,7 @@ async function confirmDeleteEvent() {
             <input
               type="time"
               v-model="editTaskEndTime"
-              class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-violet-300 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-400/20"
+              class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-primary-300 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-400/20"
             />
           </div>
 
@@ -1002,7 +1002,7 @@ async function confirmDeleteEvent() {
               <input
                 type="checkbox"
                 v-model="editTaskIsCompleted"
-                class="rounded text-violet-600 focus:ring-violet-500 w-4 h-4"
+                class="rounded text-primary-600 focus:ring-primary-500 w-4 h-4"
               />
               <span>{{ t('calendar.tasks.completed') }}</span>
             </label>

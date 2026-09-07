@@ -22,7 +22,7 @@ const { t } = useI18n()
         <Sparkles class="w-3.5 h-3.5 text-amber-500" />
         <span>{{ t('home.todayEvents.title') }}</span>
       </h2>
-      <span class="text-[11px] text-ink-faint font-mono">{{ formatDisplayDate(todayDateStr) }}</span>
+      <span class="hidden sm:inline text-[11px] text-ink-faint font-mono">{{ formatDisplayDate(todayDateStr) }}</span>
     </div>
 
     <!-- Today's List -->
@@ -32,7 +32,7 @@ const { t } = useI18n()
         :key="occ.event_id"
         class="p-2.5 rounded-xl hover:bg-surface-subtle transition-colors flex items-start gap-2.5"
       >
-        <div class="w-2 h-2 rounded-full bg-violet-600 mt-1 shrink-0"></div>
+        <div class="w-2 h-2 rounded-full bg-primary-600 mt-1 shrink-0"></div>
         <div class="min-w-0 flex-1">
           <p class="text-xs font-bold text-ink truncate">{{ occ.title }}</p>
           <p v-if="occ.milestone_info" class="text-[11px] text-ink-muted mt-0.5 line-clamp-1">

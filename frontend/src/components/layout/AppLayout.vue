@@ -6,6 +6,7 @@ import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AppNavbar from '@/components/layout/AppNavbar.vue'
 import AppTabBar from '@/components/layout/AppTabBar.vue'
 import AppPageLoader from '@/components/ui/AppPageLoader.vue'
+import AppPartnerNoteFab from '@/components/layout/AppPartnerNoteFab.vue'
 
 const route = useRoute()
 const tabStore = useTabStore()
@@ -49,5 +50,8 @@ const uiStore = useUiStore()
         </div>
       </main>
     </div>
+
+    <!-- Responsive Draggable Partner Note FAB & Modal (Hiện trên mọi màn khi ở chế độ responsive) -->
+    <AppPartnerNoteFab />
   </div>
 </template>

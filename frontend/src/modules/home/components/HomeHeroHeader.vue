@@ -34,7 +34,7 @@ const { t } = useI18n()
       <div class="flex items-center gap-3 mb-5 bg-white px-4 py-2 rounded-full border border-border/60 shadow-2xs">
         <!-- 2 Avatars overlapping -->
         <div class="flex items-center -space-x-2 shrink-0">
-          <div class="w-8 h-8 rounded-full bg-violet-600 text-white font-bold text-xs flex items-center justify-center overflow-hidden border-2 border-white shadow-2xs">
+          <div class="w-8 h-8 rounded-full bg-primary-600 text-white font-bold text-xs flex items-center justify-center overflow-hidden border-2 border-white shadow-2xs">
             <img
               v-if="couple.user1?.avatar_url"
               :src="couple.user1.avatar_url"
@@ -74,14 +74,14 @@ const { t } = useI18n()
       <!-- 2. Centered Wave Circle: Clean, Spacious, Focused on Days & Clock -->
       <div class="relative flex items-center justify-center my-3">
         <!-- Ambient Radiating Ripple Waves (Hiệu ứng sóng tỏa) -->
-        <div class="absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full border border-violet-400/35 animate-gentle-wave-1 pointer-events-none"></div>
-        <div class="absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full border border-purple-400/25 animate-gentle-wave-2 pointer-events-none"></div>
+        <div class="absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full border border-primary-400/35 animate-gentle-wave-1 pointer-events-none"></div>
+        <div class="absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full border border-primary-300/25 animate-gentle-wave-2 pointer-events-none"></div>
         <div class="absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full border border-rose-400/20 animate-gentle-wave-3 pointer-events-none"></div>
 
         <!-- Main Circular Core: Crisp White Card with Gentle Shadow -->
-        <div class="relative w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-white border border-border/60 shadow-lg shadow-violet-500/10 flex flex-col items-center justify-center p-6 text-center text-ink transition-transform duration-300 hover:scale-[1.02] z-10">
+        <div class="relative w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-white border border-border/60 shadow-lg shadow-primary-500/10 flex flex-col items-center justify-center p-6 text-center text-ink transition-transform duration-300 hover:scale-[1.02] z-10">
           <!-- Label -->
-          <p class="text-[10px] uppercase font-mono tracking-[0.24em] text-violet-700 font-bold mb-0.5">
+          <p class="text-[10px] uppercase font-mono tracking-[0.24em] text-primary-700 font-bold mb-0.5">
             {{ t('home.together') }}
           </p>
 
@@ -90,7 +90,7 @@ const { t } = useI18n()
             <span class="text-4xl sm:text-5xl font-extrabold text-ink tracking-tight font-sans">
               {{ days }}
             </span>
-            <span class="text-xs font-bold uppercase tracking-wider text-violet-700 font-mono">
+            <span class="text-xs font-bold uppercase tracking-wider text-primary-700 font-mono">
               {{ t('home.days') }}
             </span>
           </div>
@@ -113,9 +113,9 @@ const { t } = useI18n()
       v-else-if="!loading"
       class="relative flex items-center justify-center"
     >
-      <div class="absolute w-52 h-52 rounded-full border border-violet-400/25 animate-gentle-wave-1 pointer-events-none"></div>
-      <div class="relative w-52 h-52 rounded-full bg-white border border-border/60 shadow-lg shadow-violet-500/10 flex flex-col items-center justify-center p-5 text-center text-ink z-10 space-y-2.5">
-        <div class="w-10 h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-600">
+      <div class="absolute w-52 h-52 rounded-full border border-primary-400/25 animate-gentle-wave-1 pointer-events-none"></div>
+      <div class="relative w-52 h-52 rounded-full bg-white border border-border/60 shadow-lg shadow-primary-500/10 flex flex-col items-center justify-center p-5 text-center text-ink z-10 space-y-2.5">
+        <div class="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary-600">
           <Heart class="w-5 h-5" />
         </div>
         <p class="text-xs text-ink-muted max-w-[150px] leading-relaxed">

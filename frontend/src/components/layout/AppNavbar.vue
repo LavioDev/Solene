@@ -19,6 +19,7 @@ import {
 import { useUiStore } from '@/stores/uiStore'
 import { useAuthStore } from '@/stores/authStore'
 import AppLangSwitcher from '@/components/ui/AppLangSwitcher.vue'
+import AppThemeSwitcher from '@/components/ui/AppThemeSwitcher.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -195,7 +196,7 @@ onUnmounted(() => {
             @focus="isSearchOpen = true"
             @keydown.esc="isSearchOpen = false"
             @keydown.enter="filteredNavItems.length > 0 && navigateTo(filteredNavItems[0].path)"
-            class="w-36 focus:w-56 transition-all duration-200 pl-8 pr-3 py-1.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border/60 focus:border-violet-400 rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-violet-400/20"
+            class="w-36 focus:w-56 transition-all duration-200 pl-8 pr-3 py-1.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border/60 focus:border-primary-400 rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary-400/20"
           />
         </div>
 
@@ -221,13 +222,13 @@ onUnmounted(() => {
               :key="item.path"
               type="button"
               @click="navigateTo(item.path)"
-              class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-xs transition-colors hover:bg-violet-50 group cursor-pointer"
+              class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-xs transition-colors hover:bg-primary-50 group cursor-pointer"
             >
-              <div class="w-7 h-7 rounded-lg bg-surface-subtle group-hover:bg-violet-100 flex items-center justify-center text-ink-muted group-hover:text-violet-600 shrink-0">
+              <div class="w-7 h-7 rounded-lg bg-surface-subtle group-hover:bg-primary-100 flex items-center justify-center text-ink-muted group-hover:text-primary-600 shrink-0">
                 <component :is="item.icon" class="w-3.5 h-3.5" />
               </div>
               <div class="min-w-0 flex-1">
-                <p class="font-semibold text-ink group-hover:text-violet-700 truncate">{{ item.name }}</p>
+                <p class="font-semibold text-ink group-hover:text-primary-700 truncate">{{ item.name }}</p>
                 <p class="text-[10px] text-ink-faint font-mono truncate">{{ item.desc }}</p>
               </div>
             </button>
@@ -246,12 +247,19 @@ onUnmounted(() => {
         <AppLangSwitcher :collapsed="true" />
       </div>
 
-      <!-- 3. Fullscreen Toggle (F11 Zoom toàn màn hình) -->
+      <!-- 3. Theme Color Switcher (Icon Only) -->
+      <div class="flex items-center">
+        <AppThemeSwitcher />
+      </div>
+
+      <div class="hidden sm:block h-4 w-px bg-border/60"></div>
+
+      <!-- 4. Fullscreen Toggle (F11 Zoom toàn màn hình) -->
       <button
         type="button"
         @click="toggleFullscreen"
         :title="isFullscreen ? t('nav.exitFullscreen') : t('nav.enterFullscreen')"
-        class="hidden sm:flex p-2 rounded-xl text-ink-muted hover:text-violet-600 hover:bg-surface-raised transition-colors cursor-pointer border border-transparent hover:border-border/60"
+        class="hidden sm:flex p-2 rounded-xl text-ink-muted hover:text-primary-600 hover:bg-surface-raised transition-colors cursor-pointer border border-transparent hover:border-border/60"
       >
         <Minimize v-if="isFullscreen" class="w-4 h-4" />
         <Maximize v-else class="w-4 h-4" />
@@ -259,13 +267,13 @@ onUnmounted(() => {
 
       <div class="hidden sm:block h-4 w-px bg-border/60"></div>
 
-      <!-- 4. User Avatar Icon & Dropdown Menu -->
+      <!-- 5. User Avatar Icon & Dropdown Menu -->
       <div ref="userMenuRef" class="relative">
         <button
           type="button"
           @click.stop="showUserMenu = !showUserMenu"
           :title="authStore.user?.full_name || t('nav.account')"
-          class="w-8 h-8 rounded-full bg-violet-100 hover:bg-violet-200 border border-violet-200 flex items-center justify-center text-violet-700 font-bold text-xs transition-colors cursor-pointer overflow-hidden shadow-2xs"
+          class="w-8 h-8 rounded-full bg-primary-100 hover:bg-primary-200 border border-primary-200 flex items-center justify-center text-primary-700 font-bold text-xs transition-colors cursor-pointer overflow-hidden shadow-2xs"
         >
           <img
             v-if="authStore.user?.avatar_url"
@@ -295,7 +303,7 @@ onUnmounted(() => {
               @click="showUserMenu = false"
               class="flex items-center gap-2.5 pb-2.5 border-b border-border/60 hover:opacity-80 transition-opacity group cursor-pointer"
             >
-              <div class="w-8 h-8 rounded-xl bg-violet-100 border border-violet-200 flex items-center justify-center text-violet-700 font-bold text-xs shrink-0 group-hover:bg-violet-200 transition-colors overflow-hidden">
+              <div class="w-8 h-8 rounded-xl bg-primary-100 border border-primary-200 flex items-center justify-center text-primary-700 font-bold text-xs shrink-0 group-hover:bg-primary-200 transition-colors overflow-hidden">
                 <img
                   v-if="authStore.user.avatar_url"
                   :src="authStore.user.avatar_url"
@@ -305,7 +313,7 @@ onUnmounted(() => {
                 <UserIcon v-else class="w-4 h-4" />
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-bold text-ink truncate leading-tight group-hover:text-violet-700 transition-colors">{{ authStore.user.full_name }}</p>
+                <p class="text-xs font-bold text-ink truncate leading-tight group-hover:text-primary-700 transition-colors">{{ authStore.user.full_name }}</p>
                 <p class="text-[10px] text-ink-muted font-mono truncate mt-0.5">{{ authStore.user.email }}</p>
               </div>
             </router-link>
@@ -315,9 +323,9 @@ onUnmounted(() => {
             <button
               type="button"
               @click="navigateTo('/profile')"
-              class="w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium text-ink hover:bg-violet-50 hover:text-violet-700 transition-colors cursor-pointer text-left"
+              class="w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium text-ink hover:bg-primary-50 hover:text-primary-700 transition-colors cursor-pointer text-left"
             >
-              <UserIcon class="w-3.5 h-3.5 text-ink-muted group-hover:text-violet-600" />
+              <UserIcon class="w-3.5 h-3.5 text-ink-muted group-hover:text-primary-600" />
               <span>{{ t('nav.profile') }}</span>
             </button>
 

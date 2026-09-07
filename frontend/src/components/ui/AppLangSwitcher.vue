@@ -65,10 +65,10 @@ onUnmounted(() => {
       type="button"
       @click.stop="isOpen = !isOpen"
       :title="t('common.language')"
-      class="p-2 rounded-xl text-ink-muted hover:text-violet-600 hover:bg-surface-raised transition-colors cursor-pointer border border-transparent hover:border-border/60 flex items-center justify-center"
-      :class="isOpen ? 'bg-violet-50 text-violet-700 !border-violet-200' : ''"
+      class="p-2 rounded-xl text-ink-muted hover:text-primary-600 hover:bg-surface-raised transition-colors cursor-pointer border border-transparent hover:border-border/60 flex items-center justify-center"
+      :class="isOpen ? 'bg-primary-50 text-primary-700 !border-primary-200' : ''"
     >
-      <Globe class="w-4 h-4 text-violet-500 shrink-0" />
+      <Globe class="w-4 h-4 text-primary-500 shrink-0" />
     </button>
 
     <!-- Expanded Mode Trigger: Full width row with clear spacing and badge -->
@@ -80,8 +80,8 @@ onUnmounted(() => {
       :class="isOpen ? 'bg-surface-raised text-ink' : ''"
     >
       <!-- Left icon & Label -->
-      <div class="flex items-center gap-2.5 text-ink-faint group-hover:text-violet-600 shrink-0">
-        <Globe class="w-4 h-4 text-violet-500 shrink-0" />
+      <div class="flex items-center gap-2.5 text-ink-faint group-hover:text-primary-600 shrink-0">
+        <Globe class="w-4 h-4 text-primary-500 shrink-0" />
         <span class="text-xs font-medium text-ink-muted group-hover:text-ink">
           {{ t('common.language') }}
         </span>
@@ -89,12 +89,12 @@ onUnmounted(() => {
 
       <!-- Right Short Code Badge & Chevron -->
       <div class="flex items-center gap-1.5 shrink-0 ml-2">
-        <span class="text-[11px] font-bold text-violet-700 bg-violet-100/90 px-1.5 py-0.5 rounded font-mono">
+        <span class="text-[11px] font-bold text-primary-700 bg-primary-100/90 px-1.5 py-0.5 rounded font-mono">
           {{ currentLanguage.short }}
         </span>
         <ChevronDown
           class="w-3.5 h-3.5 text-ink-faint transition-transform duration-200"
-          :class="isOpen ? 'rotate-180 text-violet-600' : ''"
+          :class="isOpen ? 'rotate-180 text-primary-600' : ''"
         />
       </div>
     </button>
@@ -127,17 +127,17 @@ onUnmounted(() => {
           @click="selectLang(lang.code as any)"
           class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs transition-colors cursor-pointer"
           :class="locale === lang.code
-            ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
+            ? 'bg-primary-50 text-primary-700 font-semibold shadow-2xs'
             : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-medium'"
         >
           <div class="flex items-center gap-2">
-            <span class="w-5 text-[10px] font-mono font-bold text-violet-600 bg-violet-100/80 px-1 py-0.5 rounded text-center">
+            <span class="w-5 text-[10px] font-mono font-bold text-primary-600 bg-primary-100/80 px-1 py-0.5 rounded text-center">
               {{ lang.short }}
             </span>
             <span>{{ lang.label }}</span>
           </div>
 
-          <Check v-if="locale === lang.code" class="w-3.5 h-3.5 text-violet-600 shrink-0" />
+          <Check v-if="locale === lang.code" class="w-3.5 h-3.5 text-primary-600 shrink-0" />
         </button>
       </div>
     </transition>

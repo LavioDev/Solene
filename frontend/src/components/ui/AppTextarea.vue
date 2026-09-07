@@ -39,7 +39,7 @@ function onInput(event: Event) {
       :required="required"
       @input="onInput"
       class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink placeholder-ink-faint
-             transition-all duration-150 shadow-2xs hover:border-violet-300 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-400/20
+             transition-all duration-150 shadow-2xs hover:border-primary-300 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-400/20
              disabled:bg-surface-subtle disabled:text-ink-faint disabled:cursor-not-allowed resize-y"
       :class="error ? 'border-err-text focus:border-err-text focus:ring-rose-400/20' : ''"
     ></textarea>

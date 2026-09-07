@@ -163,7 +163,7 @@ onMounted(() => {
         class="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80"
         @click="router.push('/')"
       >
-        <div class="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center text-white shadow-sm shadow-violet-500/30">
+        <div class="w-8 h-8 rounded-xl bg-primary-600 flex items-center justify-center text-white shadow-sm shadow-primary-500/30">
           <Heart class="w-4 h-4 fill-white" />
         </div>
         <span class="text-base font-bold text-ink tracking-tight font-serif">Solène</span>
@@ -176,9 +176,9 @@ onMounted(() => {
 
     <!-- Main Container -->
     <main class="w-full max-w-lg mx-auto my-auto py-8">
-      <div class="bg-white rounded-3xl border border-violet-100/80 shadow-card p-6 sm:p-8 space-y-6 relative overflow-hidden">
+      <div class="bg-white rounded-3xl border border-primary-100/80 shadow-card p-6 sm:p-8 space-y-6 relative overflow-hidden">
         <!-- Background Ambient Glow -->
-        <div class="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-violet-200/30 blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-primary-200/30 blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -left-24 w-48 h-48 rounded-full bg-pink-200/30 blur-3xl pointer-events-none"></div>
 
         <!-- 1. State: Success Animation -->
@@ -198,7 +198,7 @@ onMounted(() => {
 
         <!-- 2. State: Loading Code Info -->
         <div v-else-if="loadingInfo" class="py-12 flex flex-col items-center justify-center gap-3">
-          <div class="w-9 h-9 rounded-full border-3 border-violet-600 border-t-transparent animate-spin"></div>
+          <div class="w-9 h-9 rounded-full border-3 border-primary-600 border-t-transparent animate-spin"></div>
           <p class="text-xs font-semibold text-ink-muted">
             {{ t('couples.pair.verifying') }}
           </p>
@@ -210,7 +210,7 @@ onMounted(() => {
           <div class="text-center space-y-3">
             <div class="relative inline-flex items-center justify-center">
               <!-- Inviter Avatar (Left) -->
-              <div class="relative w-16 h-16 rounded-full bg-violet-600 text-white font-bold text-base flex items-center justify-center border-4 border-white shadow-md z-10">
+              <div class="relative w-16 h-16 rounded-full bg-primary-600 text-white font-bold text-base flex items-center justify-center border-4 border-white shadow-md z-10">
                 <img
                   v-if="invitationInfo.inviter?.avatar_url"
                   :src="invitationInfo.inviter.avatar_url"
@@ -241,7 +241,7 @@ onMounted(() => {
             </div>
 
             <div class="space-y-1">
-              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-violet-100 text-violet-700">
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary-100 text-primary-700">
                 <Sparkles class="w-3 h-3" />
                 {{ t('couples.pair.inviteBadge') }}
               </span>
@@ -269,7 +269,7 @@ onMounted(() => {
               {{ t('couples.pair.selfInviteNotice') }}
             </p>
             <div class="flex items-center justify-center gap-2">
-              <span class="text-sm font-mono font-bold text-violet-700 bg-white px-3 py-1.5 rounded-lg border border-border">
+              <span class="text-sm font-mono font-bold text-primary-700 bg-white px-3 py-1.5 rounded-lg border border-border">
                 {{ invitationInfo.code }}
               </span>
               <AppButton size="sm" variant="outline" @click="copyCurrentLink">
@@ -286,7 +286,7 @@ onMounted(() => {
 
           <!-- Case B: Guest User (Needs Login / Register) -->
           <div v-else-if="!authStore.isAuthenticated" class="space-y-4">
-            <div class="p-4 rounded-2xl bg-violet-50/60 border border-violet-100 text-xs text-ink-muted leading-relaxed">
+            <div class="p-4 rounded-2xl bg-primary-50/60 border border-primary-100 text-xs text-ink-muted leading-relaxed">
               {{ t('couples.pair.loginPrompt') }}
             </div>
             <AppButton
@@ -378,7 +378,7 @@ onMounted(() => {
         <!-- 5. State: No Code in URL -> Prompt to enter code -->
         <div v-else class="space-y-6">
           <div class="text-center space-y-2">
-            <div class="w-12 h-12 mx-auto rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center">
+            <div class="w-12 h-12 mx-auto rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center">
               <KeyRound class="w-6 h-6" />
             </div>
             <h3 class="text-base font-bold text-ink">

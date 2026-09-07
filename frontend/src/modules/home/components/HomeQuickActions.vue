@@ -18,7 +18,7 @@ const { t } = useI18n()
       @click="emit('navigate', '/calendar')"
       class="bg-white hover:bg-surface-subtle shadow-2xs border border-border/60 text-xs text-ink"
     >
-      <CalendarIcon class="w-3.5 h-3.5 mr-1.5 text-violet-600" />
+      <CalendarIcon class="w-3.5 h-3.5 mr-1.5 text-primary-600" />
       {{ t('home.quickActions.viewCalendar') }}
     </AppButton>
 
@@ -29,7 +29,7 @@ const { t } = useI18n()
       class="bg-white hover:bg-surface-subtle shadow-2xs border border-border/60 text-xs text-ink"
     >
       <StickyNote class="w-3.5 h-3.5 mr-1.5 text-amber-500" />
-      {{ t('home.quickActions.addNote') }}
+      kỷ niệm
     </AppButton>
 
     <AppButton
@@ -38,7 +38,7 @@ const { t } = useI18n()
       @click="emit('navigate', '/couples')"
       class="bg-white hover:bg-surface-subtle shadow-2xs border border-border/60 text-xs text-ink"
     >
-      <Users class="w-3.5 h-3.5 mr-1.5 text-purple-600" />
+      <Users class="w-3.5 h-3.5 mr-1.5 text-primary-600" />
       {{ t('home.quickActions.viewCouples') }}
     </AppButton>
   </div>

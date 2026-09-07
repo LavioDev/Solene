@@ -58,7 +58,7 @@ const myUser = computed(() => {
         <!-- 2 Overlapping Avatars: Tôi bên trái (z-10), Đối phương bên phải & đè lên trên (z-20) -->
         <div class="relative flex items-center shrink-0">
           <!-- 1. My Avatar (Bên trái, z-10) -->
-          <div class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-violet-600 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-2xs z-10">
+          <div class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-primary-600 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-2xs z-10">
             <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
               <img
                 v-if="myUser?.avatar_url"
@@ -75,6 +75,7 @@ const myUser = computed(() => {
             class="relative -ml-3 sm:-ml-3.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-purple-500 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-md z-20 cursor-pointer transition-transform hover:scale-110 hover:z-30"
             @mouseenter="isPartnerHovered = true"
             @mouseleave="isPartnerHovered = false"
+            @click="isPartnerHovered = !isPartnerHovered"
           >
             <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
               <img
@@ -115,7 +116,7 @@ const myUser = computed(() => {
           <h1 class="text-xs sm:text-sm font-bold text-ink flex items-center gap-1.5 truncate">
             <span class="truncate">{{ coupleNickname }}</span>
           </h1>
-          <p class="text-[10px] sm:text-[11px] text-ink-muted font-mono truncate">
+          <p class="hidden sm:block text-[10px] sm:text-[11px] text-ink-muted font-mono truncate">
             {{ t('home.since', { date: formattedStartDate }) }}
           </p>
         </div>
@@ -123,7 +124,7 @@ const myUser = computed(() => {
 
       <!-- Fallback if No Couple Linked -->
       <div v-if="!loading && !couple" class="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-        <Heart class="w-4 h-4 text-violet-500 shrink-0" />
+        <Heart class="w-4 h-4 text-primary-500 shrink-0" />
         <span class="truncate">{{ t('home.noCoupleDesc') }}</span>
         <AppButton size="sm" class="ml-1 sm:ml-2" @click="emit('link-couple')">
           <Sparkles class="w-3.5 h-3.5 mr-1" />
@@ -132,7 +133,7 @@ const myUser = computed(() => {
       </div>
     </div>
 
-    <!-- Right Controls: Nút Cảm xúc hôm nay (Sát phải) -->
+    <!-- Right Controls: Nút Cảm xúc hôm nay (Sát phải - Trên mobile chỉ hiện icon gọn gàng) -->
     <div class="flex items-center gap-2 sm:gap-2.5 ml-auto shrink-0">
       <div
         class="relative inline-flex items-center"
@@ -141,14 +142,15 @@ const myUser = computed(() => {
       >
         <button
           type="button"
-          class="relative flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-2xl border transition-all duration-200 cursor-pointer text-xs select-none shadow-md"
+          class="relative flex items-center justify-center gap-1.5 sm:gap-2 p-2 sm:px-3.5 sm:py-2 rounded-xl sm:rounded-2xl border transition-all duration-200 cursor-pointer text-xs select-none shadow-md"
           :class="[
             isMoodOpen
-              ? 'bg-violet-600 text-white border-violet-600 shadow-violet-500/20 ring-2 ring-violet-400/30 font-bold scale-102 -translate-y-0.5'
+              ? 'bg-primary-600 text-white border-primary-600 shadow-primary-500/20 ring-2 ring-primary-400/30 font-bold scale-102 -translate-y-0.5'
               : myMood
-                ? 'bg-white/95 backdrop-blur-md text-ink border-violet-200/80 hover:border-violet-300 shadow-violet-500/10 hover:shadow-lg hover:shadow-violet-500/15 font-semibold hover:scale-102 hover:-translate-y-0.5'
-                : 'bg-white/95 backdrop-blur-md text-ink-muted hover:text-ink border-border/80 hover:border-violet-300 shadow-violet-500/5 hover:shadow-md font-medium hover:scale-102 hover:-translate-y-0.5'
+                ? 'bg-white/95 backdrop-blur-md text-ink border-primary-200/80 hover:border-primary-300 shadow-primary-500/10 hover:shadow-lg hover:shadow-primary-500/15 font-semibold hover:scale-102 hover:-translate-y-0.5'
+                : 'bg-white/95 backdrop-blur-md text-ink-muted hover:text-ink border-border/80 hover:border-primary-300 shadow-primary-500/5 hover:shadow-md font-medium hover:scale-102 hover:-translate-y-0.5'
           ]"
+          :title="myMood ? `${myMood.mood_score}/10` : t('mood.title')"
           @click="emit('toggle-mood')"
         >
           <!-- Icon or Emoji with Note Dot -->
@@ -156,19 +158,19 @@ const myUser = computed(() => {
             <span v-if="myMood" class="text-base leading-none">
               {{ getMoodByScore(myMood.mood_score)?.emoji }}
             </span>
-            <Smile v-else class="w-4 h-4 text-violet-600" />
+            <Smile v-else class="w-4 h-4 text-primary-600" />
 
             <!-- Dot chỉ thị nếu có ghi chú (Note Dot) -->
             <span
               v-if="myMood?.note"
-              class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-violet-600 border-2 border-white shadow-xs animate-pulse"
-              :class="isMoodOpen ? 'bg-amber-300 ring-1 ring-violet-800' : 'bg-violet-600'"
+              class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary-600 border-2 border-white shadow-xs animate-pulse"
+              :class="isMoodOpen ? 'bg-amber-300 ring-1 ring-primary-800' : 'bg-primary-600'"
               title="Có ghi chú hôm nay"
             ></span>
           </div>
 
-          <!-- Label -->
-          <span class="font-sans whitespace-nowrap">
+          <!-- Label: Ẩn trên mobile (< sm), chỉ hiện icon -->
+          <span class="hidden sm:inline font-sans whitespace-nowrap">
             {{ myMood ? `${myMood.mood_score}/10` : t('mood.title') }}
           </span>
         </button>
@@ -177,16 +179,16 @@ const myUser = computed(() => {
         <Transition name="bubble-pop">
           <div
             v-if="isMoodHovered && myMood?.note && !isMoodOpen"
-            class="absolute right-0 top-full mt-2.5 w-64 sm:w-72 max-w-[calc(100vw-2rem)] p-3 rounded-2xl bg-white/98 backdrop-blur-xl border border-violet-200/90 shadow-xl shadow-violet-900/10 z-30 text-left pointer-events-none"
+            class="absolute right-0 top-full mt-2.5 w-64 sm:w-72 max-w-[calc(100vw-2rem)] p-3 rounded-2xl bg-white/98 backdrop-blur-xl border border-primary-200/90 shadow-xl shadow-primary-900/10 z-30 text-left pointer-events-none"
           >
             <div class="flex items-center justify-between gap-2 pb-1.5 border-b border-border/50 mb-1.5">
               <div class="flex items-center gap-1.5 min-w-0">
-                <FileText class="w-3.5 h-3.5 text-violet-600 shrink-0" />
-                <span class="text-[11px] font-bold text-violet-700 whitespace-nowrap tracking-tight">
+                <FileText class="w-3.5 h-3.5 text-primary-600 shrink-0" />
+                <span class="text-[11px] font-bold text-primary-700 whitespace-nowrap tracking-tight">
                   Ghi chú hôm nay
                 </span>
               </div>
-              <span class="text-xs font-bold text-violet-700 shrink-0 whitespace-nowrap">
+              <span class="text-xs font-bold text-primary-700 shrink-0 whitespace-nowrap">
                 {{ getMoodByScore(myMood.mood_score)?.emoji }} {{ myMood.mood_score }}/10
               </span>
             </div>

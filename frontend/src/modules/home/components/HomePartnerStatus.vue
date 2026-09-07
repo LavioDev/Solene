@@ -24,12 +24,12 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 // Active Task Priority Badge Variant
-const priorityBadgeVariant = computed<'err' | 'warn' | 'ok' | 'violet' | 'neutral'>(() => {
+const priorityBadgeVariant = computed<'err' | 'warn' | 'ok' | 'primary' | 'violet' | 'neutral'>(() => {
   const p = props.partnerStatus?.active_task?.priority?.toLowerCase()
   if (p === 'urgent' || p === 'high') return 'err'
   if (p === 'medium') return 'warn'
   if (p === 'low') return 'ok'
-  return 'violet'
+  return 'primary'
 })
 
 const priorityLabel = computed(() => {
@@ -89,7 +89,7 @@ const priorityLabel = computed(() => {
       type="button"
       @click="emit('refresh')"
       class="text-ink-faint hover:text-ink transition-colors cursor-pointer p-1 rounded-md hover:bg-surface-subtle"
-      :class="{ 'animate-spin text-violet-600': isRefreshing }"
+      :class="{ 'animate-spin text-primary-600': isRefreshing }"
       :title="t('tabs.refresh')"
     >
       <RotateCw class="w-3.5 h-3.5" />

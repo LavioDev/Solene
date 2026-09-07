@@ -264,18 +264,18 @@ function closeCropModal() {
       class="border-2 border-dashed rounded-2xl p-4 transition-all duration-150 cursor-pointer flex flex-col items-center justify-center text-center group"
       :class="[
         isDragging
-          ? 'border-violet-500 bg-violet-50/60'
-          : 'border-border/80 hover:border-violet-400 bg-surface-subtle/50 hover:bg-surface-raised',
+          ? 'border-primary-500 bg-primary-50/60'
+          : 'border-border/80 hover:border-primary-400 bg-surface-subtle/50 hover:bg-surface-raised',
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       ]"
     >
       <div v-if="uploading && !showCropModal" class="flex flex-col items-center gap-2 py-2">
-        <Loader2 class="w-6 h-6 text-violet-600 animate-spin" />
+        <Loader2 class="w-6 h-6 text-primary-600 animate-spin" />
         <span class="text-xs font-medium text-ink-muted">{{ t('upload.uploading') }}</span>
       </div>
 
       <div v-else class="flex flex-col items-center gap-1.5 py-1">
-        <div class="w-9 h-9 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-600 group-hover:scale-110 transition-transform">
+        <div class="w-9 h-9 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform">
           <UploadCloud class="w-5 h-5" />
         </div>
         <div class="text-xs font-semibold text-ink mt-0.5">
@@ -308,7 +308,7 @@ function closeCropModal() {
             class="px-3 py-1.5 rounded-xl bg-white/90 hover:bg-white text-ink text-xs font-semibold shadow-md transition-all flex items-center gap-1.5 cursor-pointer hover:scale-105"
             :title="t('upload.changeImage')"
           >
-            <UploadCloud class="w-3.5 h-3.5 text-violet-600" />
+            <UploadCloud class="w-3.5 h-3.5 text-primary-600" />
             <span>{{ t('upload.changeImage') }}</span>
           </button>
 
@@ -342,7 +342,7 @@ function closeCropModal() {
               v-if="crop"
               type="button"
               @click.stop="openCropExisting(imgUrl, index)"
-              class="w-7 h-7 rounded-lg bg-white/90 hover:bg-white text-violet-700 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
+              class="w-7 h-7 rounded-lg bg-white/90 hover:bg-white text-primary-700 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
               :title="t('upload.cropImage')"
             >
               <Crop class="w-3.5 h-3.5" />
@@ -396,7 +396,7 @@ function closeCropModal() {
             type="button"
             @click="handleRotateLeft"
             :title="t('avatar.rotateLeft')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <RotateCcw class="w-4 h-4" />
           </button>
@@ -404,7 +404,7 @@ function closeCropModal() {
             type="button"
             @click="handleRotateRight"
             :title="t('avatar.rotateRight')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <RotateCw class="w-4 h-4" />
           </button>
@@ -412,7 +412,7 @@ function closeCropModal() {
             type="button"
             @click="handleZoomIn"
             :title="t('avatar.zoomIn')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <ZoomIn class="w-4 h-4" />
           </button>
@@ -420,7 +420,7 @@ function closeCropModal() {
             type="button"
             @click="handleZoomOut"
             :title="t('avatar.zoomOut')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <ZoomOut class="w-4 h-4" />
           </button>
@@ -428,7 +428,7 @@ function closeCropModal() {
             type="button"
             @click="handleReset"
             :title="t('avatar.reset')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <RefreshCw class="w-4 h-4" />
           </button>

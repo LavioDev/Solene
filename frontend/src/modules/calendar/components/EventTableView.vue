@@ -170,7 +170,7 @@ defineExpose({
           v-model="searchQuery"
           type="text"
           :placeholder="t('calendar.list.searchPlaceholder')"
-          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-500 transition-all shadow-2xs"
+          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary-400/20 focus:border-primary-500 transition-all shadow-2xs"
         />
       </div>
 
@@ -198,13 +198,13 @@ defineExpose({
     <div class="bg-white border border-border rounded-2xl shadow-card overflow-hidden">
       <!-- Loading State -->
       <div v-if="loading" class="py-20 text-center text-sm text-ink-faint">
-        <div class="animate-spin w-6 h-6 border-2 border-violet-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+        <div class="animate-spin w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full mx-auto mb-2"></div>
         {{ t('calendar.loading') }}
       </div>
 
       <!-- Empty State -->
       <div v-else-if="filteredEvents.length === 0" class="py-16 text-center space-y-3">
-        <div class="w-12 h-12 rounded-full bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-400 mx-auto">
+        <div class="w-12 h-12 rounded-full bg-primary-50 border border-primary-100 flex items-center justify-center text-primary-400 mx-auto">
           <CalendarHeart class="w-6 h-6" />
         </div>
         <p class="text-sm font-semibold text-ink">{{ t('calendar.list.emptyTitle') }}</p>
@@ -244,7 +244,7 @@ defineExpose({
                     <div class="flex items-center gap-1.5">
                       <p class="font-semibold text-ink truncate">{{ evt.title }}</p>
                       <AppBadge v-if="evt.is_shared" variant="violet" size="sm">
-                        <Heart class="w-2.5 h-2.5 fill-current text-violet-500" />
+                        <Heart class="w-2.5 h-2.5 fill-current text-primary-500" />
                         <span>{{ t('common.shared') }}</span>
                       </AppBadge>
                     </div>
@@ -285,7 +285,7 @@ defineExpose({
                   <button
                     type="button"
                     @click="emit('edit-event', evt)"
-                    class="p-1.5 rounded-lg text-ink-faint hover:text-violet-600 hover:bg-violet-50 transition-colors cursor-pointer"
+                    class="p-1.5 rounded-lg text-ink-faint hover:text-primary-600 hover:bg-primary-50 transition-colors cursor-pointer"
                     :title="t('calendar.list.editEvent')"
                   >
                     <Edit2 class="w-3.5 h-3.5" />

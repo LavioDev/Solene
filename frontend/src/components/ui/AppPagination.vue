@@ -129,7 +129,7 @@ const visiblePages = computed(() => {
             @click="setPage(Number(p))"
             class="min-w-[32px] h-8 px-2 flex items-center justify-center rounded-xl text-xs font-semibold transition-all cursor-pointer"
             :class="p === currentPage
-              ? 'bg-violet-600 text-white shadow-2xs shadow-violet-200'
+              ? 'bg-primary-600 text-white shadow-2xs shadow-primary-200'
               : 'text-ink-muted hover:text-ink hover:bg-surface-raised font-medium'"
           >
             {{ p }}

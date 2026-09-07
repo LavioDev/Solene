@@ -287,7 +287,7 @@ function getPriorityBarClass(priority: string, isCompleted: boolean, isPartner: 
     case 'low':
       return 'bg-slate-500 text-white shadow-xs'
     default:
-      return 'bg-violet-600 text-white shadow-xs'
+      return 'bg-primary-600 text-white shadow-xs'
   }
 }
 
@@ -409,7 +409,7 @@ defineExpose({
             v-if="filteredTasks.length === 0"
             class="h-56 flex flex-col items-center justify-center gap-2 text-center px-4"
           >
-            <div class="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center text-violet-500 border border-violet-100/70">
+            <div class="w-8 h-8 rounded-xl bg-primary-50 flex items-center justify-center text-primary-500 border border-primary-100/70">
               <Clock class="w-4 h-4" />
             </div>
             <div>
@@ -424,18 +424,18 @@ defineExpose({
           <div
             v-for="task in filteredTasks"
             :key="task.id"
-            class="h-12 px-3.5 flex items-center gap-2 hover:bg-violet-50/30 transition-colors group"
+            class="h-12 px-3.5 flex items-center gap-2 hover:bg-primary-50/30 transition-colors group"
             :class="task.is_completed ? 'bg-surface-subtle/30' : ''"
           >
             <!-- Toggle Complete Checkbox -->
             <button
               type="button"
               @click="toggleTask(task)"
-              class="text-ink-faint hover:text-violet-600 transition-colors cursor-pointer shrink-0"
+              class="text-ink-faint hover:text-primary-600 transition-colors cursor-pointer shrink-0"
               :title="task.is_completed ? t('calendar.tasks.completed') : t('calendar.tasks.pending')"
             >
               <CheckSquare v-if="task.is_completed" class="w-4 h-4 text-emerald-600" />
-              <Square v-else class="w-4 h-4 text-ink-muted hover:text-violet-600" />
+              <Square v-else class="w-4 h-4 text-ink-muted hover:text-primary-600" />
             </button>
 
             <div class="min-w-0 flex-1">
@@ -464,7 +464,7 @@ defineExpose({
               <button
                 type="button"
                 @click="openEditTaskModal(task)"
-                class="p-1 rounded-md text-ink-faint hover:text-violet-600 hover:bg-violet-50 transition-all cursor-pointer shrink-0"
+                class="p-1 rounded-md text-ink-faint hover:text-primary-600 hover:bg-primary-50 transition-all cursor-pointer shrink-0"
                 :title="t('calendar.tasks.editTask')"
               >
                 <Pencil class="w-3 h-3" />
@@ -548,7 +548,7 @@ defineExpose({
           <div
             v-for="task in filteredTasks"
             :key="task.id"
-            class="h-12 px-4 flex items-center hover:bg-violet-50/30 transition-colors relative"
+            class="h-12 px-4 flex items-center hover:bg-primary-50/30 transition-colors relative"
             :class="task.is_completed ? 'bg-surface-subtle/30' : ''"
           >
             <div class="relative w-full h-6 flex items-center gantt-timeline-track">
@@ -583,7 +583,7 @@ defineExpose({
       <button
         type="button"
         @click="resetZoom"
-        class="px-1.5 py-0.5 text-[11px] font-mono font-medium text-ink-muted hover:text-violet-600 cursor-pointer"
+        class="px-1.5 py-0.5 text-[11px] font-mono font-medium text-ink-muted hover:text-primary-600 cursor-pointer"
         title="Reset 150% Zoom"
       >
         {{ Math.round(zoomLevel * 100) }}%
@@ -625,7 +625,7 @@ defineExpose({
             <input
               type="time"
               v-model="editTaskStartTime"
-              class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-violet-300 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-400/20"
+              class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-primary-300 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-400/20"
             />
           </div>
 
@@ -636,7 +636,7 @@ defineExpose({
             <input
               type="time"
               v-model="editTaskEndTime"
-              class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-violet-300 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-400/20"
+              class="w-full px-3.5 py-2.5 text-sm font-medium bg-white border border-border rounded-xl text-ink shadow-2xs hover:border-primary-300 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-400/20"
             />
           </div>
 
@@ -674,7 +674,7 @@ defineExpose({
               <input
                 type="checkbox"
                 v-model="editTaskIsCompleted"
-                class="rounded text-violet-600 focus:ring-violet-500 w-4 h-4"
+                class="rounded text-primary-600 focus:ring-primary-500 w-4 h-4"
               />
               <span>{{ t('calendar.tasks.completed') }}</span>
             </label>

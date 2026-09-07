@@ -23,13 +23,13 @@ const { t } = useI18n()
     <!-- Header -->
     <div class="flex items-center justify-between border-b border-border/40 pb-3">
       <h2 class="text-xs font-bold uppercase tracking-wider text-ink font-mono flex items-center gap-1.5">
-        <CalendarIcon class="w-3.5 h-3.5 text-violet-600" />
+        <CalendarIcon class="w-3.5 h-3.5 text-primary-600" />
         <span>{{ t('home.upcomingEvents.title') }}</span>
       </h2>
       <button
         type="button"
         @click="emit('view-calendar')"
-        class="text-[11px] font-semibold text-violet-600 hover:text-violet-700 cursor-pointer inline-flex items-center gap-0.5"
+        class="hidden sm:inline-flex text-[11px] font-semibold text-primary-600 hover:text-primary-700 cursor-pointer items-center gap-0.5"
       >
         <span>{{ t('home.upcomingEvents.viewCalendar') }}</span>
         <ArrowRight class="w-3 h-3" />
@@ -49,7 +49,7 @@ const { t } = useI18n()
             {{ formatDisplayDate(occ.date) }}
           </p>
         </div>
-        <span class="text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full font-mono shrink-0">
+        <span class="text-[10px] font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded-full font-mono shrink-0">
           {{ t('home.upcomingEvents.inDays', { n: calculateDaysRemaining(occ.date) }) }}
         </span>
       </div>

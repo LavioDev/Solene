@@ -88,8 +88,8 @@ export const MOOD_DEFINITIONS: MoodDefinition[] = [
     tag: 'awesome',
     nameKey: 'mood.scores.awesome',
     color: '#7c3aed', // Violet-600 (Solène signature)
-    badgeColor: 'bg-violet-50 text-violet-700 border-violet-200',
-    heatmapClass: 'bg-violet-600',
+    badgeColor: 'bg-primary-50 text-primary-700 border-primary-200',
+    heatmapClass: 'bg-primary-600',
   },
 ]
 
@@ -106,7 +106,7 @@ export function getMoodByTag(tag?: string | null): MoodDefinition | null {
 // GitHub Matrix Color scale mapping for 1-10 scores
 export function getHeatmapCellColor(score?: number | null, isDark: boolean = false): string {
   if (!score || score < 1) {
-    return isDark ? 'bg-zinc-800/80 hover:border-zinc-500' : 'bg-surface-raised/90 border-border/70 hover:border-violet-300'
+    return isDark ? 'bg-zinc-800/80 hover:border-zinc-500' : 'bg-surface-raised/90 border-border/70 hover:border-primary-300'
   }
   
   // High contrast heatmap colors
@@ -115,5 +115,5 @@ export function getHeatmapCellColor(score?: number | null, isDark: boolean = fal
   if (score <= 5) return 'bg-slate-400 text-white'
   if (score <= 6) return 'bg-teal-400 text-white'
   if (score <= 8) return 'bg-emerald-500 text-white'
-  return 'bg-violet-600 text-white shadow-xs ring-1 ring-violet-400/40'
+  return 'bg-primary-600 text-white shadow-xs ring-1 ring-primary-400/40'
 }

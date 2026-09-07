@@ -341,7 +341,7 @@ onMounted(() => {
           v-model="searchQuery"
           type="text"
           :placeholder="t('users.searchPlaceholder')"
-          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-500 transition-all shadow-2xs"
+          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary-400/20 focus:border-primary-500 transition-all shadow-2xs"
         />
       </div>
 
@@ -370,14 +370,14 @@ onMounted(() => {
     <div class="bg-white border border-border rounded-2xl shadow-card overflow-hidden">
       <!-- Loading State -->
       <div v-if="loading" class="py-20 text-center text-sm text-ink-faint">
-        <div class="animate-spin w-6 h-6 border-2 border-violet-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+        <div class="animate-spin w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full mx-auto mb-2"></div>
         {{ t('users.couples.loading') }}
       </div>
 
       <!-- Empty State -->
       <div v-else-if="filteredCouples.length === 0" class="py-16 text-center space-y-3">
-        <div class="w-14 h-14 rounded-full bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-600 mx-auto shadow-2xs">
-          <Heart class="w-7 h-7 fill-violet-200 text-violet-600" />
+        <div class="w-14 h-14 rounded-full bg-primary-50 border border-primary-100 flex items-center justify-center text-primary-600 mx-auto shadow-2xs">
+          <Heart class="w-7 h-7 fill-primary-200 text-primary-600" />
         </div>
         <p class="text-sm font-semibold text-ink">{{ t('users.couples.emptyTitle') }}</p>
         <p class="text-xs text-ink-muted max-w-sm mx-auto">{{ t('users.couples.emptySubtitle') }}</p>
@@ -413,7 +413,7 @@ onMounted(() => {
               class="transition-colors group"
               :class="[
                 (authStore.isAdmin || authStore.hasPermission('couples:update'))
-                  ? 'cursor-pointer hover:bg-violet-50/40'
+                  ? 'cursor-pointer hover:bg-primary-50/40'
                   : 'cursor-default hover:bg-surface-raised/40'
               ]"
             >
@@ -421,7 +421,7 @@ onMounted(() => {
               <td class="py-3.5 px-5">
                 <div class="flex items-center gap-3">
                   <!-- Violet-tone catch cover thumbnail -->
-                  <div class="w-10 h-10 rounded-xl bg-violet-600 border border-violet-300/40 text-white font-bold text-xs flex items-center justify-center shrink-0 overflow-hidden shadow-2xs relative">
+                  <div class="w-10 h-10 rounded-xl bg-primary-600 border border-primary-300/40 text-white font-bold text-xs flex items-center justify-center shrink-0 overflow-hidden shadow-2xs relative">
                     <img
                       v-if="c.cover_url"
                       :src="c.cover_url"
@@ -433,14 +433,14 @@ onMounted(() => {
 
                   <div class="min-w-0">
                     <div class="flex items-center gap-1.5">
-                      <p class="font-bold text-ink group-hover:text-violet-700 transition-colors truncate leading-tight">
+                      <p class="font-bold text-ink group-hover:text-primary-700 transition-colors truncate leading-tight">
                         {{ c.nickname || ((c.user1?.full_name || 'User 1') + ' & ' + (c.user2?.full_name || 'User 2')) }}
                       </p>
                       <span
                         v-if="c.days_together !== undefined"
-                        class="text-[10px] bg-violet-100 text-violet-700 border border-violet-200/80 font-bold px-1.5 py-0.2 rounded-md font-mono shrink-0 shadow-2xs inline-flex items-center gap-0.5"
+                        class="text-[10px] bg-primary-100 text-primary-700 border border-primary-200/80 font-bold px-1.5 py-0.2 rounded-md font-mono shrink-0 shadow-2xs inline-flex items-center gap-0.5"
                       >
-                        <Sparkles class="w-2.5 h-2.5 text-violet-600" />
+                        <Sparkles class="w-2.5 h-2.5 text-primary-600" />
                         {{ t('users.couples.daysTogetherBadge', { n: c.days_together }) }}
                       </span>
                     </div>
@@ -457,7 +457,7 @@ onMounted(() => {
                   <!-- Overlapping Avatar Stack (with Violet Catch Fallback) -->
                   <div class="flex items-center -space-x-2 shrink-0">
                     <!-- User 1 Avatar -->
-                    <div class="w-7 h-7 rounded-full bg-violet-600 text-white border-2 border-white font-bold text-[10px] flex items-center justify-center overflow-hidden shadow-2xs">
+                    <div class="w-7 h-7 rounded-full bg-primary-600 text-white border-2 border-white font-bold text-[10px] flex items-center justify-center overflow-hidden shadow-2xs">
                       <img
                         v-if="c.user1?.avatar_url"
                         :src="c.user1.avatar_url"
@@ -492,7 +492,7 @@ onMounted(() => {
               <!-- 3. Relationship Start Date -->
               <td class="py-3.5 px-4 text-ink-muted text-xs font-mono whitespace-nowrap">
                 <div class="flex items-center gap-1.5">
-                  <CalendarIcon class="w-3.5 h-3.5 text-violet-500 shrink-0" />
+                  <CalendarIcon class="w-3.5 h-3.5 text-primary-500 shrink-0" />
                   <span>{{ formatDate(c.start_date) }}</span>
                 </div>
               </td>
@@ -534,7 +534,7 @@ onMounted(() => {
                     v-if="authStore.isAdmin || authStore.hasPermission('couples:update')"
                     type="button"
                     @click="openEditCoupleModal(c)"
-                    class="p-1.5 rounded-lg text-ink-faint hover:text-violet-600 hover:bg-violet-50 transition-colors cursor-pointer"
+                    class="p-1.5 rounded-lg text-ink-faint hover:text-primary-600 hover:bg-primary-50 transition-colors cursor-pointer"
                     :title="t('users.couples.editCouple')"
                   >
                     <Edit2 class="w-3.5 h-3.5" />

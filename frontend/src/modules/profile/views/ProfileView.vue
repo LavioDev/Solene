@@ -188,7 +188,7 @@ onMounted(() => {
       <div v-if="authStore.user.created_at" class="sm:text-right border-t sm:border-t-0 pt-3 sm:pt-0 border-border/60">
         <p class="text-[10px] font-bold uppercase tracking-wider text-ink-faint">{{ t('users.colCreatedAt') }}</p>
         <p class="text-xs font-semibold text-ink-muted mt-0.5 flex items-center sm:justify-end gap-1 font-mono">
-          <CalendarIcon class="w-3.5 h-3.5 text-violet-400" />
+          <CalendarIcon class="w-3.5 h-3.5 text-primary-400" />
           {{ formatDate(authStore.user.created_at) }}
         </p>
       </div>
@@ -201,7 +201,7 @@ onMounted(() => {
       <div class="bg-white border border-border rounded-2xl p-6 shadow-card flex flex-col justify-between space-y-6">
         <div class="space-y-4">
           <div class="flex items-center gap-2 pb-3 border-b border-border/60">
-            <UserIcon class="w-4 h-4 text-violet-600 shrink-0" />
+            <UserIcon class="w-4 h-4 text-primary-600 shrink-0" />
             <h3 class="text-sm font-bold text-ink">{{ t('profile.personalInfo') }}</h3>
           </div>
 
@@ -250,7 +250,7 @@ onMounted(() => {
       <div class="bg-white border border-border rounded-2xl p-6 shadow-card flex flex-col justify-between space-y-6">
         <div class="space-y-4">
           <div class="flex items-center gap-2 pb-3 border-b border-border/60">
-            <KeyRound class="w-4 h-4 text-violet-600 shrink-0" />
+            <KeyRound class="w-4 h-4 text-primary-600 shrink-0" />
             <h3 class="text-sm font-bold text-ink">{{ t('profile.security') }}</h3>
           </div>
 
@@ -290,7 +290,7 @@ onMounted(() => {
             size="sm"
             variant="outline"
             :loading="passwordSaving"
-            class="w-full sm:w-auto hover:border-violet-400"
+            class="w-full sm:w-auto hover:border-primary-400"
           >
             {{ t('profile.updatePassword') }}
           </AppButton>

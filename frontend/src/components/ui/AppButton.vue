@@ -24,8 +24,8 @@ const sizeClasses = computed(() => ({
 }[props.size]))
 
 const variantClasses = computed(() => ({
-  primary:   'bg-violet-600 hover:bg-violet-700 text-white shadow-sm',
-  secondary: 'bg-violet-50 hover:bg-violet-100 text-violet-700 border border-violet-200',
+  primary:   'bg-primary-600 hover:bg-primary-700 text-white shadow-sm',
+  secondary: 'bg-primary-50 hover:bg-primary-100 text-primary-700 border border-primary-200',
   outline:   'bg-white hover:bg-surface-subtle text-ink border border-border hover:border-border-strong',
   danger:    'bg-err-bg hover:bg-red-100 text-err-text border border-err-border',
   ghost:     'bg-transparent hover:bg-surface-raised text-ink-muted hover:text-ink',
@@ -36,7 +36,7 @@ const variantClasses = computed(() => ({
   <button
     :type="type"
     :disabled="disabled || loading"
-    class="inline-flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-violet-400/40 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+    class="inline-flex items-center justify-center gap-1.5 rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary-400/40 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
     :class="[sizeClasses, variantClasses]"
   >
     <svg v-if="loading" class="animate-spin h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none">

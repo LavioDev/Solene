@@ -65,7 +65,7 @@ async function handleSubmit() {
         >
           <span>Solène</span>
 
-          <Sparkles class="w-6 h-6 text-violet-600 animate-pulse ml-1" />
+          <Sparkles class="w-6 h-6 text-primary-600 animate-pulse ml-1" />
         </h1>
       </div>
 
@@ -89,7 +89,7 @@ async function handleSubmit() {
         <div class="mt-5 pt-4 border-t border-border text-center">
           <button
             type="button"
-            class="text-xs font-medium text-ink-muted hover:text-violet-700 transition-colors"
+            class="text-xs font-medium text-ink-muted hover:text-primary-700 transition-colors"
             @click="isRegister = !isRegister; errorMessage = ''"
           >
             {{ isRegister ? t('auth.alreadyHaveAccount') : t('auth.dontHaveAccount') }}

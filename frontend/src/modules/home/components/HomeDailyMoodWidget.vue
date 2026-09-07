@@ -123,7 +123,9 @@ onMounted(() => {
 <template>
   <AppModal
     :show="show"
-    width="880"
+    width="sm"
+    :draggable="false"
+    :bottom-sheet-on-mobile="true"
     :maximizable="false"
     @close="emit('close')"
   >
@@ -131,69 +133,56 @@ onMounted(() => {
     <template #header>
       <div class="flex items-center justify-between gap-3 w-full pr-2">
         <div class="flex items-center gap-2">
-          <div>
-            <h3 class="text-sm font-bold text-ink leading-tight font-sans">
-              {{ t('mood.title') }}
-            </h3>
-          </div>
+          <h3 class="text-xs sm:text-sm font-bold text-ink leading-tight font-sans">
+            {{ t('mood.title') }}
+          </h3>
         </div>
 
-        <!-- Right: Partner Mood Badge or Link to Heatmap -->
+        <!-- Right: Partner Mood Badge (Desktop) -->
         <div class="flex items-center gap-2">
-          <!-- Partner Mood Badge (if available) -->
           <div
             v-if="partnerMood"
-            class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-pink-50 text-pink-700 border border-pink-200 text-xs font-semibold"
+            class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-primary-50 text-primary-700 border border-primary-200 text-xs font-semibold"
             :title="partnerMood.note || partnerMood.mood_tag"
           >
-            <Heart class="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
+            <Heart class="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
             <span>{{ partnerMood.user_full_name ? `${partnerMood.user_full_name}:` : 'Partner:' }}</span>
             <span class="text-sm">{{ getMoodByScore(partnerMood.mood_score)?.emoji }}</span>
             <span>{{ partnerMood.mood_score }}/10</span>
           </div>
-
-          <!-- View Annual Heatmap Button -->
-          <!-- <button
-            type="button"
-            class="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 hover:text-violet-900 bg-violet-50 hover:bg-violet-100 px-3 py-1.5 rounded-xl border border-violet-200 transition-colors cursor-pointer"
-            @click="navigateToHeatmap"
-          >
-            <span>{{ t('mood.viewHeatmap') }}</span>
-            <ChevronRight class="w-3.5 h-3.5" />
-          </button> -->
         </div>
       </div>
     </template>
 
     <!-- Modal Body Content -->
-    <div class="space-y-4 pt-1 select-none">
-      <!-- Partner Mood Mobile Row (visible on small screens) -->
+    <div class="space-y-3 sm:space-y-4 pt-0 sm:pt-1 select-none">
+      <!-- Partner Mood Mobile Row (Minimalist pill on small screens) -->
       <div
         v-if="partnerMood"
-        class="sm:hidden flex items-center justify-between p-2.5 rounded-xl bg-pink-50/70 border border-pink-100 text-xs text-pink-800"
+        class="sm:hidden flex items-center justify-between px-3 py-1.5 rounded-xl bg-primary-50/70 border border-primary-100 text-xs text-primary-800"
       >
-        <span class="flex items-center gap-1.5 font-medium">
-          <Heart class="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
-          <span>{{ partnerMood.user_full_name ? `${partnerMood.user_full_name}:` : 'Partner:' }}</span>
+        <span class="flex items-center gap-1.5 font-medium truncate">
+          <Heart class="w-3 h-3 text-rose-500 fill-rose-500 shrink-0" />
+          <span class="truncate">{{ partnerMood.user_full_name || 'Partner' }}</span>
         </span>
-        <span class="flex items-center gap-1 font-bold">
+        <span class="flex items-center gap-1 font-bold shrink-0">
           <span>{{ getMoodByScore(partnerMood.mood_score)?.emoji }}</span>
-          <span>{{ partnerMood.mood_score }}/10 ({{ partnerMood.mood_tag }})</span>
+          <span>{{ partnerMood.mood_score }}/10</span>
         </span>
       </div>
 
       <!-- 1-Click Rank 10 Emotion Selector Chips -->
       <div class="space-y-2">
-        <div class="grid grid-cols-5 sm:grid-cols-10 gap-1.5 sm:gap-2">
+        <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
           <button
             v-for="def in MOOD_DEFINITIONS"
             :key="def.score"
             type="button"
-            class="relative flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer group"
+            class="relative flex flex-col items-center justify-center p-2 rounded-2xl border transition-all cursor-pointer group active:scale-90 select-none"
             :class="[
               selectedScore === def.score
-                ? 'bg-violet-50/90 border-violet-500 shadow-xs ring-2 ring-violet-400/30 scale-105 z-10'
-                : 'bg-surface-subtle/40 border-border/70 hover:border-violet-300 hover:bg-white'
+                ? 'bg-primary-50/90 border-primary-500 shadow-sm shadow-primary-500/20 ring-2 ring-primary-400/40 scale-105 z-10'
+                : 'bg-surface-subtle/50 border-border/70 hover:border-primary-200 hover:bg-white'
             ]"
             @click="handleSelectScore(def.score)"
           >
@@ -204,8 +193,8 @@ onMounted(() => {
 
             <!-- Score number -->
             <span
-              class="text-[11px] font-bold mt-1"
-              :class="selectedScore === def.score ? 'text-violet-700' : 'text-ink-muted'"
+              class="text-[11px] font-bold mt-1 font-mono"
+              :class="selectedScore === def.score ? 'text-primary-700' : 'text-ink-muted'"
             >
               {{ def.score }}
             </span>
@@ -213,71 +202,84 @@ onMounted(() => {
             <!-- Active dot indicator -->
             <span
               v-if="selectedScore === def.score"
-              class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-violet-600 ring-2 ring-white"
+              class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary-600 ring-2 ring-white"
             />
           </button>
         </div>
 
-        <!-- Selected Emotion Tag Preview -->
-        <div class="flex items-center justify-between pt-1 text-xs">
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-ink">
-              {{ currentDefinition?.emoji }} {{ t(currentDefinition?.nameKey || '') }}
-            </span>
-            
-            <span v-if="saveSuccess" class="inline-flex items-center gap-1 text-emerald-600 font-semibold">
-              <CheckCircle2 class="w-3.5 h-3.5" />
-              <span>Saved!</span>
+        <!-- Selected Emotion Tag Preview Banner -->
+        <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-primary-50/70 border border-primary-100/90 text-xs">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-xl shrink-0">{{ currentDefinition?.emoji }}</span>
+            <div class="min-w-0">
+              <p class="font-bold text-primary-950 text-xs truncate">
+                {{ t(currentDefinition?.nameKey || '') }}
+              </p>
+              <p class="text-[11px] text-primary-600/90 font-mono">
+                {{ currentDefinition?.score }}/10 • {{ currentDefinition?.tag }}
+              </p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2 shrink-0">
+            <span v-if="saveSuccess" class="inline-flex items-center gap-1 text-emerald-600 font-semibold text-xs animate-fade-in">
+              <CheckCircle2 class="w-4 h-4" />
             </span>
           </div>
         </div>
       </div>
 
       <!-- Note (Journal / Reflection) Input Area -->
-      <div class="space-y-2 pt-2 border-t border-border/60">
-        <label class="block text-xs font-semibold text-ink">
-          {{ t('mood.noteLabel') }}
-        </label>
+      <div class="space-y-1.5 pt-1 border-t border-border/50">
+        <div class="flex items-center justify-between text-xs">
+          <label class="font-semibold text-ink">
+            {{ t('mood.noteLabel') }}
+          </label>
+          <span class="text-[11px] text-ink-muted flex items-center gap-1">
+            <Heart class="w-3 h-3 text-rose-400 fill-rose-400" />
+            <span>{{ partnerMood?.user_full_name ? `Gửi ${partnerMood.user_full_name}` : 'Gửi cho người ấy' }}</span>
+          </span>
+        </div>
         <AppTextarea
           v-model="noteText"
           :placeholder="t('mood.notePlaceholder')"
-          :rows="3"
+          :rows="2"
         />
       </div>
     </div>
 
-    <!-- Modal Footer Actions -->
+    <!-- Modal Footer Actions (Ergonomic Thumb-friendly Bar) -->
     <template #footer>
-      <div class="flex items-center justify-between w-full">
+      <div class="flex items-center w-full gap-2">
         <button
           v-if="myMood"
           type="button"
-          class="text-xs text-rose-500 hover:text-rose-700 flex items-center gap-1 cursor-pointer transition-colors"
+          class="w-11 h-11 rounded-xl border border-rose-200 text-rose-500 hover:text-rose-700 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer shrink-0 active:scale-95"
+          :title="t('mood.deleteMood')"
           @click="handleDelete"
         >
-          <Trash2 class="w-3.5 h-3.5" />
-          <span>{{ t('mood.deleteMood') }}</span>
+          <Trash2 class="w-4 h-4" />
         </button>
-        <div v-else />
 
-        <div class="flex items-center gap-2">
-          <AppButton
-            variant="secondary"
-            size="sm"
-            @click="emit('close')"
-          >
-            {{ t('common.close') }}
-          </AppButton>
-          <AppButton
-            variant="primary"
-            size="sm"
-            :disabled="isSaving"
-            @click="() => saveMood()"
-          >
-            <Send class="w-3.5 h-3.5 mr-1" />
-            <span>{{ myMood ? t('mood.updateMood') : t('mood.logMood') }}</span>
-          </AppButton>
-        </div>
+        <AppButton
+          variant="secondary"
+          size="md"
+          class="hidden sm:inline-flex h-11"
+          @click="emit('close')"
+        >
+          {{ t('common.close') }}
+        </AppButton>
+
+        <AppButton
+          variant="primary"
+          size="md"
+          :disabled="isSaving"
+          class="flex-1 h-11 text-sm font-bold shadow-md shadow-primary-500/20 active:scale-98"
+          @click="() => saveMood()"
+        >
+          <Send class="w-4 h-4 mr-1.5" />
+          <span>{{ myMood ? t('mood.updateMood') : t('mood.logMood') }}</span>
+        </AppButton>
       </div>
     </template>
   </AppModal>

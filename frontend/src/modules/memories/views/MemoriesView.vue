@@ -286,7 +286,7 @@ onUnmounted(() => {
           v-model="searchQuery"
           type="text"
           :placeholder="t('memories.searchPlaceholder')"
-          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-500 transition-all shadow-2xs"
+          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary-400/20 focus:border-primary-500 transition-all shadow-2xs"
         />
       </div>
 
@@ -310,7 +310,7 @@ onUnmounted(() => {
     <div>
       <!-- Loading Placeholder -->
       <div v-if="loading" class="py-20 text-center text-sm text-ink-faint">
-        <div class="animate-spin w-6 h-6 border-2 border-violet-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+        <div class="animate-spin w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full mx-auto mb-2"></div>
         {{ t('memories.loading') }}
       </div>
 
@@ -318,10 +318,10 @@ onUnmounted(() => {
       <div
         v-else-if="filteredMemories.length === 0"
         @click="openAddModal"
-        class="border-2 border-dashed border-violet-200/80 bg-surface-subtle/40 hover:bg-violet-50/40 hover:border-violet-300 rounded-3xl py-16 px-6 text-center transition-all duration-200 cursor-pointer group select-none"
+        class="border-2 border-dashed border-primary-200/80 bg-surface-subtle/40 hover:bg-primary-50/40 hover:border-primary-300 rounded-3xl py-16 px-6 text-center transition-all duration-200 cursor-pointer group select-none"
       >
-        <div class="w-14 h-14 rounded-2xl bg-white border border-violet-100 shadow-xs flex items-center justify-center text-violet-500 mx-auto group-hover:scale-105 group-hover:border-violet-200 group-hover:shadow-card transition-all duration-200">
-          <Heart class="w-6 h-6 fill-violet-100 text-violet-500 group-hover:text-violet-600 transition-colors" />
+        <div class="w-14 h-14 rounded-2xl bg-white border border-primary-100 shadow-xs flex items-center justify-center text-primary-500 mx-auto group-hover:scale-105 group-hover:border-primary-200 group-hover:shadow-card transition-all duration-200">
+          <Heart class="w-6 h-6 fill-primary-100 text-primary-500 group-hover:text-primary-600 transition-colors" />
         </div>
         <h3 class="text-sm sm:text-base font-bold text-ink mt-3.5">
           {{ t('memories.emptyTitle') }}
@@ -329,8 +329,8 @@ onUnmounted(() => {
         <p class="text-xs text-ink-muted max-w-sm mx-auto mt-1 leading-relaxed">
           {{ t('memories.emptySubtitle') }}
         </p>
-        <div class="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-xl bg-white border border-border/80 text-xs font-semibold text-violet-700 shadow-2xs group-hover:border-violet-300 group-hover:bg-violet-50/60 transition-all">
-          <Sparkles class="w-3.5 h-3.5 text-violet-600" />
+        <div class="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-xl bg-white border border-border/80 text-xs font-semibold text-primary-700 shadow-2xs group-hover:border-primary-300 group-hover:bg-primary-50/60 transition-all">
+          <Sparkles class="w-3.5 h-3.5 text-primary-600" />
           <span>{{ t('memories.addMemory') }}</span>
         </div>
       </div>
@@ -363,17 +363,17 @@ onUnmounted(() => {
             </div>
           </div>
           <!-- Placeholder strip if no image -->
-          <div v-else class="h-1.5 w-full bg-gradient-to-r from-violet-100 to-violet-50" />
+          <div v-else class="h-1.5 w-full bg-gradient-to-r from-primary-100 to-primary-50" />
 
           <!-- Body -->
           <div class="p-5 flex-1 space-y-2.5">
             <div class="flex items-start justify-between gap-2">
-              <h3 class="text-sm font-semibold text-ink leading-snug group-hover:text-violet-700 transition-colors line-clamp-2 flex-1">
+              <h3 class="text-sm font-semibold text-ink leading-snug group-hover:text-primary-700 transition-colors line-clamp-2 flex-1">
                 {{ memory.title }}
               </h3>
               <div class="flex items-center gap-1 shrink-0">
                 <AppBadge v-if="memory.is_shared" variant="violet" size="sm" :title="t('common.shared')">
-                  <Heart class="w-3 h-3 fill-current text-violet-500" />
+                  <Heart class="w-3 h-3 fill-current text-primary-500" />
                 </AppBadge>
                 <AppBadge v-if="memory.display_type === 'DATE'" variant="violet" size="sm">
                   <CalendarIcon class="w-3 h-3" />
@@ -389,14 +389,14 @@ onUnmounted(() => {
           <!-- Footer -->
           <div class="px-5 py-3 border-t border-border/60 bg-surface-subtle/40 flex items-center justify-between">
             <span class="text-[10px] text-ink-faint font-mono flex items-center gap-1">
-              <CalendarIcon class="w-3 h-3 text-violet-300" />
+              <CalendarIcon class="w-3 h-3 text-primary-300" />
               {{ formatDate(memory.created_at) }}
             </span>
             <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 type="button"
                 @click.stop="openEditModal(memory)"
-                class="p-1 text-ink-faint hover:text-violet-600 hover:bg-violet-50 rounded transition-colors cursor-pointer"
+                class="p-1 text-ink-faint hover:text-primary-600 hover:bg-primary-50 rounded transition-colors cursor-pointer"
                 :title="t('common.edit')"
               >
                 <Edit2 class="w-3.5 h-3.5" />
@@ -419,9 +419,9 @@ onUnmounted(() => {
         <!-- Loading More Spinner -->
         <div
           v-if="loadingMore"
-          class="flex items-center gap-2 py-3 px-4 rounded-xl bg-violet-50/80 border border-violet-100 text-violet-700 text-xs font-medium shadow-2xs animate-pulse"
+          class="flex items-center gap-2 py-3 px-4 rounded-xl bg-primary-50/80 border border-primary-100 text-primary-700 text-xs font-medium shadow-2xs animate-pulse"
         >
-          <Loader2 class="w-4 h-4 animate-spin text-violet-600" />
+          <Loader2 class="w-4 h-4 animate-spin text-primary-600" />
           <span>{{ t('memories.loadingMore') }}</span>
         </div>
 
@@ -430,7 +430,7 @@ onUnmounted(() => {
           v-else-if="!hasMore && memories.length > 0"
           class="py-4 text-center text-xs text-ink-faint flex items-center justify-center gap-1.5"
         >
-          <Heart class="w-3.5 h-3.5 text-violet-300 fill-violet-50" />
+          <Heart class="w-3.5 h-3.5 text-primary-300 fill-primary-50" />
           <span>{{ t('memories.allLoaded') }}</span>
         </div>
       </div>

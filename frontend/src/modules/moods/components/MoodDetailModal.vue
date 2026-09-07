@@ -35,13 +35,13 @@ function formatDateDisplay(dateStr?: string): string {
       <!-- Date and Lock status banner -->
       <div class="flex items-center justify-between p-3 rounded-xl bg-surface-raised border border-border/70">
         <div class="flex items-center gap-2">
-          <Calendar class="w-4 h-4 text-violet-600" />
+          <Calendar class="w-4 h-4 text-primary-600" />
           <span class="font-semibold text-ink">{{ formatDateDisplay(day.date) }}</span>
         </div>
         <div class="flex items-center gap-2">
           <span
             v-if="day.is_today"
-            class="px-2 py-0.5 rounded-full text-xs font-semibold bg-violet-100 text-violet-700 border border-violet-200"
+            class="px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-100 text-primary-700 border border-primary-200"
           >
             Today
           </span>
@@ -56,13 +56,13 @@ function formatDateDisplay(dateStr?: string): string {
       </div>
 
       <!-- My Mood Section -->
-      <div class="p-4 rounded-2xl border border-violet-100 bg-violet-50/40 space-y-2">
+      <div class="p-4 rounded-2xl border border-primary-100 bg-primary-50/40 space-y-2">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-violet-900 uppercase tracking-wider flex items-center gap-1.5">
-            <User class="w-3.5 h-3.5 text-violet-600" />
+          <span class="text-xs font-semibold text-primary-900 uppercase tracking-wider flex items-center gap-1.5">
+            <User class="w-3.5 h-3.5 text-primary-600" />
             {{ t('mood.heatmap.myMood') }}
           </span>
-          <div v-if="day.score" class="flex items-center gap-1.5 font-bold text-violet-700">
+          <div v-if="day.score" class="flex items-center gap-1.5 font-bold text-primary-700">
             <span class="text-xl">{{ getMoodByScore(day.score)?.emoji }}</span>
             <span>{{ day.score }}/10</span>
           </div>
@@ -72,7 +72,7 @@ function formatDateDisplay(dateStr?: string): string {
           <p class="text-xs text-ink-muted capitalize mb-1">
             {{ day.tag }}
           </p>
-          <div v-if="day.note" class="p-3 rounded-xl bg-white border border-violet-100 shadow-2xs">
+          <div v-if="day.note" class="p-3 rounded-xl bg-white border border-primary-100 shadow-2xs">
             <p class="text-ink leading-relaxed whitespace-pre-wrap text-xs sm:text-sm font-sans">{{ day.note }}</p>
           </div>
           <p v-else class="text-xs text-ink-faint italic">

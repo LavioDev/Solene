@@ -149,7 +149,7 @@ onUnmounted(() => {
         class="h-7 px-3 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-1.5 cursor-pointer shrink-0 border group relative"
         :class="[
           route.path === tab.path
-            ? 'bg-white text-violet-700 font-semibold border-border shadow-2xs'
+            ? 'bg-white text-primary-700 font-semibold border-border shadow-2xs'
             : 'text-ink-muted hover:text-ink hover:bg-white/60 border-transparent hover:border-border/40'
         ]"
       >
@@ -157,7 +157,7 @@ onUnmounted(() => {
         <component
           :is="getIconComponent(tab.icon)"
           class="w-3.5 h-3.5 transition-colors shrink-0"
-          :class="route.path === tab.path ? 'text-violet-600' : 'text-ink-faint group-hover:text-ink-muted'"
+          :class="route.path === tab.path ? 'text-primary-600' : 'text-ink-faint group-hover:text-ink-muted'"
         />
 
         <!-- Tab Title -->
@@ -169,7 +169,7 @@ onUnmounted(() => {
           type="button"
           @click="(e) => handleCloseTab(tab, e)"
           class="w-3.5 h-3.5 rounded-full flex items-center justify-center text-ink-faint hover:text-ink hover:bg-surface-raised ml-0.5 transition-colors cursor-pointer"
-          :class="route.path === tab.path ? 'opacity-80 hover:opacity-100 hover:text-violet-900 hover:bg-violet-100' : 'opacity-0 group-hover:opacity-100'"
+          :class="route.path === tab.path ? 'opacity-80 hover:opacity-100 hover:text-primary-900 hover:bg-primary-100' : 'opacity-0 group-hover:opacity-100'"
         >
           <X class="w-2.5 h-2.5" />
         </button>
@@ -187,7 +187,7 @@ onUnmounted(() => {
       >
         <RotateCw
           class="w-3.5 h-3.5"
-          :class="isRefreshing ? 'animate-spin text-violet-600' : ''"
+          :class="isRefreshing ? 'animate-spin text-primary-600' : ''"
         />
       </button>
 

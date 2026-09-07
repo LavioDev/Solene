@@ -26,7 +26,7 @@ const emit = defineEmits<{
 
 const { t, te } = useI18n()
 
-// Dragging state for partner note
+// Dragging state for partner note (desktop)
 const noteRef = ref<HTMLElement | null>(null)
 const position = ref({ x: 0, y: 0 })
 const isDragging = ref(false)
@@ -34,8 +34,9 @@ const isMobile = ref(false)
 
 function checkMobile() {
   if (typeof window !== 'undefined') {
+    const wasMobile = isMobile.value
     isMobile.value = window.innerWidth < 768
-    if (isMobile.value) {
+    if (wasMobile !== isMobile.value) {
       position.value = { x: 0, y: 0 }
       isDragging.value = false
     }
@@ -45,13 +46,10 @@ function checkMobile() {
 const isMoved = computed(() => Math.abs(position.value.x) > 1 || Math.abs(position.value.y) > 1)
 
 const noteTransformStyle = computed(() => {
-  if (isMobile.value) {
-    return {
-      transform: 'rotate(-0.8deg)',
-    }
-  }
   return {
-    transform: `translate3d(${position.value.x}px, calc(-50% + ${position.value.y}px), 0)${isDragging.value ? ' scale(1.02) rotate(1.5deg)' : ''}`,
+    transform: `translate3d(${position.value.x}px, calc(-50% + ${position.value.y}px), 0)${
+      isDragging.value ? ' scale(1.02) rotate(1.5deg)' : ''
+    }`,
   }
 })
 
@@ -82,7 +80,6 @@ function getContainerBounds() {
 }
 
 function handlePointerDown(event: PointerEvent) {
-  if (isMobile.value) return // Non-draggable on mobile (miếng dán cứng cố định)
   if (event.button !== 0 && event.pointerType === 'mouse') return
   if (!noteRef.value) return
 
@@ -110,7 +107,7 @@ function handlePointerDown(event: PointerEvent) {
 }
 
 function handlePointerMove(event: PointerEvent) {
-  if (!isDragging.value || !noteRef.value || isMobile.value) return
+  if (!isDragging.value || !noteRef.value) return
 
   const deltaX = event.clientX - startPointer.x
   const deltaY = event.clientY - startPointer.y
@@ -146,7 +143,6 @@ function resetPosition() {
 
 function handleWindowResize() {
   checkMobile()
-  if (isMobile.value) return
   if (!noteRef.value || (!position.value.x && !position.value.y)) return
   const noteRect = noteRef.value.getBoundingClientRect()
   const bounds = getContainerBounds()
@@ -193,18 +189,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="relative py-6 sm:py-10 flex flex-col items-center justify-center select-none" style="margin-top:0 !important;">
+  <div class="relative py-7 sm:py-8 md:py-10 flex flex-col items-center justify-center select-none" style="margin-top:0 !important;">
     <!-- Hub: Waves and Circle share the exact same physical center -->
     <div class="relative flex items-center justify-center">
       <!-- Ambient Radiating Ripple Waves (centered strictly around the circle) -->
-      <div class="absolute inset-0 m-auto w-44 h-44 sm:w-56 sm:h-56 md:w-60 md:h-60 rounded-full border border-violet-400/35 animate-gentle-wave-1 pointer-events-none"></div>
-      <div class="absolute inset-0 m-auto w-44 h-44 sm:w-56 sm:h-56 md:w-60 md:h-60 rounded-full border border-purple-400/25 animate-gentle-wave-2 pointer-events-none"></div>
+      <div class="absolute inset-0 m-auto w-44 h-44 sm:w-56 sm:h-56 md:w-60 md:h-60 rounded-full border border-primary-400/35 animate-gentle-wave-1 pointer-events-none"></div>
+      <div class="absolute inset-0 m-auto w-44 h-44 sm:w-56 sm:h-56 md:w-60 md:h-60 rounded-full border border-primary-300/25 animate-gentle-wave-2 pointer-events-none"></div>
       <div class="absolute inset-0 m-auto w-44 h-44 sm:w-56 sm:h-56 md:w-60 md:h-60 rounded-full border border-rose-400/20 animate-gentle-wave-3 pointer-events-none"></div>
 
       <!-- Main Pure White Circular Love Core (Clickable to reveal random memory) -->
       <div
         @click="emit('open-random-memory')"
-        class="relative w-44 h-44 sm:w-56 sm:h-56 md:w-60 md:h-60 rounded-full bg-white border border-border/60 shadow-xl shadow-violet-500/10 flex flex-col items-center justify-center p-4 sm:p-6 text-center text-ink transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer group z-10 shrink-0"
+        class="relative w-44 h-44 sm:w-56 sm:h-56 md:w-60 md:h-60 rounded-full bg-white border border-border/60 shadow-xl shadow-primary-500/10 flex flex-col items-center justify-center p-4 sm:p-6 text-center text-ink transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer group z-10 shrink-0"
         :title="t('home.heartHint')"
       >
         <!-- Beating Heart Button (Click to open Glowing Particle Heart on Black BG) -->
@@ -218,7 +214,7 @@ onUnmounted(() => {
         </button>
 
         <!-- Label -->
-        <p class="text-[9px] sm:text-[10px] uppercase font-mono tracking-[0.24em] text-violet-700 font-bold">
+        <p class="text-[9px] sm:text-[10px] uppercase font-mono tracking-[0.24em] text-primary-700 font-bold">
           {{ t('home.together') }}
         </p>
 
@@ -227,7 +223,7 @@ onUnmounted(() => {
           <span class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-ink tracking-tight font-sans">
             {{ days }}
           </span>
-          <span class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-violet-700 font-mono">
+          <span class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-primary-700 font-mono">
             {{ t('home.days') }}
           </span>
         </div>
@@ -244,28 +240,29 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- DUY NHẤT 1 MIẾNG DÁN: Desktop có thể kéo thả, Mobile là miếng dán cứng nằm dưới div tròn -->
+    <!-- Desktop: Miếng dán sticky note có thể kéo thả bên cạnh div tròn (chỉ hiện trên màn hình md trở lên - giữ nền vàng note chân thực) -->
     <Transition name="partner-note">
       <div
         ref="noteRef"
         v-if="partnerMood"
         :style="noteTransformStyle"
-        class="flex flex-col select-none text-left bg-[#fffef5] border border-amber-200/90 rounded-xl p-3.5 pt-4 transition-shadow group z-20
-               mt-8 w-full max-w-xs sm:max-w-sm mx-auto shadow-sm shadow-amber-900/5
-               md:absolute md:right-0 md:top-1/2 md:mt-0 md:w-64 lg:w-72 md:p-4 md:pt-4.5"
+        class="hidden md:flex flex-col select-none text-left bg-[#fffef5] border border-amber-200/90 rounded-xl p-4 pt-4.5 transition-shadow group
+               absolute right-0 top-1/2 w-64 lg:w-72 shadow-md shadow-amber-900/5 z-20"
         :class="[
-          isMobile
-            ? 'cursor-default touch-auto'
-            : isDragging
-              ? 'cursor-grabbing shadow-2xl shadow-violet-500/20 z-40 ring-2 ring-violet-400/50 border-violet-500 touch-none transition-none'
-              : 'cursor-grab hover:border-violet-300/80 shadow-md shadow-amber-900/5 hover:shadow-xl duration-300 touch-none'
+          isDragging
+            ? 'cursor-grabbing shadow-2xl shadow-primary-500/20 z-40 ring-2 ring-primary-400/50 border-primary-500 touch-none transition-none'
+            : isMoved
+              ? 'cursor-grab shadow-lg shadow-amber-900/10 hover:shadow-xl hover:border-amber-300/80 z-30 touch-none duration-300'
+              : 'cursor-grab hover:border-amber-300/80 hover:shadow-xl z-20 duration-300 touch-none'
         ]"
-        :title="!isMobile ? (isMoved ? t('home.doubleClickReset') : t('home.dragNoteHint')) : undefined"
+        :title="isMoved ? t('home.doubleClickReset') : t('home.dragNoteHint')"
         @pointerdown="handlePointerDown"
-        @dblclick="!isMobile && resetPosition()"
+        @dblclick="resetPosition"
       >
-        <!-- Băng dính Washi Tape dán đầu tờ note -->
-        <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-14 h-3.5 bg-amber-200/80 border border-amber-300/60 rounded-2xs shadow-2xs rotate-[-1deg] pointer-events-none backdrop-blur-xs"></div>
+        <!-- Băng dính Washi Tape dán đầu tờ note (chân thực, bán trong suốt) -->
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-amber-100/85 backdrop-blur-[2px] border-y border-amber-300/60 border-x border-dashed border-amber-300/40 rounded-2xs shadow-2xs rotate-[-1.2deg] pointer-events-none z-20 flex items-center justify-center">
+          <span class="w-full h-px bg-amber-200/50"></span>
+        </div>
 
         <!-- Header Note: Tiêu đề ghi chú & Huy hiệu cảm xúc & Nút Reset / Drag grip -->
         <div class="flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-amber-200/50">
@@ -277,18 +274,18 @@ onUnmounted(() => {
           </div>
 
           <!-- Drag controls (Chỉ hiện trên desktop để kéo / reset vị trí) -->
-          <div v-if="!isMobile" class="flex items-center gap-1 shrink-0">
+          <div class="flex items-center gap-1 shrink-0">
             <button
               v-if="isMoved"
               type="button"
-              class="p-0.5 rounded text-amber-600 hover:text-amber-900 hover:bg-amber-100/80 transition-colors cursor-pointer"
+              class="p-1 rounded text-amber-600 hover:text-amber-900 hover:bg-amber-100/80 active:scale-95 transition-all cursor-pointer"
               :title="t('home.resetPosition')"
               @pointerdown.stop
               @click.stop="resetPosition"
             >
-              <RotateCcw class="w-3 h-3" />
+              <RotateCcw class="w-3.5 h-3.5" />
             </button>
-            <GripHorizontal class="w-3.5 h-3.5 text-amber-400/80 group-hover:text-amber-600 transition-colors" />
+            <GripHorizontal class="w-3.5 h-3.5 text-amber-400/80 group-hover:text-amber-600 transition-colors cursor-grab" />
           </div>
         </div>
 

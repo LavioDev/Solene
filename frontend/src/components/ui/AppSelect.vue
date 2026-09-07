@@ -117,8 +117,8 @@ onUnmounted(() => {
           error
             ? 'border-err-text focus:border-err-text focus:ring-2 focus:ring-rose-400/20'
             : isOpen
-              ? 'border-violet-500 ring-2 ring-violet-400/20'
-              : 'border-border hover:border-violet-300',
+              ? 'border-primary-500 ring-2 ring-primary-400/20'
+              : 'border-border hover:border-primary-300',
         ]"
       >
         <span
@@ -135,7 +135,7 @@ onUnmounted(() => {
           class="text-ink-muted shrink-0 ml-2 transition-transform duration-200"
           :class="[
             size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4',
-            isOpen ? 'rotate-180 text-violet-600' : ''
+            isOpen ? 'rotate-180 text-primary-600' : ''
           ]"
         />
       </button>
@@ -166,7 +166,7 @@ onUnmounted(() => {
                 v-model="searchQuery"
                 type="text"
                 :placeholder="searchPlaceholder || t('users.searchPlaceholder') || 'Search...'"
-                class="w-full pl-8 pr-2.5 py-1.5 text-xs bg-surface-subtle focus:bg-white border border-border rounded-lg text-ink placeholder:text-ink-faint focus:outline-none focus:ring-1 focus:ring-violet-400 focus:border-violet-500 transition-all"
+                class="w-full pl-8 pr-2.5 py-1.5 text-xs bg-surface-subtle focus:bg-white border border-border rounded-lg text-ink placeholder:text-ink-faint focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-500 transition-all"
                 @click.stop
                 @keydown.stop
               />
@@ -182,13 +182,13 @@ onUnmounted(() => {
               @click="selectOption(opt.value)"
               class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer text-left"
               :class="opt.value === modelValue
-                ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
-                : 'text-ink hover:bg-surface-raised hover:text-violet-700'"
+                ? 'bg-primary-50 text-primary-700 font-semibold shadow-2xs'
+                : 'text-ink hover:bg-surface-raised hover:text-primary-700'"
             >
               <span class="truncate">{{ opt.label }}</span>
               <Check
                 v-if="opt.value === modelValue"
-                class="w-3.5 h-3.5 text-violet-600 shrink-0 ml-2"
+                class="w-3.5 h-3.5 text-primary-600 shrink-0 ml-2"
               />
             </button>
           </div>

@@ -28,6 +28,21 @@ export default {
     managementDesc: 'Quản lý Cặp đôi và Tài khoản Người dùng',
     profileDesc: 'Thông tin cá nhân & bảo mật',
   },
+  theme: {
+    title: 'Giao diện & Màu sắc',
+    subtitle: 'Tùy chỉnh màu sắc theme chủ đạo',
+    primaryColor: 'Màu chủ đạo',
+    reset: 'Khôi phục mặc định',
+    presetViolet: 'Tím Solène',
+    presetBlue: 'Xanh lam',
+    presetEmerald: 'Xanh ngọc',
+    presetRose: 'Hồng ngọc',
+    presetYellow: 'Vàng pastel',
+    presetAmber: 'Cam hổ phách',
+    presetCyan: 'Xanh lơ',
+    presetIndigo: 'Chàm',
+    presetPink: 'Hồng sakura',
+  },
   auth: {
 
     signIn: 'Đăng Nhập',
@@ -85,6 +100,7 @@ export default {
     },
     heartHint: 'Bấm vào để xem kỷ niệm ngẫu nhiên',
     particleHeartHint: 'Bấm để mở không gian trái tim hạt sáng',
+    particleHeartReturnHint: 'Bấm vào bất kỳ đâu để quay lại',
     dragNoteHint: 'Kéo để di chuyển ghi chú trên màn hình (Nhấp đúp để đặt lại)',
     doubleClickReset: 'Nhấp đúp hoặc bấm nút đặt lại để về vị trí ban đầu',
     resetPosition: 'Đặt lại vị trí',
@@ -97,7 +113,7 @@ export default {
     },
     quickActions: {
       title: 'Thao tác',
-      addNote: 'Ghi chú',
+      addNote: 'kỷ niệm',
       addTask: 'Công việc',
       viewCalendar: 'Lịch',
       viewCouples: 'Cặp đôi',

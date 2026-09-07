@@ -27,9 +27,9 @@ function toggle() {
 }
 
 const switchTrackClass = computed(() => {
-  const base = 'relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-violet-500/20 shadow-2xs'
+  const base = 'relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500/20 shadow-2xs'
   const sizeCls = props.size === 'sm' ? 'h-5 w-9' : 'h-6 w-11'
-  const stateCls = props.modelValue ? 'bg-violet-600' : 'bg-surface-raised border-border'
+  const stateCls = props.modelValue ? 'bg-primary-600' : 'bg-surface-raised border-border'
   const disabledCls = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
   return `${base} ${sizeCls} ${stateCls} ${disabledCls}`
 })

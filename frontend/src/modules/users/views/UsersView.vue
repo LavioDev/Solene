@@ -381,7 +381,7 @@ onMounted(() => {
           v-model="searchQuery"
           type="text"
           :placeholder="t('users.searchPlaceholder')"
-          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-500 transition-all shadow-2xs"
+          class="w-full h-[42px] pl-9 pr-3.5 py-2.5 text-xs bg-surface-subtle/80 hover:bg-surface-raised focus:bg-white border border-border rounded-xl text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-primary-400/20 focus:border-primary-500 transition-all shadow-2xs"
         />
       </div>
 
@@ -412,13 +412,13 @@ onMounted(() => {
     <div class="bg-white border border-border rounded-2xl shadow-card overflow-hidden">
       <!-- Loading State -->
       <div v-if="loading" class="py-20 text-center text-sm text-ink-faint">
-        <div class="animate-spin w-6 h-6 border-2 border-violet-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+        <div class="animate-spin w-6 h-6 border-2 border-primary-600 border-t-transparent rounded-full mx-auto mb-2"></div>
         {{ t('users.loading') }}
       </div>
 
       <!-- Empty State -->
       <div v-else-if="filteredUsers.length === 0" class="py-16 text-center space-y-3">
-        <div class="w-12 h-12 rounded-full bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-400 mx-auto">
+        <div class="w-12 h-12 rounded-full bg-primary-50 border border-primary-100 flex items-center justify-center text-primary-400 mx-auto">
           <UserX class="w-6 h-6" />
         </div>
         <p class="text-sm font-semibold text-ink">{{ t('users.emptyTitle') }}</p>
@@ -451,7 +451,7 @@ onMounted(() => {
               <td class="py-3.5 px-5">
                 <div class="flex items-center gap-3">
                   <div
-                    class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs border overflow-hidden bg-surface-subtle border-violet-200/80"
+                    class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs border overflow-hidden bg-surface-subtle border-primary-200/80"
                   >
                     <img
                       :src="u.avatar_url || defaultAvatar"
@@ -464,7 +464,7 @@ onMounted(() => {
                       <p class="font-semibold text-ink truncate leading-tight">{{ u.full_name || 'User' }}</p>
                       <span
                         v-if="authStore.user && u.id === authStore.user.id"
-                        class="text-[10px] bg-violet-100 text-violet-700 font-bold px-1.5 py-0.2 rounded-md font-mono"
+                        class="text-[10px] bg-primary-100 text-primary-700 font-bold px-1.5 py-0.2 rounded-md font-mono"
                       >
                         {{ t('users.you') }}
                       </span>
@@ -511,7 +511,7 @@ onMounted(() => {
                   <button
                     type="button"
                     @click="openEditModal(u)"
-                    class="p-1.5 rounded-lg text-ink-faint hover:text-violet-600 hover:bg-violet-50 transition-colors cursor-pointer"
+                    class="p-1.5 rounded-lg text-ink-faint hover:text-primary-600 hover:bg-primary-50 transition-colors cursor-pointer"
                     :title="t('users.editUser')"
                   >
                     <Edit2 class="w-3.5 h-3.5" />
@@ -620,7 +620,7 @@ onMounted(() => {
                 <button
                   type="button"
                   @click="selectAllPermissions"
-                  class="text-xs font-semibold text-violet-600 hover:text-violet-700 hover:underline cursor-pointer"
+                  class="text-xs font-semibold text-primary-600 hover:text-primary-700 hover:underline cursor-pointer"
                 >
                   {{ t('users.selectAll') }}
                 </button>
@@ -637,7 +637,7 @@ onMounted(() => {
 
             <!-- Loading indicator -->
             <div v-if="permissionsLoading" class="py-10 text-center text-sm text-ink-muted">
-              <div class="animate-spin w-5 h-5 border-2 border-violet-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+              <div class="animate-spin w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full mx-auto mb-2"></div>
               <span>Đang tải danh mục quyền...</span>
             </div>
 
@@ -666,13 +666,13 @@ onMounted(() => {
                     @click="togglePermission(perm)"
                     class="flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none bg-white"
                     :class="isPermissionSelected(perm)
-                      ? 'border-violet-500 bg-violet-50/40 ring-1 ring-violet-400/20'
-                      : 'border-border hover:border-violet-300'"
+                      ? 'border-primary-500 bg-primary-50/40 ring-1 ring-primary-400/20'
+                      : 'border-border hover:border-primary-300'"
                   >
                     <div
                       class="w-4.5 h-4.5 rounded-md flex items-center justify-center shrink-0 border transition-all"
                       :class="isPermissionSelected(perm)
-                        ? 'bg-violet-600 border-violet-600 text-white'
+                        ? 'bg-primary-600 border-primary-600 text-white'
                         : 'border-border bg-white'"
                     >
                       <Check v-if="isPermissionSelected(perm)" class="w-3.5 h-3.5 stroke-[3]" />

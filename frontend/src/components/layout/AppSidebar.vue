@@ -128,11 +128,11 @@ async function handleLogout() {
       <router-link to="/" class="group flex items-center gap-2">
         <span
           v-if="!isEffectivelyCollapsed"
-          class="select-none tracking-tight text-ink font-bold text-lg group-hover:text-violet-700 transition-colors inline-flex items-center gap-1.5"
+          class="select-none tracking-tight text-ink font-bold text-lg group-hover:text-primary-700 transition-colors inline-flex items-center gap-1.5"
           style="font-family: 'Plus Jakarta Sans', sans-serif;"
         >
           <span>Solène</span>
-          <Sparkles class="w-4 h-4 text-violet-600 animate-pulse" />
+          <Sparkles class="w-4 h-4 text-primary-600 animate-pulse" />
         </span>
         <img
           v-else
@@ -167,20 +167,20 @@ async function handleLogout() {
         :class="[
           isEffectivelyCollapsed ? 'justify-center p-2.5' : 'gap-2.5 px-3 py-2',
           isActive(item.path)
-            ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
+            ? 'bg-primary-50 text-primary-700 font-semibold shadow-2xs'
             : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-normal'
         ]"
       >
         <component
           :is="item.icon"
           class="w-4 h-4 shrink-0"
-          :class="isActive(item.path) ? 'text-violet-600' : 'text-ink-faint'"
+          :class="isActive(item.path) ? 'text-primary-600' : 'text-ink-faint'"
         />
         <span v-if="!isEffectivelyCollapsed" class="truncate">{{ item.name }}</span>
         <!-- Active indicator -->
         <span
           v-if="!isEffectivelyCollapsed && isActive(item.path)"
-          class="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500"
+          class="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500"
         />
       </router-link>
 
@@ -194,7 +194,7 @@ async function handleLogout() {
           class="w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs sm:text-sm transition-all cursor-pointer select-none"
           :class="[
             isManagementActive
-              ? 'text-violet-800 font-semibold bg-violet-50/60'
+              ? 'text-primary-800 font-semibold bg-primary-50/60'
               : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-medium'
           ]"
           :title="t('nav.management')"
@@ -202,7 +202,7 @@ async function handleLogout() {
           <div class="flex items-center gap-2.5 min-w-0">
             <ShieldCheck
               class="w-4 h-4 shrink-0"
-              :class="isManagementActive ? 'text-violet-600' : 'text-ink-faint'"
+              :class="isManagementActive ? 'text-primary-600' : 'text-ink-faint'"
             />
             <span class="truncate">{{ t('nav.management') }}</span>
           </div>
@@ -215,7 +215,7 @@ async function handleLogout() {
         <!-- Submenu Children -->
         <div
           v-show="isManagementOpen"
-          class="mt-1 ml-3.5 pl-3 space-y-1 border-l border-violet-100 transition-all"
+          class="mt-1 ml-3.5 pl-3 space-y-1 border-l border-primary-100 transition-all"
         >
           <router-link
             v-for="sub in managementChildren"
@@ -225,19 +225,19 @@ async function handleLogout() {
             class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all"
             :class="[
               isActive(sub.path)
-                ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
+                ? 'bg-primary-50 text-primary-700 font-semibold shadow-2xs'
                 : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-normal'
             ]"
           >
             <component
               :is="sub.icon"
               class="w-3.5 h-3.5 shrink-0"
-              :class="isActive(sub.path) ? 'text-violet-600' : 'text-ink-faint'"
+              :class="isActive(sub.path) ? 'text-primary-600' : 'text-ink-faint'"
             />
             <span class="truncate">{{ sub.name }}</span>
             <span
               v-if="isActive(sub.path)"
-              class="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500"
+              class="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500"
             />
           </router-link>
         </div>
@@ -250,20 +250,20 @@ async function handleLogout() {
           class="w-full flex items-center justify-center p-2.5 rounded-xl text-xs transition-all cursor-pointer"
           :class="[
             isManagementActive
-              ? 'bg-violet-50 text-violet-700 font-semibold shadow-2xs'
+              ? 'bg-primary-50 text-primary-700 font-semibold shadow-2xs'
               : 'text-ink-muted hover:bg-surface-raised hover:text-ink font-normal'
           ]"
           :title="t('nav.management')"
         >
           <ShieldCheck
             class="w-4 h-4 shrink-0"
-            :class="isManagementActive ? 'text-violet-600' : 'text-ink-faint'"
+            :class="isManagementActive ? 'text-primary-600' : 'text-ink-faint'"
           />
         </button>
 
         <!-- Hover Flyout Menu -->
         <div
-          class="absolute left-full top-0 ml-2 hidden group-hover/popover:flex flex-col bg-white border border-border/80 rounded-xl shadow-xl shadow-violet-500/10 p-1.5 min-w-40 z-50 pointer-events-auto"
+          class="absolute left-full top-0 ml-2 hidden group-hover/popover:flex flex-col bg-white border border-border/80 rounded-xl shadow-xl shadow-primary-500/10 p-1.5 min-w-40 z-50 pointer-events-auto"
         >
           <div class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-faint border-b border-border/50 mb-1">
             {{ t('nav.management') }}
@@ -275,14 +275,14 @@ async function handleLogout() {
             class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all"
             :class="[
               isActive(sub.path)
-                ? 'bg-violet-50 text-violet-700 font-semibold'
+                ? 'bg-primary-50 text-primary-700 font-semibold'
                 : 'text-ink-muted hover:bg-surface-raised hover:text-ink'
             ]"
           >
             <component
               :is="sub.icon"
               class="w-3.5 h-3.5 shrink-0"
-              :class="isActive(sub.path) ? 'text-violet-600' : 'text-ink-faint'"
+              :class="isActive(sub.path) ? 'text-primary-600' : 'text-ink-faint'"
             />
             <span class="truncate">{{ sub.name }}</span>
           </router-link>
@@ -309,7 +309,7 @@ async function handleLogout() {
         class="flex items-center justify-between p-1.5 pl-2 rounded-xl hover:bg-surface-raised/80 transition-colors group"
       >
         <router-link to="/profile" class="flex items-center gap-2 min-w-0 flex-1 group/user" :title="t('nav.profile')">
-          <div class="w-7 h-7 rounded-full bg-violet-100 group-hover/user:bg-violet-200 text-violet-700 font-semibold text-xs flex items-center justify-center shrink-0 transition-colors overflow-hidden border border-violet-200">
+          <div class="w-7 h-7 rounded-full bg-primary-100 group-hover/user:bg-primary-200 text-primary-700 font-semibold text-xs flex items-center justify-center shrink-0 transition-colors overflow-hidden border border-primary-200">
             <img
               v-if="authStore.user.avatar_url"
               :src="authStore.user.avatar_url"
@@ -319,7 +319,7 @@ async function handleLogout() {
             <UserIcon v-else class="w-3.5 h-3.5" />
           </div>
           <div class="min-w-0 flex-1">
-            <p class="text-xs font-medium text-ink group-hover/user:text-violet-700 truncate leading-tight transition-colors">{{ authStore.user.full_name }}</p>
+            <p class="text-xs font-medium text-ink group-hover/user:text-primary-700 truncate leading-tight transition-colors">{{ authStore.user.full_name }}</p>
             <p class="text-[10px] text-ink-faint truncate">{{ authStore.user.email }}</p>
           </div>
         </router-link>
@@ -343,7 +343,7 @@ async function handleLogout() {
         <router-link
           to="/profile"
           :title="`${authStore.user.full_name} (${authStore.user.email})`"
-          class="w-8 h-8 rounded-xl bg-violet-100 hover:bg-violet-200 text-violet-700 font-semibold text-xs flex items-center justify-center shrink-0 transition-colors overflow-hidden border border-violet-200"
+          class="w-8 h-8 rounded-xl bg-primary-100 hover:bg-primary-200 text-primary-700 font-semibold text-xs flex items-center justify-center shrink-0 transition-colors overflow-hidden border border-primary-200"
         >
           <img
             v-if="authStore.user.avatar_url"

@@ -35,7 +35,7 @@ const emit = defineEmits<{
       <!-- Icon -->
       <div
         class="w-12 h-12 rounded-full flex items-center justify-center mx-auto"
-        :class="variant === 'danger' ? 'bg-err-bg text-err-text border border-err-border' : 'bg-violet-50 text-violet-600 border border-violet-100'"
+        :class="variant === 'danger' ? 'bg-err-bg text-err-text border border-err-border' : 'bg-primary-50 text-primary-600 border border-primary-100'"
       >
         <AlertTriangle class="w-6 h-6" />
       </div>

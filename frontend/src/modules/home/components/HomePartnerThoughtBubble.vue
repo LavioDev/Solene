@@ -40,12 +40,12 @@ function formatTime(isoStr?: string | null): string {
 }
 
 // Badge priority
-const priorityVariant = computed<'err' | 'warn' | 'ok' | 'violet'>(() => {
+const priorityVariant = computed<'err' | 'warn' | 'ok' | 'primary' | 'violet'>(() => {
   const p = props.task?.priority?.toLowerCase()
   if (p === 'urgent' || p === 'high') return 'err'
   if (p === 'medium') return 'warn'
   if (p === 'low') return 'ok'
-  return 'violet'
+  return 'primary'
 })
 
 const priorityLabel = computed(() => {
@@ -78,7 +78,7 @@ function openModal() {
     >
       <!-- Container chính của Bong bóng -->
       <div
-        class="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-violet-200/80 shadow-md shadow-violet-500/10 hover:shadow-lg hover:shadow-violet-500/15 hover:border-violet-300 transition-all text-xs"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-primary-200/80 shadow-md shadow-primary-500/10 hover:shadow-lg hover:shadow-primary-500/15 hover:border-primary-300 transition-all text-xs"
       >
         <!-- Icon suy nghĩ / Trạng thái -->
         <div class="relative shrink-0 flex items-center justify-center">
@@ -91,7 +91,7 @@ function openModal() {
 
         <!-- Nội dung suy nghĩ / Task đang làm -->
         <div class="flex items-center gap-1.5 whitespace-nowrap">
-          <span v-if="partnerName" class="font-bold text-violet-700 shrink-0 text-xs whitespace-nowrap">
+          <span v-if="partnerName" class="font-bold text-primary-700 shrink-0 text-xs whitespace-nowrap">
             {{ partnerName }}:
           </span>
           <span class="font-medium text-ink text-xs whitespace-nowrap">
@@ -120,8 +120,8 @@ function openModal() {
 
       <!-- ĐUÔI BONG BÓNG SUY NGHĨ (2 HẠT TRÒN MÂY NỐI VÀO AVATAR Ở TRÊN) -->
       <div class="absolute -top-2 left-6 flex flex-col-reverse items-center pointer-events-none">
-        <span class="w-2 h-2 rounded-full bg-white border border-violet-200 shadow-2xs -mt-0.5"></span>
-        <span class="w-1.5 h-1.5 rounded-full bg-white border border-violet-200 shadow-2xs ml-1 -mt-0.5"></span>
+        <span class="w-2 h-2 rounded-full bg-white border border-primary-200 shadow-2xs -mt-0.5"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-white border border-primary-200 shadow-2xs ml-1 -mt-0.5"></span>
       </div>
 
     </div>
@@ -158,7 +158,7 @@ function openModal() {
 
         <!-- Thời gian & Mức độ ưu tiên -->
         <div v-if="isBusy && task?.start_time" class="flex items-center gap-2 text-ink-muted text-[11px] font-mono">
-          <Clock class="w-3.5 h-3.5 text-violet-500 shrink-0" />
+          <Clock class="w-3.5 h-3.5 text-primary-500 shrink-0" />
           <span>{{ formatTime(task.start_time) }} &mdash; {{ formatTime(task.end_time) }}</span>
           <span v-if="task.priority" class="text-ink-faint">·</span>
           <AppBadge v-if="task.priority" :variant="priorityVariant" size="sm">

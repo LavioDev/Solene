@@ -191,9 +191,9 @@ function closeModal() {
         class="w-full h-full aspect-square rounded-2xl flex items-center justify-center font-extrabold shadow-sm border overflow-hidden transition-all duration-200 shrink-0"
         :class="[
           modelValue
-            ? 'border-violet-200 bg-surface-subtle'
-            : 'bg-gradient-to-br from-violet-100 to-violet-200 border-violet-300 text-violet-800',
-          editable && !disabled ? 'group-hover:ring-2 group-hover:ring-violet-400/40 group-hover:border-violet-400' : ''
+            ? 'border-primary-200 bg-surface-subtle'
+            : 'bg-gradient-to-br from-primary-100 to-primary-200 border-primary-300 text-primary-800',
+          editable && !disabled ? 'group-hover:ring-2 group-hover:ring-primary-400/40 group-hover:border-primary-400' : ''
         ]"
       >
         <!-- Actual Avatar Image or Default Avatar -->
@@ -245,7 +245,7 @@ function closeModal() {
             type="button"
             @click="handleRotateLeft"
             :title="t('avatar.rotateLeft')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <RotateCcw class="w-4 h-4" />
           </button>
@@ -253,7 +253,7 @@ function closeModal() {
             type="button"
             @click="handleRotateRight"
             :title="t('avatar.rotateRight')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <RotateCw class="w-4 h-4" />
           </button>
@@ -261,7 +261,7 @@ function closeModal() {
             type="button"
             @click="handleZoomIn"
             :title="t('avatar.zoomIn')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <ZoomIn class="w-4 h-4" />
           </button>
@@ -269,7 +269,7 @@ function closeModal() {
             type="button"
             @click="handleZoomOut"
             :title="t('avatar.zoomOut')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <ZoomOut class="w-4 h-4" />
           </button>
@@ -277,7 +277,7 @@ function closeModal() {
             type="button"
             @click="handleReset"
             :title="t('avatar.reset')"
-            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-violet-700 transition-colors cursor-pointer shadow-2xs"
+            class="p-2 rounded-xl bg-surface-subtle hover:bg-surface-raised border border-border text-ink hover:text-primary-700 transition-colors cursor-pointer shadow-2xs"
           >
             <RefreshCw class="w-4 h-4" />
           </button>

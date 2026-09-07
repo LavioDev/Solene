@@ -2,14 +2,15 @@
 import { computed } from 'vue'
 
 interface Props {
-  variant?: 'violet' | 'rose' | 'ok' | 'warn' | 'err' | 'info' | 'neutral'
+  variant?: 'primary' | 'violet' | 'rose' | 'ok' | 'warn' | 'err' | 'info' | 'neutral'
   size?: 'sm' | 'md'
 }
 
 const props = withDefaults(defineProps<Props>(), { variant: 'neutral', size: 'sm' })
 
 const cls = computed(() => ({
-  violet:  'bg-violet-50 text-violet-700 border border-violet-200',
+  primary: 'bg-primary-50 text-primary-700 border border-primary-200',
+  violet:  'bg-primary-50 text-primary-700 border border-primary-200',
   rose:    'bg-rose-50 text-rose-700 border border-rose-200',
   ok:      'bg-ok-bg text-ok-text border border-ok-border',
   warn:    'bg-warn-bg text-warn-text border border-warn-border',

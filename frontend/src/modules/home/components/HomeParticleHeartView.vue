@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits<{
   (e: 'exit'): void
 }>()
 
+const { t } = useI18n()
+
 const containerRef = ref<HTMLDivElement | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 let animationFrameId: number | null = null
 let resizeObserver: ResizeObserver | null = null
+let handleWindowResize: (() => void) | null = null
 
 interface Particle {
   vx: number
@@ -30,13 +34,27 @@ function initHeartCanvas() {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
-  const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
-    (navigator.userAgent || navigator.vendor || (window as unknown as { opera: string }).opera || '').toLowerCase()
-  )
-  const koef = isMobile ? 0.5 : 1
+  let width = (canvas.width = container.clientWidth || window.innerWidth)
+  let height = (canvas.height = container.clientHeight || window.innerHeight)
+  let heartScale = 1
 
-  let width = (canvas.width = koef * container.clientWidth)
-  let height = (canvas.height = koef * container.clientHeight)
+  const updateDimensionsAndScale = () => {
+    if (!canvas || !container) return
+    width = canvas.width = container.clientWidth || window.innerWidth
+    height = canvas.height = container.clientHeight || window.innerHeight
+
+    // Base heart width is 420px at heartScale = 1 (sx: 210, 150, 90).
+    // On narrower viewports (mobile/responsive), heart scales down proportionally to fit the width.
+    // Also guard against low-height viewports (mobile landscape).
+    heartScale = Math.min(
+      1,
+      (width * 0.72) / 420,
+      (height * 0.65) / 400
+    )
+    heartScale = Math.max(0.4, heartScale)
+  }
+
+  updateDimensionsAndScale()
   const rand = Math.random
 
   // Light Mode Background
@@ -67,19 +85,23 @@ function initHeartCanvas() {
 
   const handleResize = () => {
     if (!canvas || !container) return
-    width = canvas.width = koef * container.clientWidth
-    height = canvas.height = koef * container.clientHeight
+    updateDimensionsAndScale()
     ctx.fillStyle = 'rgba(255,255,255,1)'
     ctx.fillRect(0, 0, width, height)
   }
 
+  handleWindowResize = handleResize
   resizeObserver = new ResizeObserver(handleResize)
   resizeObserver.observe(container)
+  window.addEventListener('resize', handleResize)
 
-  // EXACT ORIGINAL PARAMETERS
-  const traceCount = isMobile ? 20 : 50
+  const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+    (navigator.userAgent || navigator.vendor || (window as unknown as { opera: string }).opera || '').toLowerCase()
+  ) || window.innerWidth < 768
+
+  const traceCount = isMobile ? 35 : 50
   const pointsOrigin: [number, number][] = []
-  const dr = isMobile ? 0.3 : 0.1
+  const dr = isMobile ? 0.15 : 0.1
 
   for (let i = 0; i < Math.PI * 2; i += dr) {
     pointsOrigin.push(scaleAndTranslate(heartPosition(i), 210, 13, 0, 0))
@@ -96,8 +118,8 @@ function initHeartCanvas() {
   const pulse = (kx: number, ky: number) => {
     for (let i = 0; i < pointsOrigin.length; i++) {
       targetPoints[i] = [
-        kx * pointsOrigin[i][0] + width / 2,
-        ky * pointsOrigin[i][1] + height / 2,
+        kx * pointsOrigin[i][0] * heartScale + width / 2,
+        ky * pointsOrigin[i][1] * heartScale + height / 2,
       ]
     }
   }
@@ -115,7 +137,7 @@ function initHeartCanvas() {
       vx: 0,
       vy: 0,
       R: 2,
-      speed: rand() + 5,
+      speed: (rand() + 5) * Math.max(0.7, heartScale),
       q: Math.floor(rand() * heartPointsCount),
       D: 2 * (i % 2) - 1,
       force: 0.2 * rand() + 0.7,
@@ -140,6 +162,8 @@ function initHeartCanvas() {
     ctx.fillStyle = 'rgba(255,255,255,.12)'
     ctx.fillRect(0, 0, width, height)
 
+    const hitDistance = 10 * Math.max(0.6, heartScale)
+
     for (let i = particles.length; i--; ) {
       const u = particles[i]
       const q = targetPoints[u.q]
@@ -149,7 +173,7 @@ function initHeartCanvas() {
       const dy = u.trace[0].y - q[1]
       const length = Math.sqrt(dx * dx + dy * dy)
 
-      if (length < 10) {
+      if (length < hitDistance) {
         if (rand() > 0.95) {
           u.q = Math.floor(rand() * heartPointsCount)
         } else {
@@ -199,6 +223,10 @@ function stopAnimation() {
     resizeObserver.disconnect()
     resizeObserver = null
   }
+  if (handleWindowResize) {
+    window.removeEventListener('resize', handleWindowResize)
+    handleWindowResize = null
+  }
 }
 
 function handleKeydown(e: KeyboardEvent) {
@@ -223,18 +251,18 @@ onUnmounted(() => {
   <div
     ref="containerRef"
     @click="emit('exit')"
-    class="relative w-full h-full min-h-[calc(100vh-4rem)] bg-white flex flex-col items-center justify-center select-none overflow-hidden cursor-pointer"
-    title="Click to return to dashboard"
+    class="relative w-full h-full min-h-[calc(100dvh-3.5rem)] bg-white flex flex-col items-center justify-center select-none overflow-hidden cursor-pointer"
+    :title="t('home.particleHeartReturnHint')"
   >
-    <!-- Background Animated Canvas (Only the Pure Particle Heart) -->
+    <!-- Background Animated Canvas (Pure Responsive Particle Heart) -->
     <canvas
       ref="canvasRef"
-      class="absolute inset-0 w-full h-full pointer-events-none"
+      class="absolute inset-0 w-full h-full pointer-events-none block"
     ></canvas>
 
     <!-- Subtle return hint at bottom -->
-    <div class="absolute bottom-4 text-[11px] text-slate-400 font-mono pointer-events-none">
-      Click anywhere to return
+    <div class="absolute bottom-4 left-0 right-0 text-center text-[11px] text-slate-400 font-mono pointer-events-none px-4 select-none">
+      {{ t('home.particleHeartReturnHint') }}
     </div>
   </div>
 </template>

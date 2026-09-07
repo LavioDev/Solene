@@ -42,15 +42,16 @@ This document establishes setup standards, architectural rules, Clean Code guide
 ## 3. FRONTEND CODE STANDARDS (VUE 3 + TAILWIND CSS + TYPESCRIPT)
 
 ### 3.1 UI/UX Style: Strict Native UI Component Library
-- Minimalist, white-dominant background (`#ffffff` / `#fafafa`) with violet accents (`#7c3aed` / `#6d28d9`), rounded corners (`rounded-xl`), and soft shadows (`shadow-2xs` / `shadow-card`).
+- Minimalist, white-dominant background (`#ffffff` / `#fafafa`) with dynamic primary theme accents (`primary-50`..`primary-950` with presets such as Solène Violet, Pastel Yellow, Royal Blue, Rose Ruby, etc.), rounded corners (`rounded-xl`), and soft shadows (`shadow-2xs` / `shadow-card`).
 - MANDATORY Native UI Component Primitives:
-  - `AppButton.vue`: Native UI styled buttons.
+  - `AppButton.vue`: Native UI styled buttons with `primary` and `secondary` variants.
   - `AppInput.vue`: Native UI styled text/number/date inputs.
   - `AppSelect.vue`: Custom styled native select dropdown (`appearance-none` with custom `ChevronDown` arrow). Never use raw unstyled browser `<select>`.
-  - `AppTextarea.vue`: Custom styled native textarea (`rounded-xl`, violet focus ring). Never use raw unstyled browser `<textarea>`.
+  - `AppTextarea.vue`: Custom styled native textarea (`rounded-xl`, primary focus ring). Never use raw unstyled browser `<textarea>`.
   - `AppModal.vue`: Glassmorphism modal with Vue `<Transition>` animations (backdrop fade + scale zoom transform).
   - `AppConfirmModal.vue`: Native UI confirm modal dialogs for deletion/warning actions. Never use raw browser `confirm()` or `alert()`.
   - `AppLangSwitcher.vue`: Multi-language selector (EN, VI, FR, ZH).
+  - `AppThemeSwitcher.vue`: Header theme color palette switcher (Vben Admin style) with 9 presets and persistence.
 
 ### 3.2 Width Presets
 - Fixed min-width options `800px` (default), `1000px`, `1200px` hardcoded per component layout requirement.
