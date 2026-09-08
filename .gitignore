@@ -64,3 +64,6 @@ coverage/
 # Vite / Vue
 .vite/
 *.tsbuildinfo
+
+# Documentation
+docs/
