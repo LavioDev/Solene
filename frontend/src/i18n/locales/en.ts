@@ -393,6 +393,8 @@ export default {
   common: {
     cancel: 'Cancel',
     save: 'Save',
+    saving: 'Saving...',
+    saved: 'Saved!',
     create: 'Create',
     edit: 'Edit',
     delete: 'Delete',
@@ -461,6 +463,8 @@ export default {
     lockedBadge: 'Locked',
     updateMood: 'Update Mood',
     logMood: 'Log Mood',
+    updateSuccess: 'Mood updated successfully!',
+    logSuccess: 'Today mood logged successfully!',
     deleteMood: 'Delete Mood',
     confirmDelete: "Are you sure you want to reset today's mood?",
     noteLabel: 'Daily Reflection & Note',

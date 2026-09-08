@@ -393,6 +393,8 @@ export default {
   common: {
     cancel: 'Hủy bỏ',
     save: 'Lưu thay đổi',
+    saving: 'Đang lưu...',
+    saved: 'Đã lưu!',
     create: 'Tạo mới',
     edit: 'Chỉnh sửa',
     delete: 'Xóa',
@@ -461,6 +463,8 @@ export default {
     lockedBadge: 'Đã khóa',
     updateMood: 'Cập nhật cảm xúc',
     logMood: 'Ghi nhận cảm xúc',
+    updateSuccess: 'Cập nhật cảm xúc thành công!',
+    logSuccess: 'Ghi nhận cảm xúc hôm nay thành công!',
     deleteMood: 'Xóa cảm xúc hôm nay',
     confirmDelete: 'Bạn có chắc chắn muốn đặt lại cảm xúc hôm nay?',
     noteLabel: 'Ghi chú & Nhật ký hôm nay',

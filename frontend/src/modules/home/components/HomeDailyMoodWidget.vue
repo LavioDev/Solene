@@ -33,6 +33,7 @@ const selectedScore = ref<number>(7) // Default 7 (Good)
 const noteText = ref<string>('')
 const isSaving = ref<boolean>(false)
 const saveSuccess = ref<boolean>(false)
+const successMessage = ref<string>('')
 
 const myMood = computed(() => moodStore.myTodayMood)
 const partnerMood = computed(() => moodStore.partnerTodayMood)
@@ -77,30 +78,43 @@ function handleSelectScore(score: number) {
 async function saveMood(overrideScore?: number) {
   const score = overrideScore ?? selectedScore.value
   const def = getMoodByScore(score)
-  if (!def) return
+  if (!def || isSaving.value) return
 
   isSaving.value = true
   saveSuccess.value = false
+  successMessage.value = ''
+
+  const isUpdating = !!myMood.value
+
   try {
-    if (myMood.value) {
-      await moodStore.updateTodayMood(myMood.value.id, {
-        mood_score: score,
-        mood_tag: def.tag,
-        note: noteText.value || null,
-        is_shared: true,
-      })
-    } else {
-      await moodStore.logTodayMood({
-        mood_score: score,
-        mood_tag: def.tag,
-        note: noteText.value || null,
-        is_shared: true,
-      })
-    }
+    const minDelay = new Promise((resolve) => setTimeout(resolve, 500))
+    const savePromise = isUpdating
+      ? moodStore.updateTodayMood(myMood.value!.id, {
+          mood_score: score,
+          mood_tag: def.tag,
+          note: noteText.value || null,
+          is_shared: true,
+        })
+      : moodStore.logTodayMood({
+          mood_score: score,
+          mood_tag: def.tag,
+          note: noteText.value || null,
+          is_shared: true,
+        })
+
+    await Promise.all([savePromise, minDelay])
+
     saveSuccess.value = true
+    successMessage.value = isUpdating
+      ? t('mood.updateSuccess')
+      : t('mood.logSuccess')
+
     setTimeout(() => {
       saveSuccess.value = false
-    }, 2000)
+      successMessage.value = ''
+    }, 3000)
+  } catch (error) {
+    console.error('Failed to save mood:', error)
   } finally {
     isSaving.value = false
   }
@@ -123,7 +137,6 @@ onMounted(() => {
 <template>
   <AppModal
     :show="show"
-    width="sm"
     :draggable="false"
     :bottom-sheet-on-mobile="true"
     :maximizable="false"
@@ -156,6 +169,24 @@ onMounted(() => {
 
     <!-- Modal Body Content -->
     <div class="space-y-3 sm:space-y-4 pt-0 sm:pt-1 select-none">
+      <!-- Success Notification Alert -->
+      <Transition
+        enter-active-class="transition duration-300 ease-out transform"
+        enter-from-class="-translate-y-2 opacity-0 scale-95"
+        enter-to-class="translate-y-0 opacity-100 scale-100"
+        leave-active-class="transition duration-200 ease-in transform"
+        leave-from-class="translate-y-0 opacity-100 scale-100"
+        leave-to-class="-translate-y-2 opacity-0 scale-95"
+      >
+        <div
+          v-if="saveSuccess"
+          class="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-xs"
+        >
+          <CheckCircle2 class="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{{ successMessage }}</span>
+        </div>
+      </Transition>
+
       <!-- Partner Mood Mobile Row (Minimalist pill on small screens) -->
       <div
         v-if="partnerMood"
@@ -208,7 +239,7 @@ onMounted(() => {
         </div>
 
         <!-- Selected Emotion Tag Preview Banner -->
-        <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-primary-50/70 border border-primary-100/90 text-xs">
+        <!-- <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-primary-50/70 border border-primary-100/90 text-xs">
           <div class="flex items-center gap-2 min-w-0">
             <span class="text-xl shrink-0">{{ currentDefinition?.emoji }}</span>
             <div class="min-w-0">
@@ -226,7 +257,7 @@ onMounted(() => {
               <CheckCircle2 class="w-4 h-4" />
             </span>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <!-- Note (Journal / Reflection) Input Area -->
@@ -273,12 +304,15 @@ onMounted(() => {
         <AppButton
           variant="primary"
           size="md"
+          :loading="isSaving"
           :disabled="isSaving"
-          class="flex-1 h-11 text-sm font-bold shadow-md shadow-primary-500/20 active:scale-98"
+          class="flex-1 h-11 text-sm font-bold shadow-md shadow-primary-500/20 active:scale-98 transition-all"
+          :class="{ '!bg-emerald-600 hover:!bg-emerald-700 !border-emerald-600 !shadow-emerald-500/20': saveSuccess }"
           @click="() => saveMood()"
         >
-          <Send class="w-4 h-4 mr-1.5" />
-          <span>{{ myMood ? t('mood.updateMood') : t('mood.logMood') }}</span>
+          <Send v-if="!isSaving && !saveSuccess" class="w-4 h-4 mr-1.5" />
+          <CheckCircle2 v-else-if="saveSuccess" class="w-4 h-4 mr-1.5 text-white" />
+          <span>{{ isSaving ? (t('common.saving') || 'Đang lưu...') : (saveSuccess ? (t('common.saved') || 'Đã lưu!') : (myMood ? t('mood.updateMood') : t('mood.logMood'))) }}</span>
         </AppButton>
       </div>
     </template>
