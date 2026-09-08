@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --color-primary-50: 245 243 255;
-  --color-primary-100: 237 233 254;
-  --color-primary-200: 221 214 254;
-  --color-primary-300: 196 181 253;
-  --color-primary-400: 167 139 250;
-  --color-primary-500: 139 92 246;
-  --color-primary-600: 124 58 237;
-  --color-primary-700: 109 40 217;
-  --color-primary-800: 91 33 182;
-  --color-primary-900: 59 7 100;
-  --color-primary-950: 46 16 101;
+  --color-primary-50: 255 252 235;
+  --color-primary-100: 254 246 201;
+  --color-primary-200: 254 236 156;
+  --color-primary-300: 253 221 106;
+  --color-primary-400: 251 202 59;
+  --color-primary-500: 245 174 25;
+  --color-primary-600: 226 144 14;
+  --color-primary-700: 189 110 13;
+  --color-primary-800: 150 84 17;
+  --color-primary-900: 122 69 19;
+  --color-primary-950: 68 35 9;
 }
 
 @layer base {

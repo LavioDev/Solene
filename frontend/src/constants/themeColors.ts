@@ -98,20 +98,20 @@ export const THEME_PRESETS: ThemePreset[] = [
   {
     id: 'yellow',
     nameKey: 'theme.presetYellow',
-    primaryHex: '#ca8a04',
-    previewColor: '#facc15',
+    primaryHex: '#f5ae19',
+    previewColor: '#feca3b',
     shades: {
-      50: '254 252 232',
-      100: '254 249 195',
-      200: '254 240 138',
-      300: '253 224 71',
-      400: '250 204 21',
-      500: '234 179 8',
-      600: '202 138 4',
-      700: '161 98 7',
-      800: '133 77 14',
-      900: '113 63 18',
-      950: '66 32 6',
+      50: '255 252 235',
+      100: '254 246 201',
+      200: '254 236 156',
+      300: '253 221 106',
+      400: '251 202 59',
+      500: '245 174 25',
+      600: '226 144 14',
+      700: '189 110 13',
+      800: '150 84 17',
+      900: '122 69 19',
+      950: '68 35 9',
     },
   },
   {
@@ -192,7 +192,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
 ]
 
-export const DEFAULT_THEME_ID = 'violet'
+export const DEFAULT_THEME_ID = 'yellow'
 
 export function applyThemeToCssVars(theme: ThemePreset) {
   if (typeof document === 'undefined') return
