@@ -229,7 +229,7 @@ function handleClearAll() {
 <template>
   <AppModal
     :show="show"
-    width="md"
+    width="lg"
     :draggable="false"
     :maximizable="false"
     :bottom-sheet-on-mobile="false"
