@@ -64,6 +64,7 @@ export default {
     noCoupleTitle: 'Chưa kết nối cặp đôi',
     noCoupleDesc: 'Kết nối tài khoản để theo dõi ngày yêu và chia sẻ không gian.',
     linkCoupleBtn: 'Kết nối ngay',
+    shareThoughts: 'Chia sẻ suy nghĩ...',
     partnerStatus: {
       title: 'Trạng thái',
       busy: '{name} đang bận',
@@ -453,10 +454,14 @@ export default {
   },
   mood: {
     title: 'Cảm Xúc Hôm Nay',
+    shareThoughts: 'Chia sẻ suy nghĩ...',
     howAreYouFeeling: 'Hôm nay bạn cảm thấy thế nào?',
     partnerMood: 'Tâm trạng của {name}',
     partnerMessage: 'Lời nhắn của {name}',
+    partner: 'Đối phương',
     partnerDefault: 'người ấy',
+    sendTo: 'Gửi {name}',
+    sendToPartner: 'Gửi cho người ấy',
     feelingStatus: 'Hôm nay cảm thấy {tag}',
     noPartnerMood: 'Đối phương chưa ghi nhận cảm xúc hôm nay',
     lockedAfterMidnight: 'Đã khóa sau 12h đêm (Chỉ xem)',

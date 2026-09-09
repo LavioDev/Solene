@@ -155,12 +155,11 @@ onMounted(() => {
           <div
             v-if="partnerMood"
             class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-primary-50 text-primary-700 border border-primary-200 text-xs font-semibold"
-            :title="partnerMood.note || partnerMood.mood_tag"
+            :title="partnerMood.note || (partnerMood.mood_tag ? t(`mood.tags.${partnerMood.mood_tag}`) : '')"
           >
             <Heart class="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-            <span>{{ partnerMood.user_full_name ? `${partnerMood.user_full_name}:` : 'Partner:' }}</span>
+            <span>{{ partnerMood.user_full_name ? `${partnerMood.user_full_name}:` : `${t('mood.partner')}:` }}</span>
             <span class="text-sm">{{ getMoodByScore(partnerMood.mood_score)?.emoji }}</span>
-            <span>{{ partnerMood.mood_score }}/10</span>
           </div>
         </div>
       </div>
@@ -193,11 +192,10 @@ onMounted(() => {
       >
         <span class="flex items-center gap-1.5 font-medium truncate">
           <Heart class="w-3 h-3 text-rose-500 fill-rose-500 shrink-0" />
-          <span class="truncate">{{ partnerMood.user_full_name || 'Partner' }}</span>
+          <span class="truncate">{{ partnerMood.user_full_name || t('mood.partner') }}</span>
         </span>
-        <span class="flex items-center gap-1 font-bold shrink-0">
-          <span>{{ getMoodByScore(partnerMood.mood_score)?.emoji }}</span>
-          <span>{{ partnerMood.mood_score }}/10</span>
+        <span class="text-sm shrink-0">
+          {{ getMoodByScore(partnerMood.mood_score)?.emoji }}
         </span>
       </div>
 
@@ -214,6 +212,7 @@ onMounted(() => {
                 ? 'bg-primary-50 border-primary-500 shadow-xs scale-102 z-10'
                 : 'bg-surface-subtle/50 border-border/70 hover:border-primary-200 hover:bg-white'
             ]"
+            :title="t(def.nameKey)"
             @click="handleSelectScore(def.score)"
           >
             <!-- Emoji -->
@@ -246,7 +245,7 @@ onMounted(() => {
           </label>
           <span class="text-[11px] text-ink-muted flex items-center gap-1">
             <Heart class="w-3 h-3 text-rose-400 fill-rose-400" />
-            <span>{{ partnerMood?.user_full_name ? `Gửi ${partnerMood.user_full_name}` : 'Gửi cho người ấy' }}</span>
+            <span>{{ partnerMood?.user_full_name ? t('mood.sendTo', { name: partnerMood.user_full_name }) : t('mood.sendToPartner') }}</span>
           </span>
         </div>
         <AppTextarea
@@ -290,7 +289,7 @@ onMounted(() => {
         >
           <Send v-if="!isSaving && !saveSuccess" class="w-4 h-4 mr-1.5" />
           <CheckCircle2 v-else-if="saveSuccess" class="w-4 h-4 mr-1.5 text-white" />
-          <span>{{ isSaving ? (t('common.saving') || 'Đang lưu...') : (saveSuccess ? (t('common.saved') || 'Đã lưu!') : (myMood ? t('mood.updateMood') : t('mood.logMood'))) }}</span>
+          <span>{{ isSaving ? t('common.saving') : (saveSuccess ? t('common.saved') : (myMood ? t('mood.updateMood') : t('mood.logMood'))) }}</span>
         </AppButton>
       </div>
     </template>

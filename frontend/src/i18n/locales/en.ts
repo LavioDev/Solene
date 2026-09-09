@@ -64,6 +64,7 @@ export default {
     noCoupleTitle: 'No Couple Linked',
     noCoupleDesc: 'Pair with your partner to track relationship days and share your space.',
     linkCoupleBtn: 'Link Couple',
+    shareThoughts: 'Share a thought...',
     partnerStatus: {
       title: 'Partner Status',
       busy: '{name} is busy',
@@ -453,10 +454,14 @@ export default {
   },
   mood: {
     title: 'Daily Mood',
+    shareThoughts: 'Share a thought...',
     howAreYouFeeling: 'How are you feeling today?',
     partnerMood: "{name}'s Mood",
     partnerMessage: "Message from {name}",
+    partner: 'Partner',
     partnerDefault: 'your partner',
+    sendTo: 'Send to {name}',
+    sendToPartner: 'Send to partner',
     feelingStatus: 'Feeling {tag} today',
     noPartnerMood: 'Partner has not logged mood today',
     lockedAfterMidnight: 'Locked after midnight (Read-only)',

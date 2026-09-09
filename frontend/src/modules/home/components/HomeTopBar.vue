@@ -49,14 +49,6 @@ const myUser = computed(() => {
 const currentMoodDef = computed(() =>
   props.myMood ? getMoodByScore(props.myMood.mood_score) : null
 )
-
-const partnerStatusText = computed(() => {
-  if (!props.partner) return null
-  if (props.partnerStatus?.is_busy && props.partnerStatus.active_task?.title) {
-    return props.partnerStatus.active_task.title
-  }
-  return null
-})
 </script>
 
 <template>
@@ -185,7 +177,7 @@ const partnerStatusText = computed(() => {
                 ? 'ring-2 ring-primary-300 border-primary-300'
                 : ''
             ]"
-            :title="currentMoodDef ? `${currentMoodDef.emoji} ${myMood?.mood_score}/10` : 'Chia sẻ suy nghĩ...'"
+            :title="currentMoodDef ? `${currentMoodDef.emoji} ${myMood?.mood_score}/10` : t('mood.shareThoughts')"
             @click="emit('toggle-mood')"
           >
             <!-- State 1: Mood Recorded (Hiển thị như Messenger status note) -->
@@ -204,7 +196,7 @@ const partnerStatusText = computed(() => {
             <!-- State 2: Mood Not Recorded Yet (Chia sẻ suy nghĩ... chuẩn Messenger) -->
             <template v-else>
               <span class="text-neutral-500 font-normal text-xs sm:text-[13px] whitespace-nowrap">
-                Chia sẻ suy nghĩ...
+                {{ t('mood.shareThoughts') }}
               </span>
             </template>
           </button>
