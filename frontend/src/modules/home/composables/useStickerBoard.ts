@@ -1,12 +1,12 @@
 import { ref, onMounted } from 'vue'
 import { stickerService } from '@/services/stickerService'
+import { coupleService } from '@/services/coupleService'
+import { useAuthStore } from '@/stores/authStore'
 import type {
   PinnedSticker,
   StickerItem,
   StickerPackManifest,
 } from '@/types/sticker'
-
-const STORAGE_KEY = 'solene_board_stickers'
 
 // Module-level shared reactive state
 const pinnedStickers = ref<PinnedSticker[]>([])
@@ -14,23 +14,40 @@ const loading = ref(false)
 const isSyncing = ref(false)
 const isPickerOpen = ref(false)
 const packManifest = ref<StickerPackManifest | null>(null)
+const activeCoupleId = ref<string | null>(null)
+const hasRelation = ref<boolean>(false)
 let isInitialized = false
+
+// Clean legacy shared storage key to avoid data leak across accounts
+try {
+  localStorage.removeItem('solene_board_stickers')
+} catch {
+  // Ignore
+}
 
 export function useStickerBoard() {
   // Debounce timer for saving moved stickers to backend
   let debounceSyncTimer: ReturnType<typeof setTimeout> | null = null
 
+  function getCoupleStorageKey(): string | null {
+    return activeCoupleId.value ? `solene_board_stickers_${activeCoupleId.value}` : null
+  }
+
   function saveToLocalStorage() {
+    const key = getCoupleStorageKey()
+    if (!key) return
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(pinnedStickers.value))
+      localStorage.setItem(key, JSON.stringify(pinnedStickers.value))
     } catch {
       // Ignore quota errors
     }
   }
 
   function loadFromLocalStorage(): PinnedSticker[] {
+    const key = getCoupleStorageKey()
+    if (!key) return []
     try {
-      const raw = localStorage.getItem(STORAGE_KEY)
+      const raw = localStorage.getItem(key)
       return raw ? JSON.parse(raw) : []
     } catch {
       return []
@@ -38,14 +55,41 @@ export function useStickerBoard() {
   }
 
   async function fetchBoardStickers() {
+    const authStore = useAuthStore()
+    if (!authStore.isAuthenticated) {
+      pinnedStickers.value = []
+      hasRelation.value = false
+      activeCoupleId.value = null
+      return
+    }
+
     loading.value = true
     try {
+      // Chỉ 2 người trong mối quan hệ (couple active) mới có quyền xem & dùng sticker
+      const couple = await coupleService.getMyCouple()
+      if (!couple || couple.status !== 'active') {
+        pinnedStickers.value = []
+        hasRelation.value = false
+        activeCoupleId.value = null
+        return
+      }
+
+      activeCoupleId.value = couple.id
+      hasRelation.value = true
+
+      // Load cache của riêng couple này
+      pinnedStickers.value = loadFromLocalStorage()
+
       const serverStickers = await stickerService.getBoardStickers()
       pinnedStickers.value = serverStickers
       saveToLocalStorage()
     } catch (err) {
-      console.warn('Could not fetch stickers from backend, using local storage fallback:', err)
-      pinnedStickers.value = loadFromLocalStorage()
+      console.warn('Could not fetch stickers from backend:', err)
+      if (activeCoupleId.value) {
+        pinnedStickers.value = loadFromLocalStorage()
+      } else {
+        pinnedStickers.value = []
+      }
     } finally {
       loading.value = false
     }
@@ -68,6 +112,11 @@ export function useStickerBoard() {
     item: StickerItem,
     customPos?: { x_percent: number; y_percent: number }
   ) {
+    if (!hasRelation.value || !activeCoupleId.value) {
+      console.warn('Cannot pin sticker: user is not in an active couple relation.')
+      return
+    }
+
     // Random gentle tilt between -10 and +10 degrees for cute playful sticker feel
     const randomTilt = Math.round((Math.random() * 20 - 10) * 10) / 10
     // Default position: slightly scattered near center
@@ -198,6 +247,8 @@ export function useStickerBoard() {
     isSyncing,
     isPickerOpen,
     packManifest,
+    hasRelation,
+    activeCoupleId,
     pinSticker,
     updateStickerLocal,
     toggleLock,

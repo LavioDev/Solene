@@ -221,8 +221,8 @@ onUnmounted(() => {
 <template>
   <!-- Teleport directly to body so it sits at the absolute highest root layer -->
   <Teleport to="body">
-    <!-- Only renders on mobile/responsive viewports (< 1024px) when on Home or partner note exists -->
-    <div v-if="isMobile && isPositioned && (partnerMood || isHome)" class="lg:hidden">
+    <!-- Only renders on mobile/responsive viewports (< 1024px) when on Home with couple or partner note exists -->
+    <div v-if="isMobile && isPositioned && (partnerMood || (isHome && Boolean(couple)))" class="lg:hidden">
       <!-- Draggable Floating Action Button (FAB) Container -->
       <div
         :style="{
@@ -258,9 +258,9 @@ onUnmounted(() => {
           </div>
         </button>
 
-        <!-- 2. Sticker Board FAB (Chỉ hiện ở màn Home, bỏ bọc trong, sticker trực tiếp trong nút) -->
+        <!-- 2. Sticker Board FAB (Chỉ hiện ở màn Home khi đã có relation couple) -->
         <button
-          v-if="isHome"
+          v-if="isHome && Boolean(couple)"
           type="button"
           @pointerdown="handlePointerDown"
           @click="handleStickerClick"

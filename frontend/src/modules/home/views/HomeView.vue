@@ -73,9 +73,9 @@ function navigateTo(path: string) {
 
 <template>
   <div class="relative min-h-full w-full select-none">
-    <!-- Chiikawa Desktop Sticker Canvas Overlay (Phủ trọn màn hình, không bị giới hạn trong khung) -->
+    <!-- Chiikawa Desktop Sticker Canvas Overlay (Chỉ hiển thị cho 2 người trong quan hệ kết đôi) -->
     <HomeStickerCanvas
-      v-if="!showParticleHeart"
+      v-if="!showParticleHeart && Boolean(couple)"
       :stickers="pinnedStickers"
       @update-sticker="updateStickerLocal"
       @remove-sticker="removeSticker"
@@ -173,9 +173,10 @@ function navigateTo(path: string) {
       @close="showInviteModal = false"
     />
 
-    <!-- Chiikawa Sticker Picker Drawer -->
+    <!-- Chiikawa Sticker Picker Drawer (Chỉ mở khi có relation kết đôi) -->
     <HomeStickerPickerDrawer
-      :show="isPickerOpen"
+      v-if="Boolean(couple)"
+      :show="isPickerOpen && Boolean(couple)"
       :manifest="packManifest"
       :pinned-count="pinnedStickers.length"
       @close="isPickerOpen = false"
@@ -183,8 +184,11 @@ function navigateTo(path: string) {
       @clear-all="clearAll"
     />
 
-    <!-- Desktop Floating Action Button (FAB) to open Sticker Board -->
-    <div class="fixed bottom-6 right-6 hidden lg:flex flex-col items-end gap-2 z-40 select-none">
+    <!-- Desktop Floating Action Button (FAB) to open Sticker Board (Chỉ hiện khi có relation) -->
+    <div
+      v-if="Boolean(couple)"
+      class="fixed bottom-6 right-6 hidden lg:flex flex-col items-end gap-2 z-40 select-none"
+    >
       <button
         type="button"
         class="group relative flex items-center gap-2 pl-2 pr-3.5 py-1.5 rounded-2xl bg-white/95 hover:bg-white border border-primary-200/90 hover:border-primary-300 shadow-lg shadow-primary-500/15 hover:shadow-xl hover:shadow-primary-500/25 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 cursor-pointer backdrop-blur-md"
