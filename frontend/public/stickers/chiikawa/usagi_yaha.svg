@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <filter id="stickerShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.12" />
+    </filter>
+  </defs>
+
+  <g filter="url(#stickerShadow)">
+    <!-- White Sticker Outline Layer -->
+    <path d="M 60 40 C 50 15, 80 15, 80 50 C 90 40, 110 40, 120 50 C 120 15, 150 15, 140 40 C 170 80, 165 155, 135 168 C 120 178, 80 178, 65 168 C 35 155, 30 80, 60 40 Z" fill="#ffffff" stroke="#ffffff" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" />
+
+    <!-- Feet -->
+    <ellipse cx="78" cy="168" rx="12" ry="8" fill="#fff5b8" stroke="#333333" stroke-width="3.5" />
+    <ellipse cx="122" cy="168" rx="12" ry="8" fill="#fff5b8" stroke="#333333" stroke-width="3.5" />
+
+    <!-- Usagi Signature Tall Long Ears -->
+    <path d="M 65 70 C 50 10, 85 10, 82 65 Z" fill="#fff5b8" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+    <path d="M 68 62 C 60 20, 80 20, 78 58 Z" fill="#ffe4ec" />
+
+    <path d="M 135 70 C 150 10, 115 10, 118 65 Z" fill="#fff5b8" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+    <path d="M 132 62 C 140 20, 120 20, 122 58 Z" fill="#ffe4ec" />
+
+    <!-- Main Yellow Body -->
+    <path d="M 52 90 C 40 125, 45 160, 80 168 C 120 175, 155 165, 148 125 C 160 90, 135 60, 100 60 C 65 60, 46 72, 52 90 Z" fill="#fff5b8" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+
+    <!-- Usagi Wide Chaotic Staring Eyes -->
+    <circle cx="78" cy="100" r="7.5" fill="#2d2d2d" />
+    <circle cx="76" cy="98" r="2.8" fill="#ffffff" />
+
+    <circle cx="122" cy="100" r="7.5" fill="#2d2d2d" />
+    <circle cx="120" cy="98" r="2.8" fill="#ffffff" />
+
+    <!-- Cheerful rosy cheeks -->
+    <ellipse cx="64" cy="112" rx="8" ry="5" fill="#ffb4c8" opacity="0.85" />
+    <ellipse cx="136" cy="112" rx="8" ry="5" fill="#ffb4c8" opacity="0.85" />
+
+    <!-- Wild Open Screaming Mouth (YAHA!! URARARA!) -->
+    <path d="M 90 114 Q 100 110 110 114 Q 108 135 100 135 Q 92 135 90 114 Z" fill="#e84065" stroke="#333333" stroke-width="2.5" stroke-linejoin="round" />
+    <!-- Tongue -->
+    <path d="M 94 128 Q 100 124 106 128 Q 100 134 94 128 Z" fill="#ff99b0" />
+
+    <!-- Hands raised up in wild excitement -->
+    <ellipse cx="44" cy="95" rx="8" ry="7" fill="#fff5b8" stroke="#333333" stroke-width="3" transform="rotate(-40 44 95)" />
+    <ellipse cx="156" cy="95" rx="8" ry="7" fill="#fff5b8" stroke="#333333" stroke-width="3" transform="rotate(40 156 95)" />
+
+    <!-- Sound effect "YAHA!" text banner bubble -->
+    <g transform="translate(142, 28) rotate(12)">
+      <polygon points="0,18 20,0 60,0 75,18 55,36 10,36" fill="#ffd13b" stroke="#333333" stroke-width="2" stroke-linejoin="round" />
+      <text x="14" y="24" font-family="'Arial Black', sans-serif" font-weight="bold" font-size="14" fill="#333333">YAHA!</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <filter id="stickerShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.12" />
+    </filter>
+  </defs>
+
+  <g filter="url(#stickerShadow)">
+    <!-- White Sticker Outline Layer -->
+    <path d="M 50 85 C 40 55, 65 35, 75 55 C 90 40, 110 40, 125 55 C 135 35, 160 55, 150 85 C 170 120, 160 160, 135 170 C 120 178, 80 178, 65 170 C 40 160, 30 120, 50 85 Z" fill="#ffffff" stroke="#ffffff" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" />
+
+    <!-- Feet -->
+    <ellipse cx="78" cy="168" rx="12" ry="8" fill="#ffffff" stroke="#333333" stroke-width="3.5" />
+    <ellipse cx="122" cy="168" rx="12" ry="8" fill="#ffffff" stroke="#333333" stroke-width="3.5" />
+
+    <!-- Ears -->
+    <path d="M 55 75 C 50 50, 72 45, 76 68 Z" fill="#ffffff" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+    <path d="M 58 70 C 56 56, 70 54, 72 67 Z" fill="#ffe4ec" />
+
+    <path d="M 145 75 C 150 50, 128 45, 124 68 Z" fill="#ffffff" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+    <path d="M 142 70 C 144 56, 130 54, 128 67 Z" fill="#ffe4ec" />
+
+    <!-- Main Body / Head -->
+    <path d="M 52 90 C 42 125, 48 160, 80 168 C 120 175, 152 165, 148 125 C 158 90, 135 60, 100 60 C 65 60, 48 70, 52 90 Z" fill="#ffffff" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+
+    <!-- Eyes (Heart eye / happy wink) -->
+    <ellipse cx="78" cy="104" rx="7.5" ry="9" fill="#2d2d2d" />
+    <circle cx="76" cy="101" r="3.2" fill="#ffffff" />
+    <circle cx="81" cy="107" r="1.5" fill="#ffffff" />
+
+    <path d="M 114 105 Q 122 113 130 105" fill="none" stroke="#333333" stroke-width="3.5" stroke-linecap="round" />
+
+    <!-- Nose & Smile -->
+    <path d="M 97 113 Q 100 111 103 113" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M 95 118 Q 100 124 105 118" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Cheeks (Blushing pink) -->
+    <ellipse cx="66" cy="114" rx="9" ry="6" fill="#ffb4c8" opacity="0.85" />
+    <ellipse cx="134" cy="114" rx="9" ry="6" fill="#ffb4c8" opacity="0.85" />
+
+    <!-- Big Loving Glowing Heart held in paws -->
+    <path d="M 100 135 C 92 118, 68 118, 68 135 C 68 152, 95 165, 100 170 C 105 165, 132 152, 132 135 C 132 118, 108 118, 100 135 Z" fill="#ff4d79" stroke="#333333" stroke-width="3" stroke-linejoin="round" />
+    <!-- Heart reflection shine -->
+    <path d="M 75 130 C 72 135, 74 142, 74 142" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Cute paws hugging the heart -->
+    <ellipse cx="69" cy="140" rx="8" ry="6" fill="#ffffff" stroke="#333333" stroke-width="2.8" transform="rotate(30 69 140)" />
+    <ellipse cx="131" cy="140" rx="8" ry="6" fill="#ffffff" stroke="#333333" stroke-width="2.8" transform="rotate(-30 131 140)" />
+
+    <!-- Floating mini hearts -->
+    <path d="M 40 75 C 36 68, 26 68, 26 75 C 26 82, 38 88, 40 90 C 42 88, 54 82, 54 75 C 54 68, 44 68, 40 75 Z" fill="#ff85a2" />
+    <path d="M 160 70 C 157 64, 149 64, 149 70 C 149 76, 159 81, 160 83 C 161 81, 171 76, 171 70 C 171 64, 163 64, 160 70 Z" fill="#ff85a2" />
+  </g>
+</svg>

@@ -1,0 +1,558 @@
+{
+  "pack_id": "chiikawa",
+  "pack_name": "Chiikawa & Friends",
+  "total": 75,
+  "categories": [
+    {
+      "key": "all",
+      "name": "All"
+    },
+    {
+      "key": "gif",
+      "name": "GIF (Động)"
+    },
+    {
+      "key": "chiikawa",
+      "name": "Chiikawa"
+    },
+    {
+      "key": "hachiware",
+      "name": "Hachiware"
+    },
+    {
+      "key": "usagi",
+      "name": "Usagi"
+    },
+    {
+      "key": "others",
+      "name": "Others"
+    }
+  ],
+  "stickers": [
+    {
+      "id": "stk_01",
+      "filename": "chiikawa_01.webp",
+      "url": "/stickers/chiikawa/chiikawa_01.webp",
+      "name": "Chiikawa 01",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_02",
+      "filename": "chiikawa_02.webp",
+      "url": "/stickers/chiikawa/chiikawa_02.webp",
+      "name": "Chiikawa 02",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_03",
+      "filename": "chiikawa_03.webp",
+      "url": "/stickers/chiikawa/chiikawa_03.webp",
+      "name": "Chiikawa 03",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_04",
+      "filename": "chiikawa_04.webp",
+      "url": "/stickers/chiikawa/chiikawa_04.webp",
+      "name": "Chiikawa 04",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_05",
+      "filename": "chiikawa_05.webp",
+      "url": "/stickers/chiikawa/chiikawa_05.webp",
+      "name": "Chiikawa 05",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_06",
+      "filename": "chiikawa_06.webp",
+      "url": "/stickers/chiikawa/chiikawa_06.webp",
+      "name": "Chiikawa 06",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_07",
+      "filename": "chiikawa_07.webp",
+      "url": "/stickers/chiikawa/chiikawa_07.webp",
+      "name": "Chiikawa 07",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_08",
+      "filename": "chiikawa_08.webp",
+      "url": "/stickers/chiikawa/chiikawa_08.webp",
+      "name": "Chiikawa 08",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_09",
+      "filename": "chiikawa_09.webp",
+      "url": "/stickers/chiikawa/chiikawa_09.webp",
+      "name": "Chiikawa 09",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_10",
+      "filename": "chiikawa_10.webp",
+      "url": "/stickers/chiikawa/chiikawa_10.webp",
+      "name": "Chiikawa 10",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_11",
+      "filename": "chiikawa_11.webp",
+      "url": "/stickers/chiikawa/chiikawa_11.webp",
+      "name": "Chiikawa 11",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_12",
+      "filename": "chiikawa_12.webp",
+      "url": "/stickers/chiikawa/chiikawa_12.webp",
+      "name": "Chiikawa 12",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_13",
+      "filename": "chiikawa_13.webp",
+      "url": "/stickers/chiikawa/chiikawa_13.webp",
+      "name": "Chiikawa 13",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_14",
+      "filename": "chiikawa_14.webp",
+      "url": "/stickers/chiikawa/chiikawa_14.webp",
+      "name": "Chiikawa 14",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_15",
+      "filename": "chiikawa_15.webp",
+      "url": "/stickers/chiikawa/chiikawa_15.webp",
+      "name": "Chiikawa 15",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_16",
+      "filename": "chiikawa_16.webp",
+      "url": "/stickers/chiikawa/chiikawa_16.webp",
+      "name": "Chiikawa 16",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_17",
+      "filename": "chiikawa_17.webp",
+      "url": "/stickers/chiikawa/chiikawa_17.webp",
+      "name": "Chiikawa 17",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_18",
+      "filename": "chiikawa_18.webp",
+      "url": "/stickers/chiikawa/chiikawa_18.webp",
+      "name": "Chiikawa 18",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_19",
+      "filename": "chiikawa_19.webp",
+      "url": "/stickers/chiikawa/chiikawa_19.webp",
+      "name": "Chiikawa 19",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_20",
+      "filename": "chiikawa_20.webp",
+      "url": "/stickers/chiikawa/chiikawa_20.webp",
+      "name": "Chiikawa 20",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_21",
+      "filename": "chiikawa_21.webp",
+      "url": "/stickers/chiikawa/chiikawa_21.webp",
+      "name": "Chiikawa 21",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_22",
+      "filename": "chiikawa_22.webp",
+      "url": "/stickers/chiikawa/chiikawa_22.webp",
+      "name": "Chiikawa 22",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_23",
+      "filename": "chiikawa_23.webp",
+      "url": "/stickers/chiikawa/chiikawa_23.webp",
+      "name": "Chiikawa 23",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_24",
+      "filename": "chiikawa_24.webp",
+      "url": "/stickers/chiikawa/chiikawa_24.webp",
+      "name": "Chiikawa 24",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_25",
+      "filename": "chiikawa_25.webp",
+      "url": "/stickers/chiikawa/chiikawa_25.webp",
+      "name": "Chiikawa 25",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_26",
+      "filename": "chiikawa_26.webp",
+      "url": "/stickers/chiikawa/chiikawa_26.webp",
+      "name": "Chiikawa 26",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_27",
+      "filename": "chiikawa_27.webp",
+      "url": "/stickers/chiikawa/chiikawa_27.webp",
+      "name": "Chiikawa 27",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_28",
+      "filename": "chiikawa_28.webp",
+      "url": "/stickers/chiikawa/chiikawa_28.webp",
+      "name": "Chiikawa 28",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_29",
+      "filename": "chiikawa_29.webp",
+      "url": "/stickers/chiikawa/chiikawa_29.webp",
+      "name": "Chiikawa 29",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_30",
+      "filename": "chiikawa_30.webp",
+      "url": "/stickers/chiikawa/chiikawa_30.webp",
+      "name": "Chiikawa 30",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_31",
+      "filename": "chiikawa_31.webp",
+      "url": "/stickers/chiikawa/chiikawa_31.webp",
+      "name": "Chiikawa 31",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_32",
+      "filename": "chiikawa_32.webp",
+      "url": "/stickers/chiikawa/chiikawa_32.webp",
+      "name": "Chiikawa 32",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_33",
+      "filename": "chiikawa_33.webp",
+      "url": "/stickers/chiikawa/chiikawa_33.webp",
+      "name": "Chiikawa 33",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_34",
+      "filename": "chiikawa_34.webp",
+      "url": "/stickers/chiikawa/chiikawa_34.webp",
+      "name": "Chiikawa 34",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_35",
+      "filename": "chiikawa_35.webp",
+      "url": "/stickers/chiikawa/chiikawa_35.webp",
+      "name": "Chiikawa 35",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_36",
+      "filename": "chiikawa_36.webp",
+      "url": "/stickers/chiikawa/chiikawa_36.webp",
+      "name": "Chiikawa 36",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_37",
+      "filename": "chiikawa_37.webp",
+      "url": "/stickers/chiikawa/chiikawa_37.webp",
+      "name": "Chiikawa 37",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_38",
+      "filename": "chiikawa_38.webp",
+      "url": "/stickers/chiikawa/chiikawa_38.webp",
+      "name": "Chiikawa 38",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_39",
+      "filename": "chiikawa_39.webp",
+      "url": "/stickers/chiikawa/chiikawa_39.webp",
+      "name": "Chiikawa 39",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_40",
+      "filename": "chiikawa_40.webp",
+      "url": "/stickers/chiikawa/chiikawa_40.webp",
+      "name": "Chiikawa 40",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_41",
+      "filename": "chiikawa_crying.svg",
+      "url": "/stickers/chiikawa/chiikawa_crying.svg",
+      "name": "Chiikawa Crying",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_42",
+      "filename": "chiikawa_happy.svg",
+      "url": "/stickers/chiikawa/chiikawa_happy.svg",
+      "name": "Chiikawa Happy",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_43",
+      "filename": "chiikawa_love.svg",
+      "url": "/stickers/chiikawa/chiikawa_love.svg",
+      "name": "Chiikawa Love",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_44",
+      "filename": "chiikawa_sleepy.svg",
+      "url": "/stickers/chiikawa/chiikawa_sleepy.svg",
+      "name": "Chiikawa Sleepy",
+      "category": "chiikawa"
+    },
+    {
+      "id": "stk_45",
+      "filename": "hachiware_camera.svg",
+      "url": "/stickers/chiikawa/hachiware_camera.svg",
+      "name": "Hachiware Camera",
+      "category": "hachiware"
+    },
+    {
+      "id": "stk_46",
+      "filename": "hachiware_smile.svg",
+      "url": "/stickers/chiikawa/hachiware_smile.svg",
+      "name": "Hachiware Smile",
+      "category": "hachiware"
+    },
+    {
+      "id": "stk_47",
+      "filename": "usagi_yaha.svg",
+      "url": "/stickers/chiikawa/usagi_yaha.svg",
+      "name": "Usagi Yaha",
+      "category": "usagi"
+    },
+    {
+      "id": "gif_01",
+      "filename": "chiikawa_anim_01.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_01.gif",
+      "name": "Dance",
+      "category": "gif"
+    },
+    {
+      "id": "gif_02",
+      "filename": "chiikawa_anim_02.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_02.gif",
+      "name": "Dance",
+      "category": "gif"
+    },
+    {
+      "id": "gif_03",
+      "filename": "chiikawa_anim_03.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_03.gif",
+      "name": "Hachi",
+      "category": "gif"
+    },
+    {
+      "id": "gif_04",
+      "filename": "chiikawa_anim_04.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_04.gif",
+      "name": "Hungry Belly",
+      "category": "gif"
+    },
+    {
+      "id": "gif_05",
+      "filename": "chiikawa_anim_05.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_05.gif",
+      "name": "Chiikawa",
+      "category": "gif"
+    },
+    {
+      "id": "gif_06",
+      "filename": "chiikawa_anim_06.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_06.gif",
+      "name": "Exercise Help",
+      "category": "gif"
+    },
+    {
+      "id": "gif_07",
+      "filename": "chiikawa_anim_07.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_07.gif",
+      "name": "Chiikawa",
+      "category": "gif"
+    },
+    {
+      "id": "gif_08",
+      "filename": "chiikawa_anim_08.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_08.gif",
+      "name": "Chiikawa",
+      "category": "gif"
+    },
+    {
+      "id": "gif_09",
+      "filename": "chiikawa_anim_09.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_09.gif",
+      "name": "Cat",
+      "category": "gif"
+    },
+    {
+      "id": "gif_10",
+      "filename": "chiikawa_anim_10.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_10.gif",
+      "name": "Instagram",
+      "category": "gif"
+    },
+    {
+      "id": "gif_11",
+      "filename": "chiikawa_anim_11.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_11.gif",
+      "name": "うさぎ 兔子",
+      "category": "gif"
+    },
+    {
+      "id": "gif_12",
+      "filename": "chiikawa_anim_12.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_12.gif",
+      "name": "Bear Jokebear",
+      "category": "gif"
+    },
+    {
+      "id": "gif_13",
+      "filename": "chiikawa_anim_13.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_13.gif",
+      "name": "うさぎ Hachi",
+      "category": "gif"
+    },
+    {
+      "id": "gif_14",
+      "filename": "chiikawa_anim_14.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_14.gif",
+      "name": "Chiikawa",
+      "category": "gif"
+    },
+    {
+      "id": "gif_15",
+      "filename": "chiikawa_anim_15.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_15.gif",
+      "name": "Bear Jokebear",
+      "category": "gif"
+    },
+    {
+      "id": "gif_16",
+      "filename": "chiikawa_anim_16.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_16.gif",
+      "name": "モモンガ",
+      "category": "gif"
+    },
+    {
+      "id": "gif_17",
+      "filename": "chiikawa_anim_17.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_17.gif",
+      "name": "Chiikawa",
+      "category": "gif"
+    },
+    {
+      "id": "gif_18",
+      "filename": "chiikawa_anim_18.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_18.gif",
+      "name": "Chiikawa",
+      "category": "gif"
+    },
+    {
+      "id": "gif_19",
+      "filename": "chiikawa_anim_19.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_19.gif",
+      "name": "Dance Jokebear",
+      "category": "gif"
+    },
+    {
+      "id": "gif_20",
+      "filename": "chiikawa_anim_20.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_20.gif",
+      "name": "Chiikawa",
+      "category": "gif"
+    },
+    {
+      "id": "gif_21",
+      "filename": "chiikawa_anim_21.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_21.gif",
+      "name": "Hug",
+      "category": "gif"
+    },
+    {
+      "id": "gif_22",
+      "filename": "chiikawa_anim_22.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_22.gif",
+      "name": "Chiikawa Gif 22",
+      "category": "gif"
+    },
+    {
+      "id": "gif_23",
+      "filename": "chiikawa_anim_23.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_23.gif",
+      "name": "Chiikawa Gif 23",
+      "category": "gif"
+    },
+    {
+      "id": "gif_24",
+      "filename": "chiikawa_anim_24.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_24.gif",
+      "name": "Chiikawa Gif 24",
+      "category": "gif"
+    },
+    {
+      "id": "gif_25",
+      "filename": "chiikawa_anim_25.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_25.gif",
+      "name": "Baby Dummy",
+      "category": "gif"
+    },
+    {
+      "id": "gif_26",
+      "filename": "chiikawa_anim_26.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_26.gif",
+      "name": "Cats",
+      "category": "gif"
+    },
+    {
+      "id": "gif_27",
+      "filename": "chiikawa_anim_27.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_27.gif",
+      "name": "Cats",
+      "category": "gif"
+    },
+    {
+      "id": "gif_28",
+      "filename": "chiikawa_anim_28.gif",
+      "url": "/stickers/chiikawa/gifs/chiikawa_anim_28.gif",
+      "name": "Piske by Kanahei",
+      "category": "gif"
+    }
+  ]
+}

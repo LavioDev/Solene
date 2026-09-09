@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useHomeDashboard } from '../composables/useHomeDashboard'
 import { useMoodStore } from '@/stores/moodStore'
+import { useStickerBoard } from '../composables/useStickerBoard'
 import HomeTopBar from '../components/HomeTopBar.vue'
 import HomeDailyMoodWidget from '../components/HomeDailyMoodWidget.vue'
 import HomeWaveCircle from '../components/HomeWaveCircle.vue'
@@ -11,13 +13,28 @@ import HomeUpcomingEvents from '../components/HomeUpcomingEvents.vue'
 import HomeQuickActions from '../components/HomeQuickActions.vue'
 import HomeMemoryModal from '../components/HomeMemoryModal.vue'
 import HomeParticleHeartView from '../components/HomeParticleHeartView.vue'
+import HomeStickerCanvas from '../components/HomeStickerCanvas.vue'
+import HomeStickerPickerDrawer from '../components/HomeStickerPickerDrawer.vue'
 import CoupleInviteModal from '@/modules/couples/components/CoupleInviteModal.vue'
 
 const router = useRouter()
+const { t } = useI18n()
 const moodStore = useMoodStore()
 const showParticleHeart = ref(false)
 const showDailyMoodWidget = ref(false)
 const showInviteModal = ref(false)
+
+const {
+  pinnedStickers,
+  isPickerOpen,
+  packManifest,
+  pinSticker,
+  updateStickerLocal,
+  bringToFront,
+  removeSticker,
+  toggleLock,
+  clearAll,
+} = useStickerBoard()
 
 
 const {
@@ -55,7 +72,17 @@ function navigateTo(path: string) {
 </script>
 
 <template>
-  <div class="h-full w-full select-none">
+  <div class="relative min-h-full w-full select-none">
+    <!-- Chiikawa Desktop Sticker Canvas Overlay (Phủ trọn màn hình, không bị giới hạn trong khung) -->
+    <HomeStickerCanvas
+      v-if="!showParticleHeart"
+      :stickers="pinnedStickers"
+      @update-sticker="updateStickerLocal"
+      @remove-sticker="removeSticker"
+      @bring-to-front="bringToFront"
+      @toggle-lock="toggleLock"
+    />
+
     <Transition name="fade" mode="out-in">
       <!-- 1. Pure Particle Heart View (Chỉ mở khi bấm vào trái tim ở Dashboard) -->
       <div v-if="showParticleHeart" class="w-full h-full">
@@ -64,6 +91,7 @@ function navigateTo(path: string) {
 
       <!-- 2. Main Dashboard (Màn hình chính mặc định) -->
       <div v-else class="w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 sm:py-6 pb-12 space-y-5 sm:space-y-6">
+
         <!-- Top Bar: Couple Profile (Left) & Mood Button / Partner Active Status (Right) -->
         <HomeTopBar
           :couple="couple"
@@ -144,6 +172,37 @@ function navigateTo(path: string) {
       :show="showInviteModal"
       @close="showInviteModal = false"
     />
+
+    <!-- Chiikawa Sticker Picker Drawer -->
+    <HomeStickerPickerDrawer
+      :show="isPickerOpen"
+      :manifest="packManifest"
+      :pinned-count="pinnedStickers.length"
+      @close="isPickerOpen = false"
+      @select-sticker="pinSticker"
+      @clear-all="clearAll"
+    />
+
+    <!-- Desktop Floating Action Button (FAB) to open Sticker Board -->
+    <div class="fixed bottom-6 right-6 hidden lg:flex flex-col items-end gap-2 z-40 select-none">
+      <button
+        type="button"
+        class="group relative flex items-center gap-2 pl-2 pr-3.5 py-1.5 rounded-2xl bg-white/95 hover:bg-white border border-primary-200/90 hover:border-primary-300 shadow-lg shadow-primary-500/15 hover:shadow-xl hover:shadow-primary-500/25 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 cursor-pointer backdrop-blur-md"
+        :title="t('stickers.openPicker')"
+        @click="isPickerOpen = true"
+      >
+        <div class="w-8 h-8 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center p-0.5 shrink-0 group-hover:scale-110 transition-transform overflow-hidden">
+          <img
+            src="/stickers/chiikawa/gifs/chiikawa_anim_01.gif"
+            alt="Chiikawa"
+            class="w-full h-full object-contain"
+          />
+        </div>
+        <span class="text-xs font-bold text-primary-950 font-sans tracking-wide">
+          {{ t('stickers.buttonLabel') }}
+        </span>
+      </button>
+    </div>
   </div>
 </template>
 

@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { StickyNote, Heart, X } from 'lucide-vue-next'
 import { useMoodStore } from '@/stores/moodStore'
 import { useAuthStore } from '@/stores/authStore'
 import { coupleService } from '@/services/coupleService'
+import { useStickerBoard } from '@/modules/home/composables/useStickerBoard'
 import type { Couple } from '@/types/couple'
 
+const router = useRouter()
+const route = useRoute()
 const { t, te } = useI18n()
 const moodStore = useMoodStore()
 const authStore = useAuthStore()
+const { isPickerOpen } = useStickerBoard()
 
 const couple = ref<Couple | null>(null)
 const showModal = ref(false)
@@ -37,6 +42,15 @@ const MARGIN = 12
 const TOP_MARGIN = 64 // Below navbar
 const BOTTOM_SAFE_MARGIN = 84 // Safe margin above mobile browser bar/home gesture bar
 
+const isHome = computed(() => route.path === '/')
+
+const fabTotalHeight = computed(() => {
+  let count = 0
+  if (partnerMood.value) count++
+  if (isHome.value) count++
+  return count > 1 ? 96 : 44
+})
+
 const fabX = ref(0)
 const fabY = ref(0)
 const isPositioned = ref(false)
@@ -49,7 +63,7 @@ let modalOpenedAt = 0
 
 function checkMobile() {
   if (typeof window !== 'undefined') {
-    isMobile.value = window.innerWidth < 768
+    isMobile.value = window.innerWidth < 1024
     clampPosition()
   }
 }
@@ -57,14 +71,14 @@ function checkMobile() {
 function initDefaultPosition() {
   if (typeof window === 'undefined') return
   fabX.value = Math.max(MARGIN, window.innerWidth - FAB_SIZE - 16)
-  fabY.value = Math.max(TOP_MARGIN, window.innerHeight - FAB_SIZE - BOTTOM_SAFE_MARGIN)
+  fabY.value = Math.max(TOP_MARGIN, window.innerHeight - fabTotalHeight.value - BOTTOM_SAFE_MARGIN)
   isPositioned.value = true
 }
 
 function clampPosition() {
   if (typeof window === 'undefined' || !isPositioned.value) return
   const maxX = Math.max(MARGIN, window.innerWidth - FAB_SIZE - MARGIN)
-  const maxY = Math.max(TOP_MARGIN, window.innerHeight - FAB_SIZE - 32)
+  const maxY = Math.max(TOP_MARGIN, window.innerHeight - fabTotalHeight.value - 32)
 
   fabX.value = Math.max(MARGIN, Math.min(maxX, fabX.value))
   fabY.value = Math.max(TOP_MARGIN, Math.min(maxY, fabY.value))
@@ -115,23 +129,20 @@ function handlePointerDown(event: PointerEvent) {
     }
   }
 
-  const handlePointerUp = (e: PointerEvent) => {
+  const handlePointerUp = () => {
     window.removeEventListener('pointermove', handlePointerMove)
     window.removeEventListener('pointerup', handlePointerUp)
     window.removeEventListener('pointercancel', handlePointerUp)
 
-    const dx = e.clientX - startPointer.x
-    const dy = e.clientY - startPointer.y
-    const distance = Math.hypot(dx, dy)
-
-    if (!hasMoved && distance < 8) {
-      openModal()
-    }
-
-    setTimeout(() => {
+    if (hasMoved) {
+      setTimeout(() => {
+        isDragging.value = false
+        hasMoved = false
+      }, 100)
+    } else {
       isDragging.value = false
       hasMoved = false
-    }, 150)
+    }
   }
 
   window.addEventListener('pointermove', handlePointerMove, { passive: false })
@@ -148,6 +159,18 @@ function handleClick(e: MouseEvent) {
   if (!showModal.value) {
     openModal()
   }
+}
+
+async function handleStickerClick(e: MouseEvent) {
+  if (hasMoved || isDragging.value) {
+    e.preventDefault()
+    e.stopPropagation()
+    return
+  }
+  if (route.path !== '/') {
+    await router.push('/')
+  }
+  isPickerOpen.value = true
 }
 
 function handleKeydown(e: KeyboardEvent) {
@@ -198,26 +221,28 @@ onUnmounted(() => {
 <template>
   <!-- Teleport directly to body so it sits at the absolute highest root layer -->
   <Teleport to="body">
-    <!-- Only renders on mobile/responsive viewports when partner has logged mood/note -->
-    <div v-if="isMobile && partnerMood && isPositioned" class="md:hidden">
-      <!-- Draggable Floating Action Button (FAB) -->
+    <!-- Only renders on mobile/responsive viewports (< 1024px) when on Home or partner note exists -->
+    <div v-if="isMobile && isPositioned && (partnerMood || isHome)" class="lg:hidden">
+      <!-- Draggable Floating Action Button (FAB) Container -->
       <div
         :style="{
           transform: `translate3d(${fabX}px, ${fabY}px, 0)`,
           zIndex: 99999,
         }"
-        class="partner-fab-container fixed top-0 left-0 select-none touch-none pointer-events-auto transition-opacity duration-200"
+        class="partner-fab-container fixed top-0 left-0 select-none touch-none pointer-events-auto transition-opacity duration-200 flex flex-col items-center gap-2"
         :class="isDragging ? '' : 'transition-transform duration-300 ease-out'"
       >
+        <!-- 1. Partner Note FAB (shown if partnerMood exists) -->
         <button
+          v-if="partnerMood"
           type="button"
           @pointerdown="handlePointerDown"
           @click="handleClick"
-          class="relative w-[44px] h-[44px] rounded-xl bg-[#fffef7] border border-amber-300/90 shadow-lg shadow-amber-950/20 flex items-center justify-center transition-shadow"
+          class="relative w-[44px] h-[44px] rounded-xl bg-[#fffef7] border border-amber-300/90 shadow-lg shadow-amber-950/20 flex items-center justify-center transition-shadow cursor-pointer"
           :class="[
             isDragging
               ? 'cursor-grabbing scale-110 shadow-2xl shadow-amber-950/35 ring-2 ring-amber-400/80 border-amber-400'
-              : 'cursor-grab hover:shadow-xl hover:scale-105 active:scale-95'
+              : 'hover:shadow-xl hover:scale-105 active:scale-95'
           ]"
           :title="partnerName ? t('mood.partnerMessage', { name: partnerName }) : t('mood.partnerMessage', { name: t('mood.partnerDefault') })"
         >
@@ -232,12 +257,34 @@ onUnmounted(() => {
             <Heart class="w-2 h-2 text-rose-500 fill-rose-500 absolute -top-0.5 -right-0.5 animate-pulse" />
           </div>
         </button>
+
+        <!-- 2. Sticker Board FAB (Chỉ hiện ở màn Home, bỏ bọc trong, sticker trực tiếp trong nút) -->
+        <button
+          v-if="isHome"
+          type="button"
+          @pointerdown="handlePointerDown"
+          @click="handleStickerClick"
+          class="relative w-[44px] h-[44px] rounded-xl bg-white/95 border border-primary-200/90 shadow-lg shadow-primary-950/15 flex items-center justify-center transition-all backdrop-blur-md cursor-pointer p-1"
+          :class="[
+            isDragging
+              ? 'cursor-grabbing scale-110 shadow-2xl ring-2 ring-primary-400/80 border-primary-400'
+              : 'hover:shadow-xl hover:scale-105 active:scale-95'
+          ]"
+          :title="t('stickers.openPicker')"
+        >
+          <img
+            src="/stickers/chiikawa/gifs/chiikawa_anim_01.gif"
+            alt="Sticker"
+            class="w-8 h-8 object-contain select-none pointer-events-none"
+            draggable="false"
+          />
+        </button>
       </div>
 
       <!-- Mobile Partner Note Modal with maximum z-index (2147483647) - giữ nền vàng note chân thực -->
       <Transition name="note-backdrop">
         <div
-          v-if="showModal"
+          v-if="showModal && partnerMood"
           :style="{ zIndex: 2147483647 }"
           class="fixed inset-0 bg-black/45 backdrop-blur-xs flex items-center justify-center p-4 select-none overscroll-none"
           @click.self="handleBackdropClick"

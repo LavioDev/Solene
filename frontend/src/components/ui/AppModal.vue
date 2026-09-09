@@ -118,6 +118,9 @@ function handleBackdropClick() {
           >
             <slot name="footer" />
           </div>
+
+          <!-- Overlay slot (e.g. for full modal loading / feedback) -->
+          <slot name="overlay" />
         </div>
       </div>
     </Transition>

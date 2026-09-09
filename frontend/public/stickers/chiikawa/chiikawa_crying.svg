@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <filter id="stickerShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.12" />
+    </filter>
+  </defs>
+
+  <g filter="url(#stickerShadow)">
+    <!-- White Sticker Outline Layer -->
+    <path d="M 50 85 C 40 55, 65 35, 75 55 C 90 40, 110 40, 125 55 C 135 35, 160 55, 150 85 C 170 120, 160 160, 135 170 C 120 178, 80 178, 65 170 C 40 160, 30 120, 50 85 Z" fill="#ffffff" stroke="#ffffff" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" />
+
+    <!-- Feet -->
+    <ellipse cx="78" cy="168" rx="12" ry="8" fill="#ffffff" stroke="#333333" stroke-width="3.5" />
+    <ellipse cx="122" cy="168" rx="12" ry="8" fill="#ffffff" stroke="#333333" stroke-width="3.5" />
+
+    <!-- Ears -->
+    <path d="M 55 75 C 50 50, 72 45, 76 68 Z" fill="#ffffff" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+    <path d="M 58 70 C 56 56, 70 54, 72 67 Z" fill="#ffe4ec" />
+
+    <path d="M 145 75 C 150 50, 128 45, 124 68 Z" fill="#ffffff" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+    <path d="M 142 70 C 144 56, 130 54, 128 67 Z" fill="#ffe4ec" />
+
+    <!-- Main Body / Head -->
+    <path d="M 52 90 C 42 125, 48 160, 80 168 C 120 175, 152 165, 148 125 C 158 90, 135 60, 100 60 C 65 60, 48 70, 52 90 Z" fill="#ffffff" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+
+    <!-- Crying Eyes (Watery, trembling tear droplets) -->
+    <ellipse cx="78" cy="107" rx="8" ry="9" fill="#2d2d2d" />
+    <circle cx="75" cy="103" r="3.5" fill="#ffffff" />
+    <circle cx="81" cy="110" r="1.8" fill="#ffffff" />
+    <!-- Big Teardrop pouring out left -->
+    <path d="M 68 112 C 58 115, 52 135, 62 142 C 72 145, 75 130, 72 118 Z" fill="#6bc5f8" opacity="0.9" stroke="#333333" stroke-width="2" />
+    <circle cx="62" cy="126" r="2" fill="#ffffff" opacity="0.8" />
+
+    <ellipse cx="122" cy="107" rx="8" ry="9" fill="#2d2d2d" />
+    <circle cx="119" cy="103" r="3.5" fill="#ffffff" />
+    <circle cx="125" cy="110" r="1.8" fill="#ffffff" />
+    <!-- Big Teardrop pouring out right -->
+    <path d="M 132 112 C 142 115, 148 135, 138 142 C 128 145, 125 130, 128 118 Z" fill="#6bc5f8" opacity="0.9" stroke="#333333" stroke-width="2" />
+    <circle cx="138" cy="126" r="2" fill="#ffffff" opacity="0.8" />
+
+    <!-- Troubled Eyebrows (Downward slant) -->
+    <path d="M 72 95 Q 78 98 84 93" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M 116 93 Q 122 98 128 95" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Trembling Wavy Mouth (Waah!) -->
+    <path d="M 94 121 Q 97 124 100 121 Q 103 124 106 121" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Cheeks (Blushing pink) -->
+    <ellipse cx="64" cy="118" rx="8" ry="5" fill="#ffb4c8" opacity="0.85" />
+    <ellipse cx="136" cy="118" rx="8" ry="5" fill="#ffb4c8" opacity="0.85" />
+
+    <!-- Clenched trembling paws -->
+    <ellipse cx="88" cy="138" rx="7" ry="6" fill="#ffffff" stroke="#333333" stroke-width="3" />
+    <ellipse cx="112" cy="138" rx="7" ry="6" fill="#ffffff" stroke="#333333" stroke-width="3" />
+  </g>
+</svg>

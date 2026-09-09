@@ -7,6 +7,7 @@ from app.api.v1.media_router import router as media_router
 from app.api.v1.memory_router import router as memory_router
 from app.api.v1.mood_router import router as mood_router
 from app.api.v1.permission_router import router as permission_router
+from app.api.v1.sticker_router import router as sticker_router
 from app.api.v1.task_router import router as task_router
 from app.api.v1.user_router import router as user_router
 
@@ -19,5 +20,6 @@ api_v1_router.include_router(media_router)
 api_v1_router.include_router(memory_router)
 api_v1_router.include_router(mood_router)
 api_v1_router.include_router(permission_router)
+api_v1_router.include_router(sticker_router)
 api_v1_router.include_router(task_router)
 api_v1_router.include_router(user_router)

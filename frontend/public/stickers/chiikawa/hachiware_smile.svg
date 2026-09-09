@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <filter id="stickerShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.12" />
+    </filter>
+  </defs>
+
+  <g filter="url(#stickerShadow)">
+    <!-- White Sticker Outline Layer -->
+    <path d="M 45 75 C 35 45, 60 25, 75 48 C 90 35, 110 35, 125 48 C 140 25, 165 45, 155 75 C 172 110, 165 155, 135 168 C 120 178, 80 178, 65 168 C 35 155, 28 110, 45 75 Z" fill="#ffffff" stroke="#ffffff" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" />
+
+    <!-- Feet -->
+    <ellipse cx="78" cy="168" rx="12" ry="8" fill="#ffffff" stroke="#333333" stroke-width="3.5" />
+    <ellipse cx="122" cy="168" rx="12" ry="8" fill="#ffffff" stroke="#333333" stroke-width="3.5" />
+
+    <!-- Left Cat Ear (Hachiware signature pointed ears) -->
+    <path d="M 52 70 C 44 40, 68 30, 78 55 Z" fill="#58a0df" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+    <path d="M 56 65 C 52 46, 68 40, 73 55 Z" fill="#ffe4ec" />
+
+    <!-- Right Cat Ear -->
+    <path d="M 148 70 C 156 40, 132 30, 122 55 Z" fill="#58a0df" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+    <path d="M 144 65 C 148 46, 132 40, 127 55 Z" fill="#ffe4ec" />
+
+    <!-- Main Head / Body -->
+    <path d="M 50 85 C 40 120, 45 158, 80 168 C 120 175, 155 165, 150 120 C 160 85, 138 52, 100 52 C 62 52, 45 65, 50 85 Z" fill="#ffffff" stroke="#333333" stroke-width="3.5" stroke-linejoin="round" />
+
+    <!-- Hachiware Signature Blue Patch (Parted forehead hair) -->
+    <path d="M 50 85 C 48 70, 65 52, 100 52 C 135 52, 152 70, 150 85 C 144 95, 125 80, 100 96 C 75 80, 56 95, 50 85 Z" fill="#58a0df" stroke="#333333" stroke-width="3" stroke-linejoin="round" />
+
+    <!-- Eyes (Energetic, friendly cat eyes) -->
+    <ellipse cx="78" cy="107" rx="7.5" ry="9" fill="#2d2d2d" />
+    <circle cx="76" cy="104" r="3.2" fill="#ffffff" />
+    <circle cx="81" cy="110" r="1.5" fill="#ffffff" />
+
+    <ellipse cx="122" cy="107" rx="7.5" ry="9" fill="#2d2d2d" />
+    <circle cx="120" cy="104" r="3.2" fill="#ffffff" />
+    <circle cx="125" cy="110" r="1.5" fill="#ffffff" />
+
+    <!-- Nose & Mouth (Cat style :3 smile) -->
+    <path d="M 97 114 Q 100 112 103 114" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M 92 119 Q 96 125 100 120 Q 104 125 108 119" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Cheeks (Blush) -->
+    <ellipse cx="64" cy="118" rx="8" ry="5" fill="#ffb4c8" opacity="0.85" />
+    <ellipse cx="136" cy="118" rx="8" ry="5" fill="#ffb4c8" opacity="0.85" />
+
+    <!-- Paws (Waving greeting) -->
+    <ellipse cx="44" cy="122" rx="8" ry="7" fill="#ffffff" stroke="#333333" stroke-width="3" transform="rotate(-20 44 122)" />
+    <ellipse cx="154" cy="125" rx="8" ry="7" fill="#ffffff" stroke="#333333" stroke-width="3" />
+
+    <!-- Heart accent -->
+    <path d="M 160 70 C 160 62, 168 58, 172 65 C 176 58, 184 62, 184 70 C 184 78, 172 86, 172 86 C 172 86, 160 78, 160 70 Z" fill="#ff5c8a" stroke="#ffffff" stroke-width="1.5" />
+  </g>
+</svg>
