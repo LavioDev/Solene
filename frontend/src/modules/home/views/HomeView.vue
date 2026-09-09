@@ -108,6 +108,7 @@ function navigateTo(path: string) {
             :occurrences="todayOccurrences"
             :today-date-str="todayDateStr"
             :format-display-date="formatDisplayDate"
+            :loading="loading"
           />
 
           <!-- Column 2: Upcoming Events & Memories -->
@@ -115,6 +116,7 @@ function navigateTo(path: string) {
             :occurrences="upcomingOccurrences"
             :format-display-date="formatDisplayDate"
             :calculate-days-remaining="calculateDaysRemaining"
+            :loading="loading"
             @view-calendar="navigateTo('/calendar')"
           />
         </div>
@@ -147,9 +149,14 @@ function navigateTo(path: string) {
 
 
 <style scoped>
-.fade-enter-active,
+.fade-enter-active {
+  transition: opacity 0.18s ease-out;
+  will-change: opacity;
+}
+
 .fade-leave-active {
-  transition: opacity 0.25s ease;
+  transition: opacity 0.12s ease-in;
+  will-change: opacity;
 }
 
 .fade-enter-from,

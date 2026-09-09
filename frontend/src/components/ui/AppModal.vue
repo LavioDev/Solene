@@ -130,6 +130,7 @@ function handleBackdropClick() {
   .modal-enter-active,
   .modal-leave-active {
     transition: opacity 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: opacity;
   }
   .modal-enter-from,
   .modal-leave-to {
@@ -153,9 +154,11 @@ function handleBackdropClick() {
 @media (min-width: 640px) {
   .modal-enter-active {
     transition: opacity 0.2s ease-out;
+    will-change: opacity;
   }
   .modal-leave-active {
     transition: opacity 0.15s ease-in;
+    will-change: opacity;
   }
   .modal-enter-from,
   .modal-leave-to {

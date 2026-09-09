@@ -111,7 +111,7 @@ async function handleLogout() {
 
 <template>
   <aside
-    class="bg-white border-r border-border/80 flex flex-col h-screen select-none transition-all duration-300 ease-in-out fixed inset-y-0 left-0 z-50 lg:static lg:top-0 lg:shrink-0 lg:z-30"
+    class="bg-white border-r border-border/80 flex flex-col h-screen select-none fixed inset-y-0 left-0 z-50 lg:static lg:top-0 lg:shrink-0 lg:z-30 transition-[width,transform] duration-300 ease-in-out will-change-[width,transform]"
     :class="[
       uiStore.isMobileSidebarOpen
         ? 'translate-x-0 shadow-2xl pointer-events-auto'
@@ -122,7 +122,7 @@ async function handleLogout() {
 
     <!-- Wordmark / Brand Header -->
     <div
-      class="h-14 flex items-center border-b border-border/60 transition-all"
+      class="h-14 flex items-center border-b border-border/60 transition-[padding] duration-300"
       :class="isEffectivelyCollapsed ? 'justify-center px-2' : 'px-5 justify-between'"
     >
       <router-link to="/" class="group flex items-center gap-2">
@@ -132,7 +132,7 @@ async function handleLogout() {
           style="font-family: 'Plus Jakarta Sans', sans-serif;"
         >
           <span>Solène</span>
-          <Sparkles class="w-4 h-4 text-primary-600 animate-pulse" />
+          <Sparkles class="w-4 h-4 text-primary-600 animate-pulse will-change-[opacity,transform]" />
         </span>
         <img
           v-else
@@ -163,7 +163,7 @@ async function handleLogout() {
         :key="item.path"
         :to="item.path"
         :title="item.name"
-        class="flex items-center rounded-xl text-xs sm:text-sm transition-all"
+        class="flex items-center rounded-xl text-xs sm:text-sm transition-colors duration-150"
         :class="[
           isEffectivelyCollapsed ? 'justify-center p-2.5' : 'gap-2.5 px-3 py-2',
           isActive(item.path)
@@ -173,7 +173,7 @@ async function handleLogout() {
       >
         <component
           :is="item.icon"
-          class="w-4 h-4 shrink-0"
+          class="w-4 h-4 shrink-0 transition-colors"
           :class="isActive(item.path) ? 'text-primary-600' : 'text-ink-faint'"
         />
         <span v-if="!isEffectivelyCollapsed" class="truncate">{{ item.name }}</span>
@@ -191,7 +191,7 @@ async function handleLogout() {
         <button
           type="button"
           @click="isManagementOpen = !isManagementOpen"
-          class="w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs sm:text-sm transition-all cursor-pointer select-none"
+          class="w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs sm:text-sm transition-colors duration-150 cursor-pointer select-none"
           :class="[
             isManagementActive
               ? 'text-primary-800 font-semibold bg-primary-50/60'
@@ -222,7 +222,7 @@ async function handleLogout() {
             :key="sub.path"
             :to="sub.path"
             :title="sub.name"
-            class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all"
+            class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors duration-150"
             :class="[
               isActive(sub.path)
                 ? 'bg-primary-50 text-primary-700 font-semibold shadow-2xs'
@@ -247,7 +247,7 @@ async function handleLogout() {
       <div v-else-if="isEffectivelyCollapsed && managementChildren.length > 0" class="pt-1 relative group/popover">
         <button
           type="button"
-          class="w-full flex items-center justify-center p-2.5 rounded-xl text-xs transition-all cursor-pointer"
+          class="w-full flex items-center justify-center p-2.5 rounded-xl text-xs transition-colors duration-150 cursor-pointer"
           :class="[
             isManagementActive
               ? 'bg-primary-50 text-primary-700 font-semibold shadow-2xs'
@@ -272,7 +272,7 @@ async function handleLogout() {
             v-for="sub in managementChildren"
             :key="sub.path"
             :to="sub.path"
-            class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all"
+            class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors duration-150"
             :class="[
               isActive(sub.path)
                 ? 'bg-primary-50 text-primary-700 font-semibold'

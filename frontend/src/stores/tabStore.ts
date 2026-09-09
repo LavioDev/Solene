@@ -70,8 +70,8 @@ export const useTabStore = defineStore('tabs', () => {
     reloadFlag.value = false
     setTimeout(() => {
       reloadFlag.value = true
-      uiStore.stopPageLoading(500)
-    }, 500)
+      uiStore.stopPageLoading(200)
+    }, 200)
   }
 
   function toggleContentFullscreen() {

@@ -38,8 +38,6 @@ const successMessage = ref<string>('')
 const myMood = computed(() => moodStore.myTodayMood)
 const partnerMood = computed(() => moodStore.partnerTodayMood)
 
-const currentDefinition = computed(() => getMoodByScore(selectedScore.value))
-
 // Sync state when myMood changes
 watch(
   myMood,
@@ -137,8 +135,9 @@ onMounted(() => {
 <template>
   <AppModal
     :show="show"
+    width="sm"
     :draggable="false"
-    :bottom-sheet-on-mobile="true"
+    :bottom-sheet-on-mobile="false"
     :maximizable="false"
     @close="emit('close')"
   >
@@ -209,22 +208,22 @@ onMounted(() => {
             v-for="def in MOOD_DEFINITIONS"
             :key="def.score"
             type="button"
-            class="relative flex flex-col items-center justify-center p-2 rounded-2xl border transition-all cursor-pointer group active:scale-90 select-none"
+            class="relative flex flex-col items-center justify-center py-2 px-1 rounded-xl border transition-all cursor-pointer group active:scale-95 select-none"
             :class="[
               selectedScore === def.score
-                ? 'bg-primary-50/90 border-primary-500 shadow-sm shadow-primary-500/20 ring-2 ring-primary-400/40 scale-105 z-10'
+                ? 'bg-primary-50 border-primary-500 shadow-xs scale-102 z-10'
                 : 'bg-surface-subtle/50 border-border/70 hover:border-primary-200 hover:bg-white'
             ]"
             @click="handleSelectScore(def.score)"
           >
             <!-- Emoji -->
-            <span class="text-2xl transition-transform group-hover:scale-110">
+            <span class="text-lg sm:text-xl leading-none transition-transform group-hover:scale-110">
               {{ def.emoji }}
             </span>
 
             <!-- Score number -->
             <span
-              class="text-[11px] font-bold mt-1 font-mono"
+              class="text-[11px] font-semibold mt-1 font-mono"
               :class="selectedScore === def.score ? 'text-primary-700' : 'text-ink-muted'"
             >
               {{ def.score }}
@@ -233,31 +232,10 @@ onMounted(() => {
             <!-- Active dot indicator -->
             <span
               v-if="selectedScore === def.score"
-              class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary-600 ring-2 ring-white"
+              class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary-600 ring-2 ring-white"
             />
           </button>
         </div>
-
-        <!-- Selected Emotion Tag Preview Banner -->
-        <!-- <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-primary-50/70 border border-primary-100/90 text-xs">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="text-xl shrink-0">{{ currentDefinition?.emoji }}</span>
-            <div class="min-w-0">
-              <p class="font-bold text-primary-950 text-xs truncate">
-                {{ t(currentDefinition?.nameKey || '') }}
-              </p>
-              <p class="text-[11px] text-primary-600/90 font-mono">
-                {{ currentDefinition?.score }}/10 • {{ currentDefinition?.tag }}
-              </p>
-            </div>
-          </div>
-          
-          <div class="flex items-center gap-2 shrink-0">
-            <span v-if="saveSuccess" class="inline-flex items-center gap-1 text-emerald-600 font-semibold text-xs animate-fade-in">
-              <CheckCircle2 class="w-4 h-4" />
-            </span>
-          </div>
-        </div> -->
       </div>
 
       <!-- Note (Journal / Reflection) Input Area -->

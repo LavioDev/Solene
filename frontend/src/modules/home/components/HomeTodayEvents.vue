@@ -7,9 +7,12 @@ interface Props {
   occurrences: EventOccurrence[]
   todayDateStr: string
   formatDisplayDate: (dateStr: string) => string
+  loading?: boolean
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  loading: false,
+})
 
 const { t } = useI18n()
 </script>
@@ -25,8 +28,19 @@ const { t } = useI18n()
       <span class="hidden sm:inline text-[11px] text-ink-faint font-mono">{{ formatDisplayDate(todayDateStr) }}</span>
     </div>
 
+    <!-- Skeleton Loading -->
+    <div v-if="loading" class="space-y-2 pt-1">
+      <div v-for="i in 2" :key="i" class="p-2.5 rounded-xl flex items-start gap-2.5 animate-pulse">
+        <div class="w-2 h-2 rounded-full bg-border mt-1.5 shrink-0"></div>
+        <div class="min-w-0 flex-1 space-y-1.5">
+          <div class="h-3 w-3/4 bg-surface-raised rounded"></div>
+          <div class="h-2.5 w-1/2 bg-surface-raised/70 rounded"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Today's List -->
-    <div v-if="occurrences.length > 0" class="space-y-2 pt-1">
+    <div v-else-if="occurrences.length > 0" class="space-y-2 pt-1">
       <div
         v-for="occ in occurrences"
         :key="occ.event_id"

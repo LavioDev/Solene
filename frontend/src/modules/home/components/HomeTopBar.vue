@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/authStore'
 import type { Couple, UserPartnerSummary } from '@/types/couple'
 import type { PartnerActiveStatus } from '@/types/task'
 import type { MoodItem } from '@/types/mood'
 import { getMoodByScore } from '@/constants/moods'
-import { Heart, Smile, FileText, Sparkles } from 'lucide-vue-next'
+import { Heart, RotateCw, Sparkles } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
-import HomePartnerThoughtBubble from './HomePartnerThoughtBubble.vue'
 
 interface Props {
   couple: Couple | null
@@ -38,8 +37,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const authStore = useAuthStore()
-const isMoodHovered = ref(false)
-const isPartnerHovered = ref(false)
 
 const myUser = computed(() => {
   if (!props.couple) return authStore.user
@@ -48,175 +45,177 @@ const myUser = computed(() => {
   }
   return props.couple.user1
 })
+
+const currentMoodDef = computed(() =>
+  props.myMood ? getMoodByScore(props.myMood.mood_score) : null
+)
+
+const partnerStatusText = computed(() => {
+  if (!props.partner) return null
+  if (props.partnerStatus?.is_busy && props.partnerStatus.active_task?.title) {
+    return props.partnerStatus.active_task.title
+  }
+  return null
+})
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-3 sm:gap-4 pb-3 border-b border-border/60 select-none">
-    <!-- Left Group: Couple Avatars (Tôi bên trái, Đối phương bên phải & nằm đè bên trên) + Nickname -->
-    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-      <div v-if="couple" class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-        <!-- 2 Overlapping Avatars: Tôi bên trái (z-10), Đối phương bên phải & đè lên trên (z-20) -->
-        <div class="relative flex items-center shrink-0">
-          <!-- 1. My Avatar (Bên trái, z-10) -->
-          <div class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-primary-600 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-2xs z-10">
-            <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
-              <img
-                v-if="myUser?.avatar_url"
-                :src="myUser.avatar_url"
-                :alt="myUser.full_name || 'Tôi'"
-                class="w-full h-full object-cover"
-              />
-              <span v-else>{{ getUserInitials(myUser?.full_name, myUser?.email) }}</span>
-            </div>
-          </div>
-
-          <!-- 2. Partner Avatar (Bên phải, nằm đè lên trên z-20, hover mọc duy nhất bong bóng suy nghĩ) -->
-          <div
-            class="relative -ml-3 sm:-ml-3.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-purple-500 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-md z-20 cursor-pointer transition-transform hover:scale-110 hover:z-30"
-            @mouseenter="isPartnerHovered = true"
-            @mouseleave="isPartnerHovered = false"
-            @click="isPartnerHovered = !isPartnerHovered"
-          >
-            <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
-              <img
-                v-if="partner?.avatar_url"
-                :src="partner.avatar_url"
-                :alt="partner.full_name"
-                class="w-full h-full object-cover"
-              />
-              <span v-else>{{ getUserInitials(partner?.full_name, partner?.email) }}</span>
-            </div>
-
-            <!-- Dot trạng thái của Partner -->
-            <span
-              class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white shadow-xs z-30"
-              :class="partnerStatus?.is_busy ? 'bg-rose-500' : 'bg-emerald-500 animate-pulse'"
-            ></span>
-
-            <!-- Bong bóng suy nghĩ mọc ra từ avatar đối phương khi hover -->
-            <Transition name="bubble-pop">
-              <div
-                v-if="isPartnerHovered && partner"
-                class="absolute left-0 top-full mt-2.5 z-50 pointer-events-auto"
-                @mouseenter="isPartnerHovered = true"
-                @mouseleave="isPartnerHovered = false"
-              >
-                <HomePartnerThoughtBubble
-                  :partner-name="partner.full_name"
-                  :task="partnerStatus?.active_task"
-                  :is-busy="Boolean(partnerStatus?.is_busy)"
-                />
-              </div>
-            </Transition>
-          </div>
+  <div class="select-none">
+    <!-- === SKELETON LOADING === -->
+    <div v-if="loading" class="flex items-center justify-between gap-3 pb-3 border-b border-border/60">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
+        <!-- Avatar skeleton -->
+        <div class="flex items-center shrink-0">
+          <div class="w-10 h-10 rounded-full bg-surface-raised animate-pulse"></div>
+          <div class="w-10 h-10 rounded-full bg-surface-raised animate-pulse -ml-3 border-2 border-white"></div>
         </div>
-
-        <!-- Couple Nickname & Since Date -->
-        <div class="min-w-0 flex-1">
-          <h1 class="text-xs sm:text-sm font-bold text-ink flex items-center gap-1.5 truncate">
-            <span class="truncate">{{ coupleNickname }}</span>
-          </h1>
-          <p class="hidden sm:block text-[10px] sm:text-[11px] text-ink-muted font-mono truncate">
-            {{ t('home.since', { date: formattedStartDate }) }}
-          </p>
+        <!-- Text skeleton -->
+        <div class="space-y-1.5 flex-1 min-w-0">
+          <div class="h-3.5 w-32 bg-surface-raised rounded animate-pulse"></div>
+          <div class="h-2.5 w-24 bg-surface-raised/70 rounded animate-pulse"></div>
         </div>
       </div>
-
-      <!-- Fallback if No Couple Linked -->
-      <div v-if="!loading && !couple" class="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-        <Heart class="w-4 h-4 text-primary-500 shrink-0" />
-        <span class="truncate">{{ t('home.noCoupleDesc') }}</span>
-        <AppButton size="sm" class="ml-1 sm:ml-2" @click="emit('link-couple')">
-          <Sparkles class="w-3.5 h-3.5 mr-1" />
-          {{ t('home.linkCoupleBtn') }}
-        </AppButton>
-      </div>
+      <!-- Mood button skeleton -->
+      <div class="h-9 w-24 rounded-xl bg-surface-raised animate-pulse shrink-0"></div>
     </div>
 
-    <!-- Right Controls: Nút Cảm xúc hôm nay (Sát phải - Trên mobile chỉ hiện icon gọn gàng) -->
-    <div class="flex items-center gap-2 sm:gap-2.5 ml-auto shrink-0">
-      <div
-        class="relative inline-flex items-center"
-        @mouseenter="isMoodHovered = true"
-        @mouseleave="isMoodHovered = false"
-      >
-        <button
-          type="button"
-          class="relative flex items-center justify-center gap-1.5 sm:gap-2 p-2 sm:px-3.5 sm:py-2 rounded-xl sm:rounded-2xl border transition-all duration-200 cursor-pointer text-xs select-none shadow-md"
-          :class="[
-            isMoodOpen
-              ? 'bg-primary-600 text-white border-primary-600 shadow-primary-500/20 ring-2 ring-primary-400/30 font-bold scale-102 -translate-y-0.5'
-              : myMood
-                ? 'bg-white/95 backdrop-blur-md text-ink border-primary-200/80 hover:border-primary-300 shadow-primary-500/10 hover:shadow-lg hover:shadow-primary-500/15 font-semibold hover:scale-102 hover:-translate-y-0.5'
-                : 'bg-white/95 backdrop-blur-md text-ink-muted hover:text-ink border-border/80 hover:border-primary-300 shadow-primary-500/5 hover:shadow-md font-medium hover:scale-102 hover:-translate-y-0.5'
-          ]"
-          :title="myMood ? `${myMood.mood_score}/10` : t('mood.title')"
-          @click="emit('toggle-mood')"
-        >
-          <!-- Icon or Emoji with Note Dot -->
-          <div class="relative shrink-0 flex items-center justify-center">
-            <span v-if="myMood" class="text-base leading-none">
-              {{ getMoodByScore(myMood.mood_score)?.emoji }}
-            </span>
-            <Smile v-else class="w-4 h-4 text-primary-600" />
+    <!-- === NO COUPLE STATE === -->
+    <div v-else-if="!couple" class="flex items-center justify-between gap-3 pb-3 border-b border-border/60">
+      <div class="flex items-center gap-2 text-xs text-ink-muted min-w-0">
+        <Heart class="w-4 h-4 text-primary-400 shrink-0" />
+        <span class="truncate">{{ t('home.noCoupleDesc') }}</span>
+      </div>
+      <AppButton size="sm" class="shrink-0" @click="emit('link-couple')">
+        <Sparkles class="w-3.5 h-3.5 mr-1" />
+        {{ t('home.linkCoupleBtn') }}
+      </AppButton>
+    </div>
 
-            <!-- Dot chỉ thị nếu có ghi chú (Note Dot) -->
-            <span
-              v-if="myMood?.note"
-              class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary-600 border-2 border-white shadow-xs animate-pulse"
-              :class="isMoodOpen ? 'bg-amber-300 ring-1 ring-primary-800' : 'bg-primary-600'"
-              title="Có ghi chú hôm nay"
-            ></span>
+    <!-- === COUPLE ACTIVE STATE === -->
+    <div v-else class="flex items-center justify-between gap-3 sm:gap-4 pb-3.5 sm:pb-4 border-b border-border/60">
+
+      <!-- Left: Avatars + Couple info + Partner status -->
+      <div class="flex items-center gap-3 min-w-0 flex-1">
+        <!-- Two overlapping avatars -->
+        <div class="relative flex items-center shrink-0">
+          <!-- My avatar -->
+          <div
+            class="relative w-10 h-10 rounded-full bg-primary-600 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-sm z-10 overflow-hidden"
+            :title="myUser?.full_name"
+          >
+            <img
+              v-if="myUser?.avatar_url"
+              :src="myUser.avatar_url"
+              :alt="myUser.full_name || ''"
+              class="w-full h-full object-cover"
+            />
+            <span v-else>{{ getUserInitials(myUser?.full_name, myUser?.email) }}</span>
           </div>
 
-          <!-- Label: Ẩn trên mobile (< sm), chỉ hiện icon -->
-          <span class="hidden sm:inline font-sans whitespace-nowrap">
-            {{ myMood ? `${myMood.mood_score}/10` : t('mood.title') }}
-          </span>
-        </button>
-
-        <!-- Tooltip Hover Popover hiển thị Note khi hover chuột vào nút -->
-        <Transition name="bubble-pop">
+          <!-- Partner avatar -->
           <div
-            v-if="isMoodHovered && myMood?.note && !isMoodOpen"
-            class="absolute right-0 top-full mt-2.5 w-64 sm:w-72 max-w-[calc(100vw-2rem)] p-3 rounded-2xl bg-white/98 backdrop-blur-xl border border-primary-200/90 shadow-xl shadow-primary-900/10 z-30 text-left pointer-events-none"
+            class="relative -ml-3.5 w-10 h-10 rounded-full bg-purple-500 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-sm z-20 overflow-hidden"
+            :title="partner?.full_name"
           >
-            <div class="flex items-center justify-between gap-2 pb-1.5 border-b border-border/50 mb-1.5">
-              <div class="flex items-center gap-1.5 min-w-0">
-                <FileText class="w-3.5 h-3.5 text-primary-600 shrink-0" />
-                <span class="text-[11px] font-bold text-primary-700 whitespace-nowrap tracking-tight">
-                  Ghi chú hôm nay
-                </span>
-              </div>
-              <span class="text-xs font-bold text-primary-700 shrink-0 whitespace-nowrap">
-                {{ getMoodByScore(myMood.mood_score)?.emoji }} {{ myMood.mood_score }}/10
-              </span>
-            </div>
+            <img
+              v-if="partner?.avatar_url"
+              :src="partner.avatar_url"
+              :alt="partner?.full_name || ''"
+              class="w-full h-full object-cover"
+            />
+            <span v-else>{{ getUserInitials(partner?.full_name, partner?.email) }}</span>
 
-            <!-- Note Content -->
-            <p class="text-xs text-ink leading-relaxed font-sans whitespace-pre-wrap line-clamp-4">
-              "{{ myMood.note }}"
+            <!-- Online status dot — luôn visible, không cần hover -->
+            <span
+              class="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white z-30"
+              :class="partnerStatus?.is_busy ? 'bg-rose-500' : 'bg-emerald-500'"
+              :title="partnerStatus?.is_busy
+                ? t('home.partnerStatus.busy', { name: partner?.full_name })
+                : t('home.partnerStatus.available', { name: partner?.full_name })"
+            />
+          </div>
+        </div>
+
+        <!-- Couple info text column -->
+        <div class="min-w-0 flex-1">
+          <!-- Couple name + refresh button -->
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-sm font-bold text-ink truncate leading-tight">
+              {{ coupleNickname }}
+            </h1>
+            <!-- Refresh partner status -->
+            <button
+              type="button"
+              class="shrink-0 p-0.5 rounded-full text-ink-faint hover:text-pink-600 transition-colors cursor-pointer"
+              :class="{ 'animate-spin text-pink-500': isRefreshingPartner }"
+              :title="t('home.partnerStatus.title')"
+              @click="emit('refresh-partner')"
+            >
+              <RotateCw class="w-3 h-3" />
+            </button>
+          </div>
+          <!-- Partner active status tag — luôn visible thay vì hover -->
+          <div class="flex items-center gap-1 mt-1">
+            <span
+              class="w-1.5 h-1.5 rounded-full shrink-0"
+              :class="partnerStatus?.is_busy ? 'bg-rose-500' : 'bg-emerald-400'"
+            />
+            <p class="text-[11px] text-ink-muted truncate max-w-[200px] sm:max-w-xs">
+              <template v-if="partnerStatus?.is_busy && partnerStatusText">
+                <span class="font-medium text-ink">{{ partner?.full_name?.split(' ').pop() }}:</span>
+                {{ partnerStatusText }}
+              </template>
+              <template v-else-if="partner">
+                {{ t('home.partnerStatus.available', { name: partner.full_name?.split(' ').pop() || partner.full_name }) }}
+              </template>
             </p>
           </div>
-        </Transition>
+        </div>
       </div>
+
+      <!-- Right: Messenger Note Style Thought Bubble (Chia sẻ suy nghĩ...) -->
+      <div class="shrink-0 flex flex-col items-end">
+        <div class="relative inline-flex items-center">
+          <button
+            type="button"
+            class="relative flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-white shadow-[0_2px_10px_rgba(0,0,0,0.08)] border border-neutral-100 hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all duration-200 cursor-pointer select-none"
+            :class="[
+              isMoodOpen
+                ? 'ring-2 ring-primary-300 border-primary-300'
+                : ''
+            ]"
+            :title="currentMoodDef ? `${currentMoodDef.emoji} ${myMood?.mood_score}/10` : 'Chia sẻ suy nghĩ...'"
+            @click="emit('toggle-mood')"
+          >
+            <!-- State 1: Mood Recorded (Hiển thị như Messenger status note) -->
+            <template v-if="currentMoodDef">
+              <span class="text-base sm:text-lg leading-none shrink-0">
+                {{ currentMoodDef.emoji }}
+              </span>
+              <span v-if="myMood?.note" class="text-xs sm:text-[13px] text-neutral-700 font-medium truncate max-w-[110px] sm:max-w-[180px]">
+                {{ myMood.note }}
+              </span>
+              <span v-else-if="currentMoodDef.tag" class="hidden sm:inline text-xs sm:text-[13px] text-neutral-700 font-medium">
+                {{ t(`mood.tags.${currentMoodDef.tag}`) }}
+              </span>
+            </template>
+
+            <!-- State 2: Mood Not Recorded Yet (Chia sẻ suy nghĩ... chuẩn Messenger) -->
+            <template v-else>
+              <span class="text-neutral-500 font-normal text-xs sm:text-[13px] whitespace-nowrap">
+                Chia sẻ suy nghĩ...
+              </span>
+            </template>
+          </button>
+
+          <!-- Messenger Note Thought Tail (2 chấm tròn chuẩn kiểu Messenger) -->
+          <div class="absolute -bottom-2.5 left-5 flex flex-col items-center pointer-events-none">
+            <span class="w-2.5 h-2.5 rounded-full bg-white border border-neutral-200/90 shadow-xs"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-white border border-neutral-200/90 shadow-2xs -mt-0.5"></span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
-
-<style scoped>
-.bubble-pop-enter-active {
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.bubble-pop-leave-active {
-  transition: all 0.15s ease-in;
-}
-.bubble-pop-enter-from {
-  opacity: 0;
-  transform: translateY(-6px) scale(0.95);
-}
-.bubble-pop-leave-to {
-  opacity: 0;
-  transform: translateY(-4px) scale(0.98);
-}
-</style>

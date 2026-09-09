@@ -192,7 +192,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
 ]
 
-export const DEFAULT_THEME_ID = 'yellow'
+export const DEFAULT_THEME_ID = 'violet'
 
 export function applyThemeToCssVars(theme: ThemePreset) {
   if (typeof document === 'undefined') return

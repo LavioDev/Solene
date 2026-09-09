@@ -349,6 +349,13 @@ onUnmounted(() => {
   }
 }
 
+.animate-gentle-wave-1,
+.animate-gentle-wave-2,
+.animate-gentle-wave-3 {
+  will-change: transform, opacity;
+  transform-origin: center;
+}
+
 .animate-gentle-wave-1 {
   animation: gentleWave1 3.2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
@@ -381,6 +388,7 @@ onUnmounted(() => {
 
 .animate-heartbeat {
   animation: heartbeat 1.8s ease-in-out infinite;
+  will-change: transform;
 }
 
 .partner-note-enter-active,

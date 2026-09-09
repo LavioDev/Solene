@@ -82,7 +82,7 @@ router.beforeEach(async (to, from, next) => {
   const uiStore = useUiStore()
 
   if (to.path !== from.path) {
-    uiStore.startPageLoading()
+    uiStore.startRouteLoading()
   }
 
   if (authStore.isInitializing) {
@@ -103,11 +103,21 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach((to, from) => {
   const uiStore = useUiStore()
   if (to.path !== from.path) {
-    uiStore.stopPageLoading(500)
+    uiStore.stopRouteLoading()
   }
 })
 
-router.onError(() => {
+router.onError((error, to) => {
   const uiStore = useUiStore()
-  uiStore.stopPageLoading(500)
+  uiStore.stopRouteLoading()
+
+  const isChunkLoadFailed = error?.message && (
+    error.message.includes('Failed to fetch dynamically imported module') ||
+    error.message.includes('Loading chunk') ||
+    error.message.includes('is not valid JavaScript') ||
+    error.message.includes('error loading dynamically imported module')
+  )
+  if (isChunkLoadFailed && to?.fullPath) {
+    window.location.href = to.fullPath
+  }
 })

@@ -12,7 +12,7 @@ export interface AppModalProps {
 }
 
 export const MODAL_WIDTH_CLASSES: Record<ModalWidth, string> = {
-  sm: 'sm:max-w-sm',
+  sm: 'max-w-sm',
   md: 'sm:max-w-lg',
   lg: 'sm:max-w-2xl',
   '880': 'sm:max-w-[880px]',

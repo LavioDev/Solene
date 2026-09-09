@@ -35,6 +35,25 @@ export const useUiStore = defineStore('ui', () => {
     isMobileSidebarOpen.value = !isMobileSidebarOpen.value
   }
 
+  const isRouteLoading = ref(false)
+  let routeLoadingTimer: ReturnType<typeof setTimeout> | null = null
+
+  function startRouteLoading() {
+    if (routeLoadingTimer) {
+      clearTimeout(routeLoadingTimer)
+      routeLoadingTimer = null
+    }
+    isRouteLoading.value = true
+  }
+
+  function stopRouteLoading() {
+    if (routeLoadingTimer) clearTimeout(routeLoadingTimer)
+    routeLoadingTimer = setTimeout(() => {
+      isRouteLoading.value = false
+      routeLoadingTimer = null
+    }, 120)
+  }
+
   function startPageLoading() {
     if (loadingTimer) {
       clearTimeout(loadingTimer)
@@ -44,7 +63,7 @@ export const useUiStore = defineStore('ui', () => {
     isPageLoading.value = true
   }
 
-  function stopPageLoading(minDurationMs = 500) {
+  function stopPageLoading(minDurationMs = 150) {
     const elapsed = Date.now() - loadingStartTime
     const remaining = Math.max(0, minDurationMs - elapsed)
     if (loadingTimer) clearTimeout(loadingTimer)
@@ -58,11 +77,14 @@ export const useUiStore = defineStore('ui', () => {
     isSidebarCollapsed,
     isMobileSidebarOpen,
     isPageLoading,
+    isRouteLoading,
     toggleSidebar,
     setSidebarCollapsed,
     openMobileSidebar,
     closeMobileSidebar,
     toggleMobileSidebar,
+    startRouteLoading,
+    stopRouteLoading,
     startPageLoading,
     stopPageLoading,
   }

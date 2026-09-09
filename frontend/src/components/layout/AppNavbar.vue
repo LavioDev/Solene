@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
   PanelLeft,
+  Menu,
   Search,
   Maximize,
   Minimize,
@@ -164,9 +165,10 @@ onUnmounted(() => {
         type="button"
         @click="uiStore.toggleSidebar"
         :title="sidebarToggleTitle"
-        class="p-1.5 rounded-xl text-ink-muted hover:text-ink hover:bg-surface-raised transition-colors cursor-pointer border border-border/40 hover:border-border shadow-2xs"
+        class="p-2 sm:p-1.5 rounded-xl text-ink hover:bg-surface-raised transition-colors cursor-pointer border border-border/60 hover:border-border shadow-2xs shrink-0"
       >
-        <PanelLeft class="w-4 h-4 text-ink-muted hover:text-ink" />
+        <Menu v-if="isMobile" class="w-4 h-4 text-ink" />
+        <PanelLeft v-else class="w-4 h-4 text-ink-muted hover:text-ink" />
       </button>
 
       <div class="h-4 w-px bg-border/60"></div>
