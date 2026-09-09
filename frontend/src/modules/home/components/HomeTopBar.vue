@@ -100,39 +100,56 @@ const partnerStatusText = computed(() => {
         <div class="relative flex items-center shrink-0">
           <!-- My avatar -->
           <div
-            class="relative w-10 h-10 rounded-full bg-primary-600 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-sm z-10 overflow-hidden"
+            class="relative w-10 h-10 rounded-full bg-primary-600 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-sm z-10"
             :title="myUser?.full_name"
           >
-            <img
-              v-if="myUser?.avatar_url"
-              :src="myUser.avatar_url"
-              :alt="myUser.full_name || ''"
-              class="w-full h-full object-cover"
-            />
-            <span v-else>{{ getUserInitials(myUser?.full_name, myUser?.email) }}</span>
+            <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
+              <img
+                v-if="myUser?.avatar_url"
+                :src="myUser.avatar_url"
+                :alt="myUser.full_name || ''"
+                class="w-full h-full object-cover"
+              />
+              <span v-else>{{ getUserInitials(myUser?.full_name, myUser?.email) }}</span>
+            </div>
+
+            <!-- My online status badge (Xanh lá nổi bật, không bị cắt mép) -->
+            <!-- <span
+              class="absolute -bottom-0.5 -left-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white shadow-sm z-20"
+              :title="myUser?.full_name || 'Tôi'"
+            >
+              <span class="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60"></span>
+            </span> -->
           </div>
 
           <!-- Partner avatar -->
           <div
-            class="relative -ml-3.5 w-10 h-10 rounded-full bg-purple-500 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-sm z-20 overflow-hidden"
+            class="relative -ml-3.5 w-10 h-10 rounded-full bg-purple-500 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-sm z-20"
             :title="partner?.full_name"
           >
-            <img
-              v-if="partner?.avatar_url"
-              :src="partner.avatar_url"
-              :alt="partner?.full_name || ''"
-              class="w-full h-full object-cover"
-            />
-            <span v-else>{{ getUserInitials(partner?.full_name, partner?.email) }}</span>
+            <div class="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
+              <img
+                v-if="partner?.avatar_url"
+                :src="partner.avatar_url"
+                :alt="partner?.full_name || ''"
+                class="w-full h-full object-cover"
+              />
+              <span v-else>{{ getUserInitials(partner?.full_name, partner?.email) }}</span>
+            </div>
 
-            <!-- Online status dot — luôn visible, không cần hover -->
+            <!-- Online status dot — Nổi bật, viền trắng sắc nét, không bị overflow cắt xén -->
             <span
-              class="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white z-30"
+              class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white shadow-sm z-30"
               :class="partnerStatus?.is_busy ? 'bg-rose-500' : 'bg-emerald-500'"
               :title="partnerStatus?.is_busy
                 ? t('home.partnerStatus.busy', { name: partner?.full_name })
                 : t('home.partnerStatus.available', { name: partner?.full_name })"
-            />
+            >
+              <span
+                v-if="!partnerStatus?.is_busy"
+                class="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60"
+              ></span>
+            </span>
           </div>
         </div>
 
@@ -143,33 +160,17 @@ const partnerStatusText = computed(() => {
             <h1 class="text-sm font-bold text-ink truncate leading-tight">
               {{ coupleNickname }}
             </h1>
-            <!-- Refresh partner status -->
             <button
               type="button"
-              class="shrink-0 p-0.5 rounded-full text-ink-faint hover:text-pink-600 transition-colors cursor-pointer"
-              :class="{ 'animate-spin text-pink-500': isRefreshingPartner }"
+              class="shrink-0 p-0.5 rounded-full text-ink-faint hover:text-primary-600 transition-colors cursor-pointer"
+              :class="{ 'animate-spin text-primary-500': isRefreshingPartner }"
               :title="t('home.partnerStatus.title')"
               @click="emit('refresh-partner')"
             >
               <RotateCw class="w-3 h-3" />
             </button>
           </div>
-          <!-- Partner active status tag — luôn visible thay vì hover -->
-          <div class="flex items-center gap-1 mt-1">
-            <span
-              class="w-1.5 h-1.5 rounded-full shrink-0"
-              :class="partnerStatus?.is_busy ? 'bg-rose-500' : 'bg-emerald-400'"
-            />
-            <p class="text-[11px] text-ink-muted truncate max-w-[200px] sm:max-w-xs">
-              <template v-if="partnerStatus?.is_busy && partnerStatusText">
-                <span class="font-medium text-ink">{{ partner?.full_name?.split(' ').pop() }}:</span>
-                {{ partnerStatusText }}
-              </template>
-              <template v-else-if="partner">
-                {{ t('home.partnerStatus.available', { name: partner.full_name?.split(' ').pop() || partner.full_name }) }}
-              </template>
-            </p>
-          </div>
+          <!-- Partner active status tag — hiển thị trạng thái xanh nổi bật -->
         </div>
       </div>
 
